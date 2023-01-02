@@ -7,22 +7,45 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import Switch from "@mui/material/Switch";
+import CloudSyncIcon from "@mui/icons-material/CloudSync";
+import DnsOutlinedIcon from "@mui/icons-material/DnsOutlined";
+import SyncAltOutlinedIcon from "@mui/icons-material/SyncAltOutlined";
 import { useState } from "react";
 import { getStorageBackend } from "../../components/storage/StorageBackend";
 import ConfirmReadFileDialog from "../../components/userInterface/dialog/ConfirmReadFileDialog";
 import ConfirmDialog from "../../components/userInterface/dialog/ConfirmDialog";
+import SingleTextInputDialog from "../../components/userInterface/dialog/SingleTextInputDialog";
+import {
+  getServerAddress,
+  setServerAddress,
+  testServerConnection,
+} from "../../components/storage/StorageBackend";
 
 export default function SettingsPage() {
   const [dialogVisibility, setDialogVisibility] = useState({
     importJSONData: false,
     cleanupCompleted: false,
     deleteAllData: false,
+    syncServerIPAddr: false,
   });
+  const [syncOptionEnabled, setSyncOptionEnabled] = useState(
+    getStorageBackend().isSyncEnabled()
+  );
   const updateVisibility = (item: string, visibility: boolean) => {
     setDialogVisibility({
       ...dialogVisibility,
       [item]: visibility,
     });
+  };
+  const [syncServerIPAddr, setSyncServerIPAddr] = useState(getServerAddress());
+  const handleSetSyncServerIPAddr = (addr: string) => {
+    setSyncServerIPAddr(addr);
+    setServerAddress(addr);
+  };
+  const handleSyncOptionChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSyncOptionEnabled(e.target.checked);
+    getStorageBackend().setIsSyncEnabled(e.target.checked);
   };
   return (
     <div>
@@ -30,7 +53,7 @@ export default function SettingsPage() {
       <p>
         Backup/Restore data for the app, cleanup the data, or reset the app.
       </p>
-      <List sx={{ width: "100%" }} aria-label="contacts">
+      <List sx={{ width: "100%" }}>
         <ListItem disablePadding>
           <ListItemButton
             onClick={() => {
@@ -80,13 +103,66 @@ export default function SettingsPage() {
           </ListItemButton>
         </ListItem>
       </List>
+      <h2>Prior2Do Sync</h2>
+      <p>
+        If you have your own server or Kubernetes Cluster, you can host an
+        instance of Prior2Do Sync server on it and configure your Prior2Do app
+        to backup and sync with it.
+      </p>
+      <List sx={{ width: "100%" }}>
+        <ListItem>
+          <ListItemIcon>
+            <CloudSyncIcon />
+          </ListItemIcon>
+          <ListItemText primary="Enable Prior2Do Sync" />
+          <Switch
+            edge="end"
+            checked={syncOptionEnabled}
+            onChange={handleSyncOptionChanges}
+          />
+        </ListItem>
+        {syncOptionEnabled ? (
+          <>
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => {
+                  updateVisibility("syncServerIPAddr", true);
+                }}
+              >
+                <ListItemIcon>
+                  <DnsOutlinedIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Server IP Address"
+                  secondary={syncServerIPAddr}
+                />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={async () => {
+                  await testServerConnection();
+                }}
+              >
+                <ListItemIcon>
+                  <SyncAltOutlinedIcon />
+                </ListItemIcon>
+                <ListItemText primary="Test Connection" />
+              </ListItemButton>
+            </ListItem>
+          </>
+        ) : (
+          ""
+        )}
+      </List>
+
       <ConfirmReadFileDialog
         open={dialogVisibility.importJSONData}
         confirmAction={() => {
           alert("Item imported");
         }}
         title="Confirm Import Data?"
-        message="When you choose to import data, existing data in the app will be erased and replaced by data from the JSON file. Do you confirm importing data from a JSON file?"
+        message="Existing data in the app will be erased and replaced by data from the JSON file. Do you confirm importing data from a JSON file?"
         handleClose={() => {
           updateVisibility("importJSONData", false);
         }}
@@ -111,6 +187,15 @@ export default function SettingsPage() {
         message="EVERYTHING IN THE APP WILL BE DELETED AND CANNOT BE RECOVERED. The app would be reset to its initial state. Do you confirm doing so?"
         handleClose={() => {
           updateVisibility("deleteAllData", false);
+        }}
+      />
+      <SingleTextInputDialog
+        open={dialogVisibility.syncServerIPAddr}
+        setConfirmValue={handleSetSyncServerIPAddr}
+        title="Set Server IP Address"
+        message="Please enter an IP address/domain that allows you to access your server EXTERNALLY. Please specify the port (e.g. 192.168.1.101:8080) if your server is not serving at the default HTTP port."
+        handleClose={() => {
+          updateVisibility("syncServerIPAddr", false);
         }}
       />
     </div>

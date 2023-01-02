@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import AddIcon from "@mui/icons-material/Add";
 import TaskCard from "../../components/userInterface/TaskCard";
 import AddTaskDialog from "../../components/userInterface/dialog/AddTaskDialog";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   getStorageBackend,
   Task,
@@ -19,17 +19,20 @@ const floatingButtonStyle = {
 };
 
 export default function AllTasks() {
-  const [tasks, setTasks] = useState(getStorageBackend().getTasks());
+  const storageBackend = getStorageBackend();
+  const [tasks, setTasks] = useState([] as Task[]);
   const [addTaskDialogEnabled, setAddTaskDialogEnabled] = useState(false);
-
+  const refreshTasks = useCallback(async () => {
+    setTasks(await storageBackend.getTasks());
+  }, [storageBackend]);
+  useEffect(() => {
+    refreshTasks();
+  }, []);
   const showAddTaskDialog = () => {
     setAddTaskDialogEnabled(true);
   };
   const hideAddTaskDialog = () => {
     setAddTaskDialogEnabled(false);
-  };
-  const refreshTasks = () => {
-    setTasks(getStorageBackend().getTasks());
   };
   return (
     <Box>

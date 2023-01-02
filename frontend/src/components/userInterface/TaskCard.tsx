@@ -28,10 +28,10 @@ export default function TaskCard(props: task) {
   const handleShowDialog = () => {
     setShowUpdateTaskDialog(true);
   };
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCheckboxChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { checked } = e.target;
     setTaskCompleted(checked);
-    storageBackend.updateTask({
+    await storageBackend.updateTask({
       ...props.task,
       completed: checked,
     });

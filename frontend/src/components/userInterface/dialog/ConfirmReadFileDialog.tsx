@@ -4,7 +4,6 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { FileReadResult } from "fs/promises";
 import { getStorageBackend } from "../../storage/StorageBackend";
 
 interface confirmDialogProps {
@@ -16,11 +15,6 @@ interface confirmDialogProps {
 }
 
 export default function ConfirmReadFileDialog(props: confirmDialogProps) {
-  const performConfirmAction = () => {
-    props.confirmAction();
-    props.handleClose();
-  };
-
   const fileUploadInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -33,7 +27,7 @@ export default function ConfirmReadFileDialog(props: confirmDialogProps) {
         );
         props.handleClose();
       };
-      reader.readAsText(files[0],"utf-8");
+      reader.readAsText(files[0], "utf-8");
     }
   };
 

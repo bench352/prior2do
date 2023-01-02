@@ -5,12 +5,16 @@ const localStore = require("store");
 const FileSaver = require("file-saver");
 
 export default class LocalStorageOnly {
-  getTasks() {
+  async getTasks(): Promise<Task[]> {
+    return this.localGetTasks();
+  }
+
+  localGetTasks(): Task[] {
     return localStore.get("p2d.tasks");
   }
 
-  getTaskById(id: string): Task {
-    let tasks = this.getTasks();
+  async getTaskById(id: string): Promise<Task> {
+    let tasks = await this.getTasks();
     for (const task of tasks) {
       if (task.id === id) {
         return task;
@@ -19,22 +23,37 @@ export default class LocalStorageOnly {
     throw new Error("Task not found");
   }
 
-  addTask(task: Task): void {
-    let tasks = this.getTasks();
+  async addTask(task: Task) {
+    this.localAddTask(task);
+    this.localSetLastUpdatedTimestamp();
+  }
+
+  localAddTask(task: Task) {
+    let tasks = this.localGetTasks();
     tasks.push(task);
     this.updateTasksLocalStorage(tasks);
   }
 
-  updateTask(taskToUpdate: Task): void {
-    let tasks = this.getTasks();
+  async updateTask(taskToUpdate: Task) {
+    this.localUpdateTask(taskToUpdate);
+    this.localSetLastUpdatedTimestamp();
+  }
+
+  async localUpdateTask(taskToUpdate: Task) {
+    let tasks = this.localGetTasks();
     const updatedTasks = tasks.map((task: Task) =>
       task.id === taskToUpdate.id ? taskToUpdate : task
     );
     this.updateTasksLocalStorage(updatedTasks);
   }
 
-  deleteTaskById(id: number): void {
-    let tasks = this.getTasks();
+  async deleteTaskById(id: string) {
+    this.localDeleteTaskById(id);
+    this.localSetLastUpdatedTimestamp();
+  }
+
+  localDeleteTaskById(id: string) {
+    let tasks = this.localGetTasks();
     const updatedTasks = tasks.filter((task: Task) => task.id !== id);
     this.updateTasksLocalStorage(updatedTasks);
   }
@@ -43,15 +62,25 @@ export default class LocalStorageOnly {
     localStore.set("p2d.tasks", tasks);
   }
 
-  getNewUniqueId(): number {
-    if (localStore.get("p2d.lastUsedId") == null) {
-      localStore.set("p2d.lastUsedId", 0);
-      return 0;
-    } else {
-      let lastUsedId = localStore.get("p2d.lastUsedId");
-      localStore.set("p2d.lastUsedId", lastUsedId + 1);
-      return lastUsedId + 1;
-    }
+  isSyncEnabled(): boolean {
+    return localStore.get("p2d.syncEnabled");
+  }
+
+  setIsSyncEnabled(value: boolean) {
+    localStore.set("p2d.syncEnabled", value);
+  }
+
+  getNewUniqueId(): string {
+    return crypto.randomUUID();
+  }
+
+  localGetLastUpdatedTimestamp(): number {
+    let result = localStore.get("p2d.lastUpdated");
+    return parseInt(result ? result : "0");
+  }
+
+  localSetLastUpdatedTimestamp() {
+    localStore.set("p2d.lastUpdated", Math.round(Date.now() / 1000));
   }
 
   isWelcomeMessageShown(): boolean {
@@ -66,7 +95,7 @@ export default class LocalStorageOnly {
     let exportJson = {
       lastUsedId: localStore.get("p2d.lastUsedId"),
       storageType: localStorage.getItem("p2d.storageType"),
-      tasks: this.getTasks(),
+      tasks: this.localGetTasks(),
     };
     var blob = new Blob([JSON.stringify(exportJson)], {
       type: "application/json;charset=utf-8",
@@ -86,11 +115,13 @@ export default class LocalStorageOnly {
     if (jsonObject["tasks"] !== null) {
       localStore.set("p2d.tasks", jsonObject["tasks"]);
     }
+    this.localSetLastUpdatedTimestamp();
   }
 
   cleanupCompleted() {
-    let tasks = this.getTasks();
+    let tasks = this.localGetTasks();
     const updatedTasks = tasks.filter((task: Task) => task.completed === false);
     this.updateTasksLocalStorage(updatedTasks);
+    this.localSetLastUpdatedTimestamp();
   }
 }

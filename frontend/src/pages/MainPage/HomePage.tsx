@@ -1,8 +1,5 @@
-import { useState } from "react";
-import {
-  getStorageBackend,
-  TaskWithPlan,
-} from "../../components/storage/StorageBackend";
+import { useEffect, useState, useCallback } from "react";
+import { getStorageBackend } from "../../components/storage/StorageBackend";
 import { Task } from "../../components/storage/StorageBackend";
 import TaskCard from "../../components/userInterface/TaskCard";
 import Card from "@mui/material/Card";
@@ -23,8 +20,8 @@ export default function HomePage() {
     return unfilteredTasks
       .filter((task: Task) => task.plannedDate !== null)
       .filter(
-        (task: TaskWithPlan) =>
-          new Date(task.plannedDate).getDate() === new Date().getDate()
+        (task: Task) =>
+          new Date(task.plannedDate as Date).getDate() === new Date().getDate()
       )
       .map((task: Task) => (
         <TaskCard
@@ -36,13 +33,16 @@ export default function HomePage() {
       ));
   };
   const storageBackend = getStorageBackend();
-  const [tasks, setTasks] = useState(storageBackend.getTasks());
+  const [tasks, setTasks] = useState([] as Task[]);
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(
     storageBackend.isWelcomeMessageShown()
   );
-  const refreshTasks = () => {
-    setTasks(storageBackend.getTasks());
-  };
+  const refreshTasks = useCallback(async () => {
+    setTasks(await storageBackend.getTasks());
+  }, [storageBackend]);
+  useEffect(() => {
+    refreshTasks();
+  },[]);
   const hideWelcomeMessage = () => {
     setShowWelcomeMessage(false);
     storageBackend.hideWelcomeMessage();

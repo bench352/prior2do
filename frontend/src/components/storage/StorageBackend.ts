@@ -1,7 +1,9 @@
+import { isLoggedIn } from "./Accounts";
+import { LocalAndSync } from "./LocalAndSync";
 import LocalStorageOnly from "./LocalStorageOnly";
 
 export interface Task {
-  id: number;
+  id: string;
   name: string;
   estHr: number;
   dueDate: Date | null;
@@ -9,39 +11,39 @@ export interface Task {
   tag: string;
   completed: boolean;
 }
-
-export interface TaskWithDue {
-  id: number;
-  name: string;
-  estHr: number;
-  dueDate: Date;
-  plannedDate: Date | null;
-  tag: string;
-  completed: boolean;
-}
-
-export interface TaskWithPlan {
-  id: number;
-  name: string;
-  estHr: number;
-  dueDate: Date | null;
-  plannedDate: Date;
-  tag: string;
-  completed: boolean;
-}
-
-// export abstract class BaseStorageBackend {
-//   abstract getTasks(): Task[];
-//   abstract getTaskById(id: string): Task;
-//   abstract addTask(task: Task): void;
-//   abstract updateTask(task: Task): void;
-//   abstract deleteTaskById(id: string): void;
-// }
 
 export function getStorageBackend(): LocalStorageOnly {
-  if (localStorage.getItem("p2d.storageType") === null) {
-    localStorage.setItem("p2d.storageType", "localStorageOnly");
+  if (localStorage.getItem("p2d.syncEnabled") === null) {
     localStorage.setItem("p2d.tasks", "[]");
+    localStorage.setItem("p2d.syncEnabled", "false");
+    return new LocalStorageOnly();
+  } else if (localStorage.getItem("p2d.syncEnabled") === "false") {
+    return new LocalStorageOnly();
+  } else if (!isLoggedIn()) {
+    return new LocalStorageOnly();
+  } else {
+    return new LocalAndSync();
   }
-  return new LocalStorageOnly();
+}
+
+export function getServerAddress(): string {
+  let addr = localStorage.getItem("p2d.syncServerIP");
+  return addr ? addr : "";
+}
+export function setServerAddress(addr: string) {
+  localStorage.setItem("p2d.syncServerIP", addr);
+}
+
+export async function testServerConnection() {
+  try {
+    const response = await fetch("http://" + getServerAddress());
+    let result = await response.text();
+    if (result === '"prior2do-backend"') {
+      alert("Connection success!");
+    } else {
+      alert("The configured domain is not a Prior2Do Sync Server");
+    }
+  } catch (error) {
+    alert("Connection error: [" + error + "]");
+  }
 }

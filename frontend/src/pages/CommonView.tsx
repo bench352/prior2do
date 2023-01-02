@@ -27,6 +27,8 @@ import HomePage from "./MainPage/HomePage";
 import SettingsPage from "./SettingsPage/SettingsPage";
 import TaskDue from "./TaskDue/TaskDue";
 import TaskPlan from "./TaskPlan/TaskPlan";
+import User from "./User/User";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 const drawerWidth = 240;
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
@@ -171,19 +173,31 @@ export default function CommonView() {
         </List>
         <Divider />
         <List>
-          <ListItem
-            disablePadding
-            component={Link}
-            to="/settings"
-            sx={{ "&:link": { color: "black" } }}
-          >
-            <ListItemButton>
-              <ListItemIcon>
-                <SettingsOutlinedIcon />
-              </ListItemIcon>
-              <ListItemText primary="Settings" />
-            </ListItemButton>
-          </ListItem>
+          {[
+            {
+              name: "User",
+              icon: <PersonOutlineOutlinedIcon />,
+              link: "/user",
+            },
+            {
+              name: "Settings",
+              icon: <SettingsOutlinedIcon />,
+              link: "/settings",
+            },
+          ].map((menuOption) => (
+            <ListItem
+              disablePadding
+              key={menuOption.name}
+              component={Link}
+              to={menuOption.link}
+              sx={{ "&:link": { color: "black" } }}
+            >
+              <ListItemButton>
+                <ListItemIcon>{menuOption.icon}</ListItemIcon>
+                <ListItemText primary={menuOption.name} />
+              </ListItemButton>
+            </ListItem>
+          ))}
         </List>
       </Drawer>
       <Main open={open}>
@@ -193,6 +207,7 @@ export default function CommonView() {
           <Route path="tasks" element={<AllTasks />} />
           <Route path="due" element={<TaskDue />} />
           <Route path="plan" element={<TaskPlan />} />
+          <Route path="user" element={<User />} />
           <Route path="settings" element={<SettingsPage />} />
         </Routes>
       </Main>

@@ -1,12 +1,8 @@
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import * as React from "react";
-import { useState } from "react";
-import {
-  getStorageBackend,
-  TaskWithPlan,
-} from "../../components/storage/StorageBackend";
+import { useEffect, useState, useCallback } from "react";
+import { getStorageBackend } from "../../components/storage/StorageBackend";
 import TaskPlanCard from "../../components/userInterface/TaskPlanCard";
 import { Task } from "../../components/storage/StorageBackend";
 
@@ -40,12 +36,15 @@ function a11yProps(index: number) {
 }
 
 export default function TaskPlan() {
-  const [value, setValue] = React.useState(0);
-  const [tasks, setTasks] = useState(getStorageBackend().getTasks());
-  const refreshTasks = () => {
-    setTasks(getStorageBackend().getTasks());
-  };
-
+  const storageBackend = getStorageBackend();
+  const [value, setValue] = useState(0);
+  const [tasks, setTasks] = useState([] as Task[]);
+  const refreshTasks = useCallback(async () => {
+    setTasks(await storageBackend.getTasks());
+  }, [storageBackend]);
+  useEffect(() => {
+    refreshTasks();
+  }, []);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -74,9 +73,9 @@ export default function TaskPlan() {
         {tasks
           .filter((task: Task) => task.plannedDate !== null)
           .sort(
-            (a: TaskWithPlan, b: TaskWithPlan) =>
-              new Date(a.plannedDate).getTime() -
-              new Date(b.plannedDate).getTime()
+            (a: Task, b: Task) =>
+              new Date(a.plannedDate as Date).getTime() -
+              new Date(b.plannedDate as Date).getTime()
           )
           .map((task: Task) => (
             <TaskPlanCard
