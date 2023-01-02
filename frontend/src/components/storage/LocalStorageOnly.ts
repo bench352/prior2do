@@ -1,8 +1,8 @@
-// import { BaseStorageBackend } from "./StorageBackend";
 import { Task } from "./StorageBackend";
 
 const localStore = require("store");
 const FileSaver = require("file-saver");
+const { v4: uuidv4 } = require("uuid");
 
 export default class LocalStorageOnly {
   async getTasks(): Promise<Task[]> {
@@ -71,7 +71,7 @@ export default class LocalStorageOnly {
   }
 
   getNewUniqueId(): string {
-    return crypto.randomUUID();
+    return uuidv4();
   }
 
   localGetLastUpdatedTimestamp(): number {
@@ -93,8 +93,6 @@ export default class LocalStorageOnly {
 
   exportDataToJson() {
     let exportJson = {
-      lastUsedId: localStore.get("p2d.lastUsedId"),
-      storageType: localStorage.getItem("p2d.storageType"),
       tasks: this.localGetTasks(),
     };
     var blob = new Blob([JSON.stringify(exportJson)], {
@@ -104,14 +102,7 @@ export default class LocalStorageOnly {
   }
 
   importDataFromJson(jsonFile: string) {
-    localStorage.clear();
     let jsonObject = JSON.parse(jsonFile);
-    if (jsonObject["lastUsedId"] !== null) {
-      localStore.set("p2d.lastUsedId", jsonObject["lastUsedId"]);
-    }
-    if (jsonObject["storageType"] !== null) {
-      localStorage.setItem("p2d.storageType", jsonObject["storageType"]);
-    }
     if (jsonObject["tasks"] !== null) {
       localStore.set("p2d.tasks", jsonObject["tasks"]);
     }

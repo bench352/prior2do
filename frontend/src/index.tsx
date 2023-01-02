@@ -6,6 +6,7 @@ import "@fontsource/roboto/700.css";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import "./index.css";
 import CommonView from "./pages/CommonView";
 import reportWebVitals from "./reportWebVitals";
@@ -14,10 +15,19 @@ import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
+
+const theme = createTheme({
+  palette: {
+    primary: { main: "#3f51b5" },
+    secondary: { main: "#ffc400" },
+  },
+});
 root.render(
-  <BrowserRouter>
-    <CommonView />
-  </BrowserRouter>
+  <ThemeProvider theme={theme}>
+    <BrowserRouter>
+      <CommonView />
+    </BrowserRouter>
+  </ThemeProvider>
 );
 
 // If you want your app to work offline and load faster, you can change

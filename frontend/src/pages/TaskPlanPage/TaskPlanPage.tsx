@@ -1,10 +1,15 @@
 import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Snackbar from "@mui/material/Snackbar";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import { useEffect, useState, useCallback } from "react";
-import { getStorageBackend } from "../../components/storage/StorageBackend";
+import { useCallback, useEffect, useState } from "react";
+import {
+  getStorageBackend,
+  Task,
+} from "../../components/storage/StorageBackend";
+import LoadingBackdrop from "../../components/userInterface/LoadingBackdrop";
 import TaskPlanCard from "../../components/userInterface/TaskPlanCard";
-import { Task } from "../../components/storage/StorageBackend";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -35,12 +40,28 @@ function a11yProps(index: number) {
   };
 }
 
-export default function TaskPlan() {
+export default function TaskPlanPage() {
   const storageBackend = getStorageBackend();
   const [value, setValue] = useState(0);
   const [tasks, setTasks] = useState([] as Task[]);
+  const [showLoadingBackdrop, setShowLoadingBackdrop] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState("");
+  const [showSnackBar, setShowSnackBar] = useState(false);
+  const handleSnackbarClose = () => {
+    setShowSnackBar(false);
+  };
   const refreshTasks = useCallback(async () => {
-    setTasks(await storageBackend.getTasks());
+    setShowLoadingBackdrop(true);
+    let allTasks = [] as Task[];
+    try {
+      allTasks = await storageBackend.getTasks();
+    } catch (error: any) {
+      setSnackBarMessage(error.message);
+      setShowSnackBar(true);
+      allTasks = storageBackend.localGetTasks();
+    }
+    setTasks(allTasks);
+    setShowLoadingBackdrop(false);
   }, [storageBackend]);
   useEffect(() => {
     refreshTasks();
@@ -50,7 +71,7 @@ export default function TaskPlan() {
   };
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Container>
       <h2>Task Plan</h2>
       <p>
         Always plan ahead of time so you won't get lost as you go. Schedule a
@@ -96,6 +117,13 @@ export default function TaskPlan() {
             />
           ))}
       </TabPanel>
-    </Box>
+      <LoadingBackdrop open={showLoadingBackdrop} />
+      <Snackbar
+        open={showSnackBar}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        message={snackBarMessage}
+      />
+    </Container>
   );
 }

@@ -1,23 +1,23 @@
+import BackupOutlinedIcon from "@mui/icons-material/BackupOutlined";
+import DevicesOutlinedIcon from "@mui/icons-material/DevicesOutlined";
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import Grid from "@mui/material/Grid";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
-import Avatar from "@mui/material/Avatar";
-import DevicesOutlinedIcon from "@mui/icons-material/DevicesOutlined";
-import BackupOutlinedIcon from "@mui/icons-material/BackupOutlined";
-import TextField from "@mui/material/TextField";
+import ListItemText from "@mui/material/ListItemText";
 import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
 import { useState } from "react";
-import { signup, login } from "../../components/storage/Accounts";
-import ConfirmDialog from "../../components/userInterface/dialog/ConfirmDialog";
+import { login, signup } from "../../../components/storage/Accounts";
+import ConfirmDialog from "../../../components/userInterface/dialog/ConfirmDialog";
 
 interface NotLoggedInProps {
-  setLoginStateFunc: any;
+  setLoginStateFunc(isLoggedIn: boolean): any;
 }
 
 export default function NotLoggedIn(props: NotLoggedInProps) {
@@ -37,7 +37,7 @@ export default function NotLoggedIn(props: NotLoggedInProps) {
     await signup(loginForm.username, loginForm.password);
   };
   return (
-    <Box>
+    <div>
       <Grid container spacing={2} columns={{ xs: 6, sm: 12, md: 12 }}>
         <Grid item xs={6}>
           <Card>
@@ -155,6 +155,6 @@ export default function NotLoggedIn(props: NotLoggedInProps) {
         message="Your data is not encrypted in the Prior2Do Sync server and the Sync server provider can view all your data in your account. Do you want to proceed with signing up?"
         handleClose={handleDialogClose}
       />
-    </Box>
+    </div>
   );
 }

@@ -7,10 +7,10 @@ import DialogTitle from "@mui/material/DialogTitle";
 
 interface confirmDialogProps {
   open: boolean;
-  confirmAction: any;
+  confirmAction(): any;
   title: string;
   message: string;
-  handleClose: any;
+  handleClose(): any;
 }
 
 export default function ConfirmDialog(props: confirmDialogProps) {

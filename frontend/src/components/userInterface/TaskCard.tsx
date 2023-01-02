@@ -2,9 +2,9 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { Checkbox } from "@mui/material";
 import Card from "@mui/material/Card";
 import IconButton from "@mui/material/IconButton";
+import dateFormat from "dateformat";
 import { useState } from "react";
 import { getStorageBackend, Task } from "../storage/StorageBackend";
-import dateFormat from "dateformat";
 import EditTaskDialog from "./dialog/EditTaskDialog";
 const buttonStyle = {
   display: "flex",
@@ -14,7 +14,7 @@ const buttonStyle = {
 
 interface task {
   task: Task;
-  handleRefreshPage: any;
+  handleRefreshPage(): any;
   showEstTime: boolean;
 }
 
@@ -28,7 +28,9 @@ export default function TaskCard(props: task) {
   const handleShowDialog = () => {
     setShowUpdateTaskDialog(true);
   };
-  const handleCheckboxChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCheckboxChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { checked } = e.target;
     setTaskCompleted(checked);
     await storageBackend.updateTask({

@@ -1,7 +1,9 @@
-import neo4j_client.base
-import schema
+"""Neo4j Client for Managing Tasks"""
+
 import pendulum
+import neo4j_client.base
 import neo4j_client.users
+import schema
 
 
 class Tasks(neo4j_client.base.BaseClient):
@@ -10,8 +12,8 @@ class Tasks(neo4j_client.base.BaseClient):
             user_attr = {"username": username}
             response = await session.run(
                 f"""
-                MATCH (u:User{self._dict_to_attr(user_attr)})-[:owns]->(t:Task) 
-                RETURN t.name AS name, t.id AS id, t.dueDate AS dueDate, t.estHr AS estHr, 
+                MATCH (u:User{self._dict_to_attr(user_attr)})-[:owns]->(t:Task)
+                RETURN t.name AS name, t.id AS id, t.dueDate AS dueDate, t.estHr AS estHr,
                 t.plannedDate AS plannedDate, t.tag AS tag, t.completed AS completed
                 """
             )
@@ -29,7 +31,10 @@ class Tasks(neo4j_client.base.BaseClient):
                 for task in result
             ]
             return schema.TaskPayload(
-                last_updated=await neo4j_client.users.Users().get_user_last_updated_timestamp(username), tasks=tasks
+                last_updated=await neo4j_client.users.Users().get_user_last_updated_timestamp(
+                    username
+                ),
+                tasks=tasks,
             )
 
     async def create_task(self, username: str, task: schema.Task):
@@ -44,7 +49,7 @@ class Tasks(neo4j_client.base.BaseClient):
             )
         await neo4j_client.users.Users().set_user_last_updated_timestamp(username)
 
-    async def update_task(self, username: str, task: schema.Task):  # TODO Error handling of no updated task
+    async def update_task(self, username: str, task: schema.Task):
         async with self._neo4j_driver.session() as session:
             user_attr = {"username": username}
             await session.run(
@@ -56,25 +61,15 @@ class Tasks(neo4j_client.base.BaseClient):
             )
         await neo4j_client.users.Users().set_user_last_updated_timestamp(username)
 
-    async def delete_task(self, username: str, id: str):  # TODO Error handling of no task deleted
+    async def delete_task(self, username: str, task_id: str):
         async with self._neo4j_driver.session() as session:
             user_attr = {"username": username}
             await session.run(
                 f"""
                 MATCH (u:User{self._dict_to_attr(user_attr)})-[:owns]->(t:Task)
-                WHERE t.id='{id}'
+                WHERE t.id='{task_id}'
                 DETACH DELETE t
                 """
             )
-        await neo4j_client.users.Users().set_user_last_updated_timestamp(username)
 
-    async def delete_all_tasks(self, username: str):
-        async with self._neo4j_driver.session() as session:
-            user_attr = {"username": username}
-            await session.run(
-                f"""
-                MATCH (u:User{self._dict_to_attr(user_attr)})-[:owns]->(t:Task)
-                DETACH DELETE t
-                """
-            )
         await neo4j_client.users.Users().set_user_last_updated_timestamp(username)

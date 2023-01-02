@@ -26,6 +26,10 @@ export function getStorageBackend(): LocalStorageOnly {
   }
 }
 
+export function isSyncEnabled() {
+  return localStorage.getItem("p2d.syncEnabled") === "true";
+}
+
 export function getServerAddress(): string {
   let addr = localStorage.getItem("p2d.syncServerIP");
   return addr ? addr : "";

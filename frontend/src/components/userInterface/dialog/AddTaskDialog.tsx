@@ -10,8 +10,8 @@ import { getStorageBackend } from "../../storage/StorageBackend";
 
 interface addTaskProps {
   open: boolean;
-  handleHideDialog: any;
-  handleRefreshPage: any;
+  handleHideDialog(): any;
+  handleRefreshPage(): any;
 }
 
 export default function AddTaskDialog(props: addTaskProps) {
@@ -29,8 +29,8 @@ export default function AddTaskDialog(props: addTaskProps) {
       [name]: value,
     });
   };
-  const handleSubmit = () => {
-    storageBackend.addTask({
+  const handleSubmit = async () => {
+    await storageBackend.addTask({
       id: storageBackend.getNewUniqueId(),
       name: formValues.name,
       dueDate: new Date(formValues.due),

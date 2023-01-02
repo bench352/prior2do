@@ -1,4 +1,4 @@
-import { getServerAddress } from "./StorageBackend";
+import { getServerAddress, isSyncEnabled } from "./StorageBackend";
 
 export async function signup(inputUser: string, inputPassword: string) {
   try {
@@ -19,7 +19,7 @@ export async function signup(inputUser: string, inputPassword: string) {
       alert("Signup error: [" + result + "]");
     }
   } catch (error) {
-    alert("Connection error: [" + error + "]");
+    alert("Failed to connect to Prior2Do Sync server.");
   }
 }
 
@@ -48,7 +48,7 @@ export async function login(
       return false;
     }
   } catch (error) {
-    alert("Connection error: [" + error + "]");
+    alert("Failed to connect to Prior2Do Sync server.");
     return false;
   }
 }
@@ -58,7 +58,11 @@ export function getUsername(): string {
 }
 
 export function isLoggedIn(): boolean {
-  return localStorage.getItem("p2d.accessToken") !== null;
+  if (isSyncEnabled()) {
+    return localStorage.getItem("p2d.accessToken") !== null;
+  } else {
+    return false;
+  }
 }
 
 export function logout() {
@@ -67,6 +71,28 @@ export function logout() {
 
 export function getAccessToken(): string {
   return localStorage.getItem("p2d.accessToken") || "";
+}
+
+export async function updatePassword(newPassword: string) {
+  try {
+    const response = await fetch("http://" + getServerAddress() + "/users", {
+      method: "PUT",
+      headers: {
+        Authorization: "Bearer " + getAccessToken(),
+        "Content-Type": "application/json;charset=utf-8",
+      },
+      body: JSON.stringify({
+        password: newPassword,
+      }),
+    });
+    if (response.ok) {
+      await login(getUsername(), newPassword);
+    } else {
+      alert("Error when updating password: " + (await response.text()));
+    }
+  } catch (error) {
+    alert("Failed to connect to Prior2Do Sync server.");
+  }
 }
 
 export async function deleteAccount(): Promise<boolean> {
@@ -86,7 +112,7 @@ export async function deleteAccount(): Promise<boolean> {
       return false;
     }
   } catch (error) {
-    alert("Connection error: [" + error + "]");
+    alert("Failed to connect to Prior2Do Sync server.");
     return false;
   }
 }

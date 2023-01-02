@@ -5,9 +5,11 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import ListAltOutlinedIcon from "@mui/icons-material/ListAltOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import OutlinedFlagSharpIcon from "@mui/icons-material/OutlinedFlagSharp";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
 import CssBaseline from "@mui/material/CssBaseline";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
@@ -20,15 +22,15 @@ import ListItemText from "@mui/material/ListItemText";
 import { styled, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import * as React from "react";
+import { useState } from "react";
 import { Link, Route, Routes } from "react-router-dom";
-import AllTasks from "./AllTasks/AllTasks";
-import HomePage from "./MainPage/HomePage";
+import { isSyncEnabled } from "../components/storage/StorageBackend";
+import AllTasksPage from "./AllTasksPage/AllTasksPage";
+import HomePage from "./HomePage/HomePage";
 import SettingsPage from "./SettingsPage/SettingsPage";
-import TaskDue from "./TaskDue/TaskDue";
-import TaskPlan from "./TaskPlan/TaskPlan";
-import User from "./User/User";
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import TaskDuePage from "./TaskDuePage/TaskDuePage";
+import TaskPlanPage from "./TaskPlanPage/TaskPlanPage";
+import UserPage from "./UserPage/UserPage";
 const drawerWidth = 240;
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
@@ -82,8 +84,12 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 export default function CommonView() {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [showUser, setShowUser] = useState(isSyncEnabled());
 
+  const changeUserOptionVisibility = (visibility: boolean) => {
+    setShowUser(visibility);
+  };
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -109,6 +115,12 @@ export default function CommonView() {
           <Typography variant="h6" noWrap component="div">
             Prior2Do
           </Typography>
+          <Chip
+            label="Beta"
+            color="secondary"
+            size="small"
+            sx={{ "margin-left": "10px" }}
+          />
         </Toolbar>
       </AppBar>
       <Drawer
@@ -173,42 +185,50 @@ export default function CommonView() {
         </List>
         <Divider />
         <List>
-          {[
-            {
-              name: "User",
-              icon: <PersonOutlineOutlinedIcon />,
-              link: "/user",
-            },
-            {
-              name: "Settings",
-              icon: <SettingsOutlinedIcon />,
-              link: "/settings",
-            },
-          ].map((menuOption) => (
+          {showUser ? (
             <ListItem
               disablePadding
-              key={menuOption.name}
               component={Link}
-              to={menuOption.link}
+              to="/user"
               sx={{ "&:link": { color: "black" } }}
             >
               <ListItemButton>
-                <ListItemIcon>{menuOption.icon}</ListItemIcon>
-                <ListItemText primary={menuOption.name} />
+                <ListItemIcon>
+                  <PersonOutlineOutlinedIcon />
+                </ListItemIcon>
+                <ListItemText primary="User" />
               </ListItemButton>
             </ListItem>
-          ))}
+          ) : (
+            ""
+          )}
+          <ListItem
+            disablePadding
+            component={Link}
+            to="/settings"
+            sx={{ "&:link": { color: "black" } }}
+          >
+            <ListItemButton>
+              <ListItemIcon>
+                <SettingsOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText primary="Settings" />
+            </ListItemButton>
+          </ListItem>
         </List>
       </Drawer>
       <Main open={open}>
         <DrawerHeader />
         <Routes>
           <Route path="/*" element={<HomePage />} />
-          <Route path="tasks" element={<AllTasks />} />
-          <Route path="due" element={<TaskDue />} />
-          <Route path="plan" element={<TaskPlan />} />
-          <Route path="user" element={<User />} />
-          <Route path="settings" element={<SettingsPage />} />
+          <Route path="tasks" element={<AllTasksPage />} />
+          <Route path="due" element={<TaskDuePage />} />
+          <Route path="plan" element={<TaskPlanPage />} />
+          <Route path="user" element={<UserPage />} />
+          <Route
+            path="settings"
+            element={<SettingsPage showUser={changeUserOptionVisibility} />}
+          />
         </Routes>
       </Main>
     </Box>

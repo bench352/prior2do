@@ -1,19 +1,24 @@
-import { useEffect, useState, useCallback } from "react";
-import { getStorageBackend } from "../../components/storage/StorageBackend";
-import { Task } from "../../components/storage/StorageBackend";
-import TaskCard from "../../components/userInterface/TaskCard";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import Avatar from "@mui/material/Avatar";
+import DoneOutlineOutlinedIcon from "@mui/icons-material/DoneOutlineOutlined";
 import OutlinedFlagIcon from "@mui/icons-material/OutlinedFlag";
 import PlaylistAddOutlinedIcon from "@mui/icons-material/PlaylistAddOutlined";
-import DoneOutlineOutlinedIcon from "@mui/icons-material/DoneOutlineOutlined";
+import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import Container from "@mui/material/Container";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import ListItemText from "@mui/material/ListItemText";
+import Snackbar from "@mui/material/Snackbar";
+import { useCallback, useEffect, useState } from "react";
+import {
+  getStorageBackend,
+  Task,
+} from "../../components/storage/StorageBackend";
+import LoadingBackdrop from "../../components/userInterface/LoadingBackdrop";
+import TaskCard from "../../components/userInterface/TaskCard";
 
 export default function HomePage() {
   const filterTodayPlannedTask = (unfilteredTasks: any[]) => {
@@ -34,21 +39,37 @@ export default function HomePage() {
   };
   const storageBackend = getStorageBackend();
   const [tasks, setTasks] = useState([] as Task[]);
+  const [showLoadingBackdrop, setShowLoadingBackdrop] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState("");
+  const [showSnackBar, setShowSnackBar] = useState(false);
+  const handleSnackbarClose = () => {
+    setShowSnackBar(false);
+  };
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(
     storageBackend.isWelcomeMessageShown()
   );
   const refreshTasks = useCallback(async () => {
-    setTasks(await storageBackend.getTasks());
+    setShowLoadingBackdrop(true);
+    let allTasks = [] as Task[];
+    try {
+      allTasks = await storageBackend.getTasks();
+    } catch (error: any) {
+      setSnackBarMessage(error.message);
+      setShowSnackBar(true);
+      allTasks = storageBackend.localGetTasks();
+    }
+    setTasks(allTasks);
+    setShowLoadingBackdrop(false);
   }, [storageBackend]);
   useEffect(() => {
     refreshTasks();
-  },[]);
+  }, []);
   const hideWelcomeMessage = () => {
     setShowWelcomeMessage(false);
     storageBackend.hideWelcomeMessage();
   };
   return (
-    <div>
+    <Container>
       {showWelcomeMessage ? (
         <Card sx={{ margin: "0px 0px 15px 0px" }}>
           <CardContent>
@@ -117,6 +138,13 @@ export default function HomePage() {
       ) : (
         ""
       )}
-    </div>
+      <LoadingBackdrop open={showLoadingBackdrop} />
+      <Snackbar
+        open={showSnackBar}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        message={snackBarMessage}
+      />
+    </Container>
   );
 }

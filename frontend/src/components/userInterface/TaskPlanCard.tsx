@@ -1,10 +1,10 @@
+import FlagCircleOutlinedIcon from "@mui/icons-material/FlagCircleOutlined";
 import { Checkbox } from "@mui/material";
 import Card from "@mui/material/Card";
 import IconButton from "@mui/material/IconButton";
+import dateFormat from "dateformat";
 import { useState } from "react";
 import { getStorageBackend, Task } from "../storage/StorageBackend";
-import dateFormat from "dateformat";
-import FlagCircleOutlinedIcon from "@mui/icons-material/FlagCircleOutlined";
 import TaskPlanDialog from "./dialog/TaskPlanDialog";
 const buttonStyle = {
   display: "flex",
@@ -14,7 +14,7 @@ const buttonStyle = {
 
 interface task {
   task: Task;
-  handleRefreshPage: any;
+  handleRefreshPage(): any;
 }
 
 export default function TaskPlanCard(props: task) {

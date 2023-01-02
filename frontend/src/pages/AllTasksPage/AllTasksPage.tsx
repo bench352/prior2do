@@ -1,13 +1,15 @@
-import Fab from "@mui/material/Fab";
-import Box from "@mui/material/Box";
 import AddIcon from "@mui/icons-material/Add";
-import TaskCard from "../../components/userInterface/TaskCard";
-import AddTaskDialog from "../../components/userInterface/dialog/AddTaskDialog";
-import { useState, useEffect, useCallback } from "react";
+import Container from "@mui/material/Container";
+import Fab from "@mui/material/Fab";
+import Snackbar from "@mui/material/Snackbar";
+import { useCallback, useEffect, useState } from "react";
 import {
   getStorageBackend,
   Task,
 } from "../../components/storage/StorageBackend";
+import AddTaskDialog from "../../components/userInterface/dialog/AddTaskDialog";
+import LoadingBackdrop from "../../components/userInterface/LoadingBackdrop";
+import TaskCard from "../../components/userInterface/TaskCard";
 
 const floatingButtonStyle = {
   margin: 0,
@@ -18,12 +20,28 @@ const floatingButtonStyle = {
   position: "fixed",
 };
 
-export default function AllTasks() {
+export default function AllTasksPage() {
   const storageBackend = getStorageBackend();
   const [tasks, setTasks] = useState([] as Task[]);
   const [addTaskDialogEnabled, setAddTaskDialogEnabled] = useState(false);
+  const [showLoadingBackdrop, setShowLoadingBackdrop] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState("");
+  const [showSnackBar, setShowSnackBar] = useState(false);
+  const handleSnackbarClose = () => {
+    setShowSnackBar(false);
+  };
   const refreshTasks = useCallback(async () => {
-    setTasks(await storageBackend.getTasks());
+    setShowLoadingBackdrop(true);
+    let allTasks = [] as Task[];
+    try {
+      allTasks = await storageBackend.getTasks();
+    } catch (error: any) {
+      setSnackBarMessage(error.message);
+      setShowSnackBar(true);
+      allTasks = storageBackend.localGetTasks();
+    }
+    setTasks(allTasks);
+    setShowLoadingBackdrop(false);
   }, [storageBackend]);
   useEffect(() => {
     refreshTasks();
@@ -35,10 +53,10 @@ export default function AllTasks() {
     setAddTaskDialogEnabled(false);
   };
   return (
-    <Box>
+    <Container>
       <Fab
         variant="extended"
-        color="primary"
+        color="secondary"
         aria-label="add"
         sx={floatingButtonStyle}
         onClick={showAddTaskDialog}
@@ -65,6 +83,13 @@ export default function AllTasks() {
         handleHideDialog={hideAddTaskDialog}
         handleRefreshPage={refreshTasks}
       />
-    </Box>
+      <LoadingBackdrop open={showLoadingBackdrop} />
+      <Snackbar
+        open={showSnackBar}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        message={snackBarMessage}
+      />
+    </Container>
   );
 }

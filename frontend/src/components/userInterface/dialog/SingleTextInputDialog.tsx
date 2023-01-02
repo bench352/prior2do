@@ -1,18 +1,19 @@
-import { useState } from "react";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import TextField from "@mui/material/TextField";
+import { useState } from "react";
 
 interface textInputDialogProps {
   open: boolean;
-  setConfirmValue: any;
+  setConfirmValue(value: string): any;
   title: string;
   message: string;
-  handleClose: any;
+  handleClose(): any;
+  type: string;
 }
 
 export default function SingleTextInputDialog(props: textInputDialogProps) {
@@ -32,7 +33,7 @@ export default function SingleTextInputDialog(props: textInputDialogProps) {
         <TextField
           autoFocus
           margin="dense"
-          type="text"
+          type={props.type}
           value={textValue}
           onChange={handleInputChange}
           fullWidth
@@ -45,3 +46,7 @@ export default function SingleTextInputDialog(props: textInputDialogProps) {
     </Dialog>
   );
 }
+
+SingleTextInputDialog.defaultProps = {
+  type: "text",
+};

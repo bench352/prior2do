@@ -1,9 +1,11 @@
+"""Entrypoint for server"""
+
 import fastapi
+import fastapi.middleware.cors
 import uvicorn
+import exceptions
 import routers.auth
 import routers.tasks
-import exceptions
-import fastapi.middleware.cors
 
 app = fastapi.FastAPI()
 
@@ -24,7 +26,7 @@ async def authentication_fail_handler(_: fastapi.Request, exc: exceptions.UserAu
 
 app.add_middleware(
     fastapi.middleware.cors.CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,4 +34,4 @@ app.add_middleware(
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app")
+    uvicorn.run("main:app", host="0.0.0.0")

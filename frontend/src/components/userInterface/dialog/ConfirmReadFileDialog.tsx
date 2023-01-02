@@ -8,10 +8,9 @@ import { getStorageBackend } from "../../storage/StorageBackend";
 
 interface confirmDialogProps {
   open: boolean;
-  confirmAction: any;
   title: string;
   message: string;
-  handleClose: any;
+  handleClose(): any;
 }
 
 export default function ConfirmReadFileDialog(props: confirmDialogProps) {

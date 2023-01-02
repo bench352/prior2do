@@ -11,8 +11,8 @@ import { getStorageBackend, Task } from "../../storage/StorageBackend";
 
 interface editTaskProps {
   open: boolean;
-  handleHideDialog: any;
-  handleRefreshPage: any;
+  handleHideDialog(): any;
+  handleRefreshPage(): any;
   existingTask: Task;
 }
 
@@ -38,7 +38,7 @@ export default function TaskPlanDialog(props: editTaskProps) {
       id: props.existingTask.id,
       name: props.existingTask.name,
       dueDate: props.existingTask.dueDate,
-      estHr: formValues.est,
+      estHr: (formValues.est as unknown) !== "" ? formValues.est : 0,
       plannedDate: new Date(formValues.planned),
       completed: props.existingTask.completed,
       tag: props.existingTask.tag,

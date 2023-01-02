@@ -11,8 +11,8 @@ import { getStorageBackend, Task } from "../../storage/StorageBackend";
 
 interface editTaskProps {
   open: boolean;
-  handleHideDialog: any;
-  handleRefreshPage: any;
+  handleHideDialog(): any;
+  handleRefreshPage(): any;
   existingTask: Task;
 }
 

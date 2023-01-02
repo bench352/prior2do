@@ -1,3 +1,5 @@
+"""Base Neo4j Client"""
+
 import neo4j
 import env
 

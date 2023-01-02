@@ -1,8 +1,13 @@
+"""Exceptions"""
+
+
 class UserAlreadyExists(Exception):
-    pass
+    """Exception for when the user with the specified username already existed in the database"""
+
 
 class UserAuthenticationFail(Exception):
-    pass
+    """Exception for user authentication fail"""
+
 
 class UserNotFound(Exception):
-    pass
+    """Exception for user not found"""

@@ -1,3 +1,5 @@
+"""Authentication router"""
+
 import fastapi
 import fastapi.security
 import schema
@@ -25,8 +27,14 @@ async def signup(user: schema.User):
     return "signup success"
 
 
+@router.put("/users")
+async def update_user(
+    user_data: schema.UserPayload,
+    username: str = fastapi.Depends(services.auth.get_username_from_token),
+):
+    await services.auth.update_user(username, user_data.password)
+
+
 @router.delete("/users")
 async def delete_user(username: str = fastapi.Depends(services.auth.get_username_from_token)):
     await neo4j_client.users.Users().delete_user(username)
-
-
