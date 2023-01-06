@@ -15,6 +15,7 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: 16
+    - run: git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/bench352/prior2do
     - run: npm install
     - run: "sed -i '3i \"homepage\": \"https://bench352.github.io/prior2do/\",' package.json"
     - run: npm run deploy
