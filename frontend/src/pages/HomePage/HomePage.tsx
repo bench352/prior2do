@@ -31,7 +31,7 @@ export default function HomePage() {
       .map((task: Task) => (
         <TaskCard
           key={task.id}
-          task={task}
+          task={task} // eslint-disable-next-line
           handleRefreshPage={refreshTasks}
           showEstTime={true}
         />
@@ -62,7 +62,7 @@ export default function HomePage() {
     setShowLoadingBackdrop(false);
   }, [storageBackend]);
   useEffect(() => {
-    refreshTasks();
+    refreshTasks(); // eslint-disable-next-line
   }, []);
   const hideWelcomeMessage = () => {
     setShowWelcomeMessage(false);

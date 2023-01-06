@@ -32,7 +32,7 @@ export default function TaskDuePage() {
     setShowLoadingBackdrop(false);
   }, [storageBackend]);
   useEffect(() => {
-    refreshTasks();
+    refreshTasks(); // eslint-disable-next-line
   }, []);
   return (
     <Container>

@@ -64,7 +64,7 @@ export default function TaskPlanPage() {
     setShowLoadingBackdrop(false);
   }, [storageBackend]);
   useEffect(() => {
-    refreshTasks();
+    refreshTasks(); // eslint-disable-next-line
   }, []);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);

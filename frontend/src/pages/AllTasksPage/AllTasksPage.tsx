@@ -44,7 +44,7 @@ export default function AllTasksPage() {
     setShowLoadingBackdrop(false);
   }, [storageBackend]);
   useEffect(() => {
-    refreshTasks();
+    refreshTasks(); // eslint-disable-next-line
   }, []);
   const showAddTaskDialog = () => {
     setAddTaskDialogEnabled(true);
