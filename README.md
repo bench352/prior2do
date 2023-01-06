@@ -70,7 +70,7 @@ Using [Docker](https://www.docker.com/), you can spin up your Prior2Do Sync serv
 To run your server immediately, download the `docker-compose.yml` file to your computer and use `docker-compose up` command to start the containers. You can do so with the following commands:
 
 ```bash
-curl -o https://raw.githubusercontent.com/bench352/prior2do/main/deployment/docker-compose.yml
+curl -o docker-compose.yml https://raw.githubusercontent.com/bench352/prior2do/main/deployment/docker-compose.yml
 docker-compose up -d
 ```
 
