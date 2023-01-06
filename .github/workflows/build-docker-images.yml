@@ -28,13 +28,15 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        context: .
+        context: ./frontend
+        file: ./frontend/Dockerfile
         tags: bench352/prior2do-webapp:latest
     - name: Build and Push Latest Docker Image
       uses: docker/build-push-action@v3
       with:
         push: true
-        context: .
+        context: ./frontend
+        file: ./frontend/Dockerfile
         tags: bench352/prior2do-webapp:${{ github.ref_name }}
   build-syncserver:
     runs-on: ubuntu-22.04
@@ -54,11 +56,13 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        context: .
+        context: ./backend
+        file: ./backend/Dockerfile
         tags: bench352/prior2do-syncserver:latest
     - name: Build and Push Latest Docker Image
       uses: docker/build-push-action@v3
       with:
         push: true
-        context: .
+        context: ./backend
+        file: ./backend/Dockerfile
         tags: bench352/prior2do-syncserver:${{ github.ref_name }}
