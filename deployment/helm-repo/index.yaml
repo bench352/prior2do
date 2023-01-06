@@ -3,16 +3,16 @@ entries:
   prior2do:
   - apiVersion: v2
     appVersion: latest
-    created: "2023-01-06T11:04:24.9954165+08:00"
+    created: "2023-01-06T10:58:00.677751819Z"
     dependencies:
     - name: neo4j
       repository: https://helm.neo4j.com/neo4j
       version: 5.3.0
     description: A Helm chart for Prior2do app deployment
-    digest: 1eeeee368ea6059d285d4e097d4a6a8d4df1dc0ca540ecd1a55c3267d08429d6
+    digest: 0776eda28c344e36b0d8e2e5c5681b49255aed4bddd1b723700c13531d43f35a
     name: prior2do
     type: application
     urls:
     - prior2do-0.1.0.tgz
     version: 0.1.0
-generated: "2023-01-06T11:04:24.9934209+08:00"
+generated: "2023-01-06T10:58:00.672347331Z"
