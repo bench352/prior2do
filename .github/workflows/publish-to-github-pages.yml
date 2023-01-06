@@ -16,5 +16,5 @@ jobs:
       with:
         node-version: 16
     - run: npm install
-    - run: sed -i '3i "homepage": "https://bench352.github.io/prior2do/",' package.json
+    - run: "sed -i '3i \"homepage\": \"https://bench352.github.io/prior2do/\",' package.json"
     - run: npm run deploy
