@@ -1,0 +1,24 @@
+services:
+  web-app:
+    image: bench352/prior2do-webapp:latest
+    ports:
+      - 3000:3000
+  api-server:
+    image: bench352/prior2do-syncserver:latest
+    ports:
+      - 8000:8000
+    environment:
+      NEO4J_HOST: database
+      NEO4J_PORT: 7687
+      NEO4J_USERNAME: neo4j
+      NEO4J_PASSWORD: <password>
+      SECRET_KEY: <YOUR_SECRET_KEY_HERE>
+  database:
+    image: neo4j
+    volumes:
+      - neo4j-data:/data
+    environment:
+      NEO4J_AUTH: neo4j/<password>
+volumes:
+  neo4j-data:
+    external: false
