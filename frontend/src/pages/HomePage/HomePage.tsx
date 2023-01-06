@@ -93,7 +93,7 @@ export default function HomePage() {
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText
-                  primary="Add Your Tasks"
+                  primary="Track Your Tasks"
                   secondary="Add all your tasks to the app to track what you have to do."
                 />
               </ListItem>

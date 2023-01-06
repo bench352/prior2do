@@ -119,7 +119,7 @@ export default function CommonView() {
             label="Beta"
             color="secondary"
             size="small"
-            sx={{ "margin-left": "10px" }}
+            sx={{ "marginLeft": "10px" }}
           />
         </Toolbar>
       </AppBar>

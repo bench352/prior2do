@@ -41,6 +41,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -63,6 +65,7 @@
     ]
   },
   "devDependencies": {
-    "@types/dateformat": "^5.0.0"
+    "@types/dateformat": "^5.0.0",
+    "gh-pages": "^4.0.0"
   }
 }

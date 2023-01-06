@@ -1,10 +1,15 @@
 import CleaningServicesOutlinedIcon from "@mui/icons-material/CleaningServicesOutlined";
 import CloudSyncIcon from "@mui/icons-material/CloudSync";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import DnsOutlinedIcon from "@mui/icons-material/DnsOutlined";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import SyncAltOutlinedIcon from "@mui/icons-material/SyncAltOutlined";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import List from "@mui/material/List";
@@ -23,6 +28,7 @@ import {
 } from "../../components/storage/StorageBackend";
 import ConfirmDialog from "../../components/userInterface/dialog/ConfirmDialog";
 import ConfirmReadFileDialog from "../../components/userInterface/dialog/ConfirmReadFileDialog";
+import LicenseDialog from "../../components/userInterface/dialog/LicenseDialog";
 import SingleTextInputDialog from "../../components/userInterface/dialog/SingleTextInputDialog";
 
 interface SettingsPageProps {
@@ -36,6 +42,7 @@ export default function SettingsPage(props: SettingsPageProps) {
     cleanupCompleted: false,
     deleteAllData: false,
     syncServerIPAddr: false,
+    licenseDialog: false,
   });
   const [syncOptionEnabled, setSyncOptionEnabled] = useState(
     getStorageBackend().isSyncEnabled()
@@ -61,9 +68,6 @@ export default function SettingsPage(props: SettingsPageProps) {
       <Grid container spacing={2} columns={{ xs: 6, sm: 12, md: 12 }}>
         <Grid item xs={6}>
           <h2>Managing App Data</h2>
-          <p>
-            Backup/Restore data for the app, cleanup the data, or reset the app.
-          </p>
           <List sx={{ width: "100%" }}>
             <ListItem disablePadding>
               <ListItemButton
@@ -114,14 +118,49 @@ export default function SettingsPage(props: SettingsPageProps) {
               </ListItemButton>
             </ListItem>
           </List>
+          <h2>About The App</h2>
+          <List sx={{ width: "100%" }}>
+            <ListItem>
+              <ListItemIcon>
+                <InfoOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText primary="App Version" secondary="0.1.0" />
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => {
+                  updateVisibility("licenseDialog", true);
+                }}
+              >
+                <ListItemIcon>
+                  <DescriptionOutlinedIcon />
+                </ListItemIcon>
+                <ListItemText primary="License" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => {
+                  window.open("https://github.com/bench352/prior2do");
+                }}
+              >
+                <ListItemIcon>
+                  <GitHubIcon />
+                </ListItemIcon>
+                <ListItemText primary="Project GitHub Repository" />
+              </ListItemButton>
+            </ListItem>
+          </List>
         </Grid>
         <Grid item xs={6}>
           <h2>Prior2Do Sync</h2>
-          <p>
-            If you have your own server or Kubernetes Cluster, you can host an
-            instance of Prior2Do Sync server on it and configure your Prior2Do
-            app to backup and sync with it.
-          </p>
+          <Alert severity="info">
+            <AlertTitle>Self-hosting needed for Prior2Do Sync</AlertTitle>
+            In order to enjoy the backup and sync feature, you need to{" "}
+            <strong>host your own Prior2Do Sync server</strong> and configure
+            the app to connect to it. You can still use the app standalone if
+            you do not have or cannot host your own Prior2Do Sync server.
+          </Alert>
           <List sx={{ width: "100%" }}>
             <ListItem>
               <ListItemIcon>
@@ -232,6 +271,12 @@ export default function SettingsPage(props: SettingsPageProps) {
         message="Please enter an IP address/domain that allows you to access your server EXTERNALLY. Please specify the port (e.g. 192.168.1.101:8080) if your server is not serving at the default HTTP port."
         handleClose={() => {
           updateVisibility("syncServerIPAddr", false);
+        }}
+      />
+      <LicenseDialog
+        open={dialogVisibility.licenseDialog}
+        handleHideDialog={() => {
+          updateVisibility("licenseDialog", false);
         }}
       />
     </Container>
