@@ -1,0 +1,26 @@
+name: Update Helm Repo
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  update-helm-repo:
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: ./deployment
+    steps:
+    - uses: actions/checkout@v3
+    - name: Helm tool installer
+      uses: Azure/setup-helm@v3
+    - run: helm package chart --version ${{ github.ref_name }} --destination helm-repo
+    - run: helm repo index helm-repo
+    - name: Setup Git Config
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "<>"
+    - name: Commit And Push Changes
+      run: |
+        git add .
+        git commit -m "Update Helm Repository"
+        git push origin main
