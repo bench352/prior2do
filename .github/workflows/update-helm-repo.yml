@@ -10,7 +10,7 @@ jobs:
       run:
         working-directory: ./deployment
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     - name: Helm tool installer
       uses: Azure/setup-helm@v3
     - run: helm package chart --version ${{ github.ref_name }} --destination helm-repo
