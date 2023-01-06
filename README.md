@@ -78,8 +78,6 @@ docker-compose up -d
 You may want to spend some time **configuring your secret key** as well as **changing the password for the Neo4j Graph Database**. In the `docker-compose.yml` file, you can see the environment variables for the Prior2Do Sync server as below:
 
 ```yaml
-
----
 api-server:
   image: bench352/prior2do-syncserver
   ports:
@@ -95,8 +93,6 @@ api-server:
 replace `<YOUR_SECRET_KEY_HERE>` with your own Secret Key for generating the JWT tokens. If you wish to change the password for the database, replace `<password>` next to `NEO4J_PASSWORD` with your desired password. Don't forget to update the environment variable for the Neo4j Graph Database too:
 
 ```yaml
-
----
 database:
   image: neo4j
   volumes:
