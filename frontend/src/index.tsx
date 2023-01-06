@@ -4,7 +4,7 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import "./index.css";
@@ -24,9 +24,9 @@ const theme = createTheme({
 });
 root.render(
   <ThemeProvider theme={theme}>
-    <BrowserRouter>
+    <HashRouter>
       <CommonView />
-    </BrowserRouter>
+    </HashRouter>
   </ThemeProvider>
 );
 
