@@ -124,7 +124,7 @@ export default function SettingsPage(props: SettingsPageProps) {
               <ListItemIcon>
                 <InfoOutlinedIcon />
               </ListItemIcon>
-              <ListItemText primary="App Version" secondary="0.1.0" />
+              <ListItemText primary="App Version" secondary="0.2.0" />
             </ListItem>
             <ListItem disablePadding>
               <ListItemButton
