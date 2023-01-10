@@ -1,5 +1,5 @@
 import FlagCircleOutlinedIcon from "@mui/icons-material/FlagCircleOutlined";
-import { Checkbox } from "@mui/material";
+import { CardActionArea, Checkbox } from "@mui/material";
 import Card from "@mui/material/Card";
 import IconButton from "@mui/material/IconButton";
 import dateFormat from "dateformat";
@@ -37,44 +37,46 @@ export default function TaskPlanCard(props: task) {
   };
   return (
     <div>
-      <Card sx={{ padding: "10px 10px", margin: "15px 0px", display: "flex" }}>
-        <div style={buttonStyle}>
-          <Checkbox
-            name="completed"
-            checked={taskCompleted}
-            onChange={handleCheckboxChange}
-          />
-        </div>
-        <div>
-          <h3>{props.task.name}</h3>
-          <p>
-            {props.task.tag === ""
-              ? "Uncategorized · "
-              : props.task.tag + " · "}
-            {props.task.dueDate === null
-              ? "No due date"
-              : "Due " + dateFormat(props.task.dueDate, "mmm dd, yyyy")}
-          </p>
-          <p>
-            {props.task.plannedDate !== null
-              ? "Planned on " +
-                dateFormat(props.task.plannedDate, "mmm dd, yyyy") +
-                " | Estimated " +
-                props.task.estHr +
-                "h"
-              : "No plan"}
-          </p>
-        </div>
-        <div style={buttonStyle}>
-          <IconButton
-            color="primary"
-            aria-label="Edit task"
-            component="label"
-            onClick={handleShowDialog}
-          >
-            <FlagCircleOutlinedIcon />
-          </IconButton>
-        </div>
+      <Card sx={{ margin: "15px 0px" }}>
+        <CardActionArea
+          sx={{
+            padding: "10px 10px",
+            display: "flex",
+            justifyContent: "flex-start",
+          }}
+          onClick={handleShowDialog}
+        >
+          <div style={buttonStyle}>
+            <Checkbox
+              name="completed"
+              checked={taskCompleted}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              onChange={handleCheckboxChange}
+            />
+          </div>
+          <div>
+            <h3>{props.task.name}</h3>
+            <p>
+              {props.task.tag === ""
+                ? "Uncategorized · "
+                : props.task.tag + " · "}
+              {props.task.dueDate === null
+                ? "No due date"
+                : "Due " + dateFormat(props.task.dueDate, "mmm dd, yyyy")}
+            </p>
+            <p>
+              {props.task.plannedDate !== null
+                ? "Planned on " +
+                  dateFormat(props.task.plannedDate, "mmm dd, yyyy") +
+                  " | Estimated " +
+                  props.task.estHr +
+                  "h"
+                : "No plan"}
+            </p>
+          </div>
+        </CardActionArea>
       </Card>
       <TaskPlanDialog
         open={showUpdateTaskDialog}

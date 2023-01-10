@@ -15,6 +15,9 @@ import TextField from "@mui/material/TextField";
 import { useState } from "react";
 import { login, signup } from "../../../components/storage/Accounts";
 import ConfirmDialog from "../../../components/userInterface/dialog/ConfirmDialog";
+import InputAdornment from "@mui/material/InputAdornment";
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 interface NotLoggedInProps {
   setLoginStateFunc(isLoggedIn: boolean): any;
@@ -38,7 +41,7 @@ export default function NotLoggedIn(props: NotLoggedInProps) {
   };
   return (
     <div>
-      <Grid container spacing={2} columns={{ xs: 6, sm: 12, md: 12 }}>
+      <Grid container spacing={2} columns={{ xs: 6, sm: 6, md: 12 }}>
         <Grid item xs={6}>
           <Card>
             <CardContent>
@@ -63,9 +66,14 @@ export default function NotLoggedIn(props: NotLoggedInProps) {
                   type="text"
                   value={loginForm.username}
                   onChange={handleInputChange}
-                  InputLabelProps={{
-                    shrink: true,
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <AccountCircleOutlinedIcon />
+                      </InputAdornment>
+                    ),
                   }}
+                  variant="standard"
                 />
                 <TextField
                   id="password"
@@ -74,9 +82,14 @@ export default function NotLoggedIn(props: NotLoggedInProps) {
                   type="password"
                   value={loginForm.password}
                   onChange={handleInputChange}
-                  InputLabelProps={{
-                    shrink: true,
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <LockOutlinedIcon />
+                      </InputAdornment>
+                    ),
                   }}
+                  variant="standard"
                 />
               </Box>
               <Stack
@@ -108,7 +121,7 @@ export default function NotLoggedIn(props: NotLoggedInProps) {
           </Card>
         </Grid>
         <Grid item xs={6}>
-          <Card sx={{ display: { xs: "none", sm: "block", md: "block" } }}>
+          <Card sx={{ display: { xs: "none", sm: "none", md: "block" } }}>
             <CardContent>
               <h2>Utilize Prior2Do to Your Full Potential</h2>
               <p>

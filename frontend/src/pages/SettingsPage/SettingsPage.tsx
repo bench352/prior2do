@@ -65,7 +65,7 @@ export default function SettingsPage(props: SettingsPageProps) {
   };
   return (
     <Container>
-      <Grid container spacing={2} columns={{ xs: 6, sm: 12, md: 12 }}>
+      <Grid container spacing={2} columns={{ xs: 6, sm: 6, md: 12 }}>
         <Grid item xs={6}>
           <h2>Managing App Data</h2>
           <List sx={{ width: "100%" }}>
@@ -118,13 +118,13 @@ export default function SettingsPage(props: SettingsPageProps) {
               </ListItemButton>
             </ListItem>
           </List>
-          <h2>About The App</h2>
+          <h2>About This App</h2>
           <List sx={{ width: "100%" }}>
             <ListItem>
               <ListItemIcon>
                 <InfoOutlinedIcon />
               </ListItemIcon>
-              <ListItemText primary="App Version" secondary="0.2.0" />
+              <ListItemText primary="App Version" secondary="0.1.1" />
             </ListItem>
             <ListItem disablePadding>
               <ListItemButton

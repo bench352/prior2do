@@ -8,7 +8,6 @@ import {
   Task,
 } from "../../components/storage/StorageBackend";
 import AddTaskDialog from "../../components/userInterface/dialog/AddTaskDialog";
-import LoadingBackdrop from "../../components/userInterface/LoadingBackdrop";
 import TaskCard from "../../components/userInterface/TaskCard";
 
 const floatingButtonStyle = {
@@ -20,28 +19,29 @@ const floatingButtonStyle = {
   position: "fixed",
 };
 
-export default function AllTasksPage() {
+interface AllTaskPageProps {
+  showLoading(visibility: boolean): any;
+}
+
+export default function AllTasksPage(props: AllTaskPageProps) {
   const storageBackend = getStorageBackend();
   const [tasks, setTasks] = useState([] as Task[]);
   const [addTaskDialogEnabled, setAddTaskDialogEnabled] = useState(false);
-  const [showLoadingBackdrop, setShowLoadingBackdrop] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState("");
   const [showSnackBar, setShowSnackBar] = useState(false);
   const handleSnackbarClose = () => {
     setShowSnackBar(false);
   };
   const refreshTasks = useCallback(async () => {
-    setShowLoadingBackdrop(true);
-    let allTasks = [] as Task[];
+    props.showLoading(true);
+    setTasks(storageBackend.localGetTasks());
     try {
-      allTasks = await storageBackend.getTasks();
+      setTasks(await storageBackend.getTasks());
     } catch (error: any) {
       setSnackBarMessage(error.message);
       setShowSnackBar(true);
-      allTasks = storageBackend.localGetTasks();
     }
-    setTasks(allTasks);
-    setShowLoadingBackdrop(false);
+    props.showLoading(false);
   }, [storageBackend]);
   useEffect(() => {
     refreshTasks(); // eslint-disable-next-line
@@ -83,7 +83,6 @@ export default function AllTasksPage() {
         handleHideDialog={hideAddTaskDialog}
         handleRefreshPage={refreshTasks}
       />
-      <LoadingBackdrop open={showLoadingBackdrop} />
       <Snackbar
         open={showSnackBar}
         autoHideDuration={6000}

@@ -5,7 +5,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface textInputDialogProps {
   open: boolean;
@@ -25,6 +25,9 @@ export default function SingleTextInputDialog(props: textInputDialogProps) {
     props.setConfirmValue(textValue);
     props.handleClose();
   };
+  useEffect(() => {
+    setTextValue("");
+  }, [props.open]);
   return (
     <Dialog open={props.open}>
       <DialogTitle>{props.title}</DialogTitle>

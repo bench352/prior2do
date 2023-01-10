@@ -8,6 +8,7 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
+import CircularProgress from "@mui/material/CircularProgress";
 import CssBaseline from "@mui/material/CssBaseline";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
@@ -33,10 +34,13 @@ const drawerWidth = 240;
 export default function CommonView() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showUser, setShowUser] = useState(isSyncEnabled());
+  const [showLoading, setShowLoading] = useState(false);
   const changeUserOptionVisibility = (visibility: boolean) => {
     setShowUser(visibility);
   };
-
+  const changeLoadingVisibility = (visibility: boolean) => {
+    setShowLoading(visibility);
+  };
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -138,7 +142,7 @@ export default function CommonView() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h6" component="div">
             Prior2Do
           </Typography>
           <Chip
@@ -147,6 +151,15 @@ export default function CommonView() {
             size="small"
             sx={{ marginLeft: "10px" }}
           />
+          {showLoading ? (
+            <Box
+              sx={{ width: "100%", display: "flex", justifyContent: "right" }}
+            >
+              <CircularProgress sx={{ color: "white" }} />
+            </Box>
+          ) : (
+            ""
+          )}
         </Toolbar>
       </AppBar>
       <Box
@@ -195,10 +208,22 @@ export default function CommonView() {
       >
         <Toolbar />
         <Routes>
-          <Route path="/*" element={<HomePage />} />
-          <Route path="tasks" element={<AllTasksPage />} />
-          <Route path="due" element={<TaskDuePage />} />
-          <Route path="plan" element={<TaskPlanPage />} />
+          <Route
+            path="/*"
+            element={<HomePage showLoading={changeLoadingVisibility} />}
+          />
+          <Route
+            path="tasks"
+            element={<AllTasksPage showLoading={changeLoadingVisibility} />}
+          />
+          <Route
+            path="due"
+            element={<TaskDuePage showLoading={changeLoadingVisibility} />}
+          />
+          <Route
+            path="plan"
+            element={<TaskPlanPage showLoading={changeLoadingVisibility} />}
+          />
           <Route path="user" element={<UserPage />} />
           <Route
             path="settings"

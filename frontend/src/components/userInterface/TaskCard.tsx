@@ -1,9 +1,10 @@
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { Checkbox } from "@mui/material";
+import { CardActionArea, Checkbox } from "@mui/material";
 import Card from "@mui/material/Card";
-import IconButton from "@mui/material/IconButton";
 import dateFormat from "dateformat";
 import { useState } from "react";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Stack from "@mui/material/Stack";
 import { getStorageBackend, Task } from "../storage/StorageBackend";
 import EditTaskDialog from "./dialog/EditTaskDialog";
 const buttonStyle = {
@@ -40,36 +41,44 @@ export default function TaskCard(props: task) {
   };
   return (
     <div>
-      <Card sx={{ padding: "10px 10px", margin: "15px 0px", display: "flex" }}>
-        <div style={buttonStyle}>
-          <Checkbox
-            name="completed"
-            checked={taskCompleted}
-            onChange={handleCheckboxChange}
-          />
-        </div>
-        <div>
-          <h3>{props.task.name}</h3>
-          <p>
-            {props.task.tag === ""
-              ? "Uncategorized · "
-              : props.task.tag + " · "}
-            {props.task.dueDate === null
-              ? "No due date"
-              : "Due " + dateFormat(props.task.dueDate, "mmm dd, yyyy")}
-            {props.showEstTime ? " | Estimated " + props.task.estHr + "h" : ""}
-          </p>
-        </div>
-        <div style={buttonStyle}>
-          <IconButton
-            color="primary"
-            aria-label="Edit task"
-            component="label"
-            onClick={handleShowDialog}
-          >
-            <EditOutlinedIcon />
-          </IconButton>
-        </div>
+      <Card sx={{ margin: "15px 0px" }}>
+        <CardActionArea
+          sx={{
+            padding: "10px 5px",
+          }}
+          onClick={handleShowDialog}
+        >
+          <Stack direction="row">
+            <Box style={buttonStyle}>
+              <Checkbox
+                name="completed"
+                checked={taskCompleted}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                onChange={handleCheckboxChange}
+              />
+            </Box>
+            <Box sx={{ width: "auto" }}>
+              <Typography variant="h6" component="h6" noWrap>
+                {/* BUG Typography won't adopt to card with (overflowing) */}
+                {props.task.name}
+              </Typography>
+
+              <p>
+                {props.task.tag === ""
+                  ? "Uncategorized · "
+                  : props.task.tag + " · "}
+                {props.task.dueDate === null
+                  ? "No due date"
+                  : "Due " + dateFormat(props.task.dueDate, "mmm dd, yyyy")}
+                {props.showEstTime
+                  ? " | Estimated " + props.task.estHr + "h"
+                  : ""}
+              </p>
+            </Box>
+          </Stack>
+        </CardActionArea>
       </Card>
       <EditTaskDialog
         open={showUpdateTaskDialog}

@@ -17,10 +17,13 @@ import {
   getStorageBackend,
   Task,
 } from "../../components/storage/StorageBackend";
-import LoadingBackdrop from "../../components/userInterface/LoadingBackdrop";
 import TaskCard from "../../components/userInterface/TaskCard";
 
-export default function HomePage() {
+interface HomePageProps {
+  showLoading(visibility: boolean): any;
+}
+
+export default function HomePage(props: HomePageProps) {
   const filterTodayPlannedTask = (unfilteredTasks: any[]) => {
     return unfilteredTasks
       .filter((task: Task) => task.plannedDate !== null)
@@ -39,7 +42,6 @@ export default function HomePage() {
   };
   const storageBackend = getStorageBackend();
   const [tasks, setTasks] = useState([] as Task[]);
-  const [showLoadingBackdrop, setShowLoadingBackdrop] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState("");
   const [showSnackBar, setShowSnackBar] = useState(false);
   const handleSnackbarClose = () => {
@@ -49,17 +51,15 @@ export default function HomePage() {
     storageBackend.isWelcomeMessageShown()
   );
   const refreshTasks = useCallback(async () => {
-    setShowLoadingBackdrop(true);
-    let allTasks = [] as Task[];
+    props.showLoading(true);
+    setTasks(storageBackend.localGetTasks());
     try {
-      allTasks = await storageBackend.getTasks();
+      setTasks(await storageBackend.getTasks());
     } catch (error: any) {
       setSnackBarMessage(error.message);
       setShowSnackBar(true);
-      allTasks = storageBackend.localGetTasks();
     }
-    setTasks(allTasks);
-    setShowLoadingBackdrop(false);
+    props.showLoading(false);
   }, [storageBackend]);
   useEffect(() => {
     refreshTasks(); // eslint-disable-next-line
@@ -138,7 +138,6 @@ export default function HomePage() {
       ) : (
         ""
       )}
-      <LoadingBackdrop open={showLoadingBackdrop} />
       <Snackbar
         open={showSnackBar}
         autoHideDuration={6000}

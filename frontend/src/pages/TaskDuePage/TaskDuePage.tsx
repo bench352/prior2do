@@ -5,13 +5,15 @@ import {
   getStorageBackend,
   Task,
 } from "../../components/storage/StorageBackend";
-import LoadingBackdrop from "../../components/userInterface/LoadingBackdrop";
 import TaskCard from "../../components/userInterface/TaskCard";
 
-export default function TaskDuePage() {
+interface TaskDuePageProps {
+  showLoading(visibility: boolean): any;
+}
+
+export default function TaskDuePage(props: TaskDuePageProps) {
   const storageBackend = getStorageBackend();
   const [tasks, setTasks] = useState([] as Task[]);
-  const [showLoadingBackdrop, setShowLoadingBackdrop] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState("");
   const [showSnackBar, setShowSnackBar] = useState(false);
 
@@ -19,17 +21,15 @@ export default function TaskDuePage() {
     setShowSnackBar(false);
   };
   const refreshTasks = useCallback(async () => {
-    setShowLoadingBackdrop(true);
-    let allTasks = [] as Task[];
+    props.showLoading(true);
+    setTasks(storageBackend.localGetTasks());
     try {
-      allTasks = await storageBackend.getTasks();
+      setTasks(await storageBackend.getTasks());
     } catch (error: any) {
       setSnackBarMessage(error.message);
       setShowSnackBar(true);
-      allTasks = storageBackend.localGetTasks();
     }
-    setTasks(allTasks);
-    setShowLoadingBackdrop(false);
+    props.showLoading(false);
   }, [storageBackend]);
   useEffect(() => {
     refreshTasks(); // eslint-disable-next-line
@@ -53,7 +53,6 @@ export default function TaskDuePage() {
             showEstTime={false}
           />
         ))}
-      <LoadingBackdrop open={showLoadingBackdrop} />
       <Snackbar
         open={showSnackBar}
         autoHideDuration={6000}

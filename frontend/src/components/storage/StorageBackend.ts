@@ -48,6 +48,6 @@ export async function testServerConnection() {
       alert("The configured domain is not a Prior2Do Sync Server");
     }
   } catch (error) {
-    alert("Connection error: [" + error + "]");
+    alert("Failed to connect to Prior2Do Sync server.");
   }
 }

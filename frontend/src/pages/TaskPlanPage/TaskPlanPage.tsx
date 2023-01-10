@@ -8,13 +8,16 @@ import {
   getStorageBackend,
   Task,
 } from "../../components/storage/StorageBackend";
-import LoadingBackdrop from "../../components/userInterface/LoadingBackdrop";
 import TaskPlanCard from "../../components/userInterface/TaskPlanCard";
 
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
+}
+
+interface TaskPlanPageProps {
+  showLoading(visibility: boolean): any;
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -40,28 +43,25 @@ function a11yProps(index: number) {
   };
 }
 
-export default function TaskPlanPage() {
+export default function TaskPlanPage(props: TaskPlanPageProps) {
   const storageBackend = getStorageBackend();
   const [value, setValue] = useState(0);
   const [tasks, setTasks] = useState([] as Task[]);
-  const [showLoadingBackdrop, setShowLoadingBackdrop] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState("");
   const [showSnackBar, setShowSnackBar] = useState(false);
   const handleSnackbarClose = () => {
     setShowSnackBar(false);
   };
   const refreshTasks = useCallback(async () => {
-    setShowLoadingBackdrop(true);
-    let allTasks = [] as Task[];
+    props.showLoading(true);
+    setTasks(storageBackend.localGetTasks());
     try {
-      allTasks = await storageBackend.getTasks();
+      setTasks(await storageBackend.getTasks());
     } catch (error: any) {
       setSnackBarMessage(error.message);
       setShowSnackBar(true);
-      allTasks = storageBackend.localGetTasks();
     }
-    setTasks(allTasks);
-    setShowLoadingBackdrop(false);
+    props.showLoading(false);
   }, [storageBackend]);
   useEffect(() => {
     refreshTasks(); // eslint-disable-next-line
@@ -117,7 +117,6 @@ export default function TaskPlanPage() {
             />
           ))}
       </TabPanel>
-      <LoadingBackdrop open={showLoadingBackdrop} />
       <Snackbar
         open={showSnackBar}
         autoHideDuration={6000}
