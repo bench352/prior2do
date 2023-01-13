@@ -17,7 +17,9 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import { useTheme } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { useState } from "react";
 import { isLoggedIn } from "../../components/storage/Accounts";
 import {
@@ -36,6 +38,8 @@ interface SettingsPageProps {
 }
 
 export default function SettingsPage(props: SettingsPageProps) {
+  const theme = useTheme();
+  const isMobileScreenSize = useMediaQuery(theme.breakpoints.down("sm"));
   const [dialogVisibility, setDialogVisibility] = useState({
     importJSONData: false,
     exportJSONData: false,
@@ -64,7 +68,7 @@ export default function SettingsPage(props: SettingsPageProps) {
     props.showUser(e.target.checked);
   };
   return (
-    <Container>
+    <Container disableGutters={isMobileScreenSize}>
       <Grid container spacing={2} columns={{ xs: 6, sm: 6, md: 12 }}>
         <Grid item xs={6}>
           <h2>Managing App Data</h2>

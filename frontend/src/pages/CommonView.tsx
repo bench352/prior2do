@@ -203,7 +203,7 @@ export default function CommonView() {
         sx={{
           flexGrow: 1,
           p: 3,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          width: { sm: `calc(100% - ${drawerWidth}px)`, xs: "100%" },
         }}
       >
         <Toolbar />

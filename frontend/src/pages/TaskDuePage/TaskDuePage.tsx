@@ -1,5 +1,7 @@
 import Container from "@mui/material/Container";
 import Snackbar from "@mui/material/Snackbar";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { useCallback, useEffect, useState } from "react";
 import {
   getStorageBackend,
@@ -12,6 +14,8 @@ interface TaskDuePageProps {
 }
 
 export default function TaskDuePage(props: TaskDuePageProps) {
+  const theme = useTheme();
+  const isMobileScreenSize = useMediaQuery(theme.breakpoints.down("sm"));
   const storageBackend = getStorageBackend();
   const [tasks, setTasks] = useState([] as Task[]);
   const [snackBarMessage, setSnackBarMessage] = useState("");
@@ -35,7 +39,7 @@ export default function TaskDuePage(props: TaskDuePageProps) {
     refreshTasks(); // eslint-disable-next-line
   }, []);
   return (
-    <Container>
+    <Container disableGutters={isMobileScreenSize}>
       <h2>Task Due</h2>
       <p>All the tasks with a due date.</p>
       {tasks

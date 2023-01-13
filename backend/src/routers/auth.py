@@ -23,8 +23,11 @@ async def login(form_data: fastapi.security.OAuth2PasswordRequestForm = fastapi.
 
 @router.post("/signup")
 async def signup(user: schema.User):
-    await services.auth.signup(user.username, user.password)
-    return "signup success"
+    try:
+        await services.auth.signup(user.username, user.password)
+        return "signup success"
+    except exceptions.UserAlreadyExists as e:
+        raise fastapi.HTTPException(status_code=fastapi.status.HTTP_409_CONFLICT, detail=str(e))
 
 
 @router.put("/users")

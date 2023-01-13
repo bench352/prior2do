@@ -1,17 +1,11 @@
 import { CardActionArea, Checkbox } from "@mui/material";
 import Card from "@mui/material/Card";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
 import dateFormat from "dateformat";
 import { useState } from "react";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Stack from "@mui/material/Stack";
 import { getStorageBackend, Task } from "../storage/StorageBackend";
 import EditTaskDialog from "./dialog/EditTaskDialog";
-const buttonStyle = {
-  display: "flex",
-  alignItems: "center",
-  width: 50,
-};
 
 interface task {
   task: Task;
@@ -40,7 +34,7 @@ export default function TaskCard(props: task) {
     });
   };
   return (
-    <div>
+    <>
       <Card sx={{ margin: "15px 0px" }}>
         <CardActionArea
           sx={{
@@ -48,8 +42,15 @@ export default function TaskCard(props: task) {
           }}
           onClick={handleShowDialog}
         >
-          <Stack direction="row">
-            <Box style={buttonStyle}>
+          <Grid
+            container
+            direction="row"
+            wrap="nowrap"
+            justifyContent="flex-start"
+            alignItems="center"
+            spacing={1}
+          >
+            <Grid item>
               <Checkbox
                 name="completed"
                 checked={taskCompleted}
@@ -58,10 +59,9 @@ export default function TaskCard(props: task) {
                 }}
                 onChange={handleCheckboxChange}
               />
-            </Box>
-            <Box sx={{ width: "auto" }}>
+            </Grid>
+            <Grid item zeroMinWidth>
               <Typography variant="h6" component="h6" noWrap>
-                {/* BUG Typography won't adopt to card with (overflowing) */}
                 {props.task.name}
               </Typography>
 
@@ -76,8 +76,8 @@ export default function TaskCard(props: task) {
                   ? " | Estimated " + props.task.estHr + "h"
                   : ""}
               </p>
-            </Box>
-          </Stack>
+            </Grid>
+          </Grid>
         </CardActionArea>
       </Card>
       <EditTaskDialog
@@ -86,6 +86,6 @@ export default function TaskCard(props: task) {
         handleRefreshPage={props.handleRefreshPage}
         existingTask={props.task}
       />
-    </div>
+    </>
   );
 }

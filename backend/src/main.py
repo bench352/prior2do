@@ -31,7 +31,7 @@ tags_metadata = [
 ]
 
 app = fastapi.FastAPI(
-    title="Prior2Do Sync", description=description, version="0.1.0", openapi_tags=tags_metadata
+    title="Prior2Do Sync", description=description, version="0.1.1", openapi_tags=tags_metadata
 )
 
 
@@ -46,7 +46,7 @@ app.include_router(routers.tasks.router, tags=["Tasks"])
 
 @app.exception_handler(exceptions.UserAuthenticationFail)
 async def authentication_fail_handler(_: fastapi.Request, exc: exceptions.UserAuthenticationFail):
-    return fastapi.responses.PlainTextResponse(status_code=401, content=str(exc))
+    return fastapi.responses.JSONResponse(status_code=401, content={"detail": str(exc)})
 
 
 app.add_middleware(

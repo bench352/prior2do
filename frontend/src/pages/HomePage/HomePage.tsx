@@ -12,6 +12,8 @@ import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
 import Snackbar from "@mui/material/Snackbar";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { useCallback, useEffect, useState } from "react";
 import {
   getStorageBackend,
@@ -24,6 +26,8 @@ interface HomePageProps {
 }
 
 export default function HomePage(props: HomePageProps) {
+  const theme = useTheme();
+  const isMobileScreenSize = useMediaQuery(theme.breakpoints.down("sm"));
   const filterTodayPlannedTask = (unfilteredTasks: any[]) => {
     return unfilteredTasks
       .filter((task: Task) => task.plannedDate !== null)
@@ -69,7 +73,7 @@ export default function HomePage(props: HomePageProps) {
     storageBackend.hideWelcomeMessage();
   };
   return (
-    <Container>
+    <Container disableGutters={isMobileScreenSize}>
       {showWelcomeMessage ? (
         <Card sx={{ margin: "0px 0px 15px 0px" }}>
           <CardContent>

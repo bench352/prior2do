@@ -2,6 +2,8 @@ import AddIcon from "@mui/icons-material/Add";
 import Container from "@mui/material/Container";
 import Fab from "@mui/material/Fab";
 import Snackbar from "@mui/material/Snackbar";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { useCallback, useEffect, useState } from "react";
 import {
   getStorageBackend,
@@ -24,6 +26,8 @@ interface AllTaskPageProps {
 }
 
 export default function AllTasksPage(props: AllTaskPageProps) {
+  const theme = useTheme();
+  const isMobileScreenSize = useMediaQuery(theme.breakpoints.down("sm"));
   const storageBackend = getStorageBackend();
   const [tasks, setTasks] = useState([] as Task[]);
   const [addTaskDialogEnabled, setAddTaskDialogEnabled] = useState(false);
@@ -53,7 +57,7 @@ export default function AllTasksPage(props: AllTaskPageProps) {
     setAddTaskDialogEnabled(false);
   };
   return (
-    <Container>
+    <Container disableGutters={isMobileScreenSize}>
       <Fab
         variant="extended"
         color="secondary"

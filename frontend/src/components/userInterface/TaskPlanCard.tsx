@@ -1,16 +1,10 @@
-import FlagCircleOutlinedIcon from "@mui/icons-material/FlagCircleOutlined";
-import { CardActionArea, Checkbox } from "@mui/material";
+import { CardActionArea, Checkbox, Typography } from "@mui/material";
 import Card from "@mui/material/Card";
-import IconButton from "@mui/material/IconButton";
+import Grid from "@mui/material/Grid";
 import dateFormat from "dateformat";
 import { useState } from "react";
 import { getStorageBackend, Task } from "../storage/StorageBackend";
 import TaskPlanDialog from "./dialog/TaskPlanDialog";
-const buttonStyle = {
-  display: "flex",
-  alignItems: "center",
-  width: 50,
-};
 
 interface task {
   task: Task;
@@ -36,7 +30,7 @@ export default function TaskPlanCard(props: task) {
     });
   };
   return (
-    <div>
+    <>
       <Card sx={{ margin: "15px 0px" }}>
         <CardActionArea
           sx={{
@@ -46,7 +40,15 @@ export default function TaskPlanCard(props: task) {
           }}
           onClick={handleShowDialog}
         >
-          <div style={buttonStyle}>
+          <Grid
+            container
+            direction="row"
+            wrap="nowrap"
+            justifyContent="flex-start"
+            alignItems="center"
+            spacing={1}
+          >
+            <Grid item>
             <Checkbox
               name="completed"
               checked={taskCompleted}
@@ -55,10 +57,12 @@ export default function TaskPlanCard(props: task) {
               }}
               onChange={handleCheckboxChange}
             />
-          </div>
-          <div>
-            <h3>{props.task.name}</h3>
-            <p>
+            </Grid>
+            <Grid item zeroMinWidth>
+              <Typography variant="h6" component="h6" noWrap>
+              {props.task.name}
+              </Typography>
+              <p>
               {props.task.tag === ""
                 ? "Uncategorized · "
                 : props.task.tag + " · "}
@@ -75,7 +79,8 @@ export default function TaskPlanCard(props: task) {
                   "h"
                 : "No plan"}
             </p>
-          </div>
+            </Grid>
+          </Grid>
         </CardActionArea>
       </Card>
       <TaskPlanDialog
@@ -84,6 +89,6 @@ export default function TaskPlanCard(props: task) {
         handleRefreshPage={props.handleRefreshPage}
         existingTask={props.task}
       />
-    </div>
+    </>
   );
 }

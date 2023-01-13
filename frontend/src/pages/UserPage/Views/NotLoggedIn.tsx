@@ -16,8 +16,8 @@ import { useState } from "react";
 import { login, signup } from "../../../components/storage/Accounts";
 import ConfirmDialog from "../../../components/userInterface/dialog/ConfirmDialog";
 import InputAdornment from "@mui/material/InputAdornment";
-import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 interface NotLoggedInProps {
   setLoginStateFunc(isLoggedIn: boolean): any;
@@ -37,7 +37,14 @@ export default function NotLoggedIn(props: NotLoggedInProps) {
     });
   };
   const confirmSignup = async () => {
-    await signup(loginForm.username, loginForm.password);
+    try {
+      await signup(loginForm.username, loginForm.password);
+      props.setLoginStateFunc(
+        await login(loginForm.username, loginForm.password)
+      );
+    } catch (error: any) {
+      alert(error.message);
+    }
   };
   return (
     <div>
