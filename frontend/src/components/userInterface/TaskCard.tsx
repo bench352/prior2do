@@ -1,16 +1,11 @@
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { Checkbox } from "@mui/material";
+import { CardActionArea, Checkbox } from "@mui/material";
 import Card from "@mui/material/Card";
-import IconButton from "@mui/material/IconButton";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
 import dateFormat from "dateformat";
 import { useState } from "react";
 import { getStorageBackend, Task } from "../storage/StorageBackend";
 import EditTaskDialog from "./dialog/EditTaskDialog";
-const buttonStyle = {
-  display: "flex",
-  alignItems: "center",
-  width: 50,
-};
 
 interface task {
   task: Task;
@@ -39,37 +34,58 @@ export default function TaskCard(props: task) {
     });
   };
   return (
-    <div>
-      <Card sx={{ padding: "10px 10px", margin: "15px 0px", display: "flex" }}>
-        <div style={buttonStyle}>
-          <Checkbox
-            name="completed"
-            checked={taskCompleted}
-            onChange={handleCheckboxChange}
-          />
-        </div>
-        <div>
-          <h3>{props.task.name}</h3>
-          <p>
-            {props.task.tag === ""
-              ? "Uncategorized · "
-              : props.task.tag + " · "}
-            {props.task.dueDate === null
-              ? "No due date"
-              : "Due " + dateFormat(props.task.dueDate, "mmm dd, yyyy")}
-            {props.showEstTime ? " | Estimated " + props.task.estHr + "h" : ""}
-          </p>
-        </div>
-        <div style={buttonStyle}>
-          <IconButton
-            color="primary"
-            aria-label="Edit task"
-            component="label"
-            onClick={handleShowDialog}
+    <>
+      <Card sx={{ margin: "15px 0px" }}>
+        <CardActionArea
+          sx={{
+            padding: "10px 5px",
+          }}
+          onClick={handleShowDialog}
+        >
+          <Grid
+            container
+            direction="row"
+            wrap="nowrap"
+            justifyContent="flex-start"
+            alignItems="center"
+            spacing={1}
           >
-            <EditOutlinedIcon />
-          </IconButton>
-        </div>
+            <Grid item>
+              <Checkbox
+                name="completed"
+                checked={taskCompleted}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                onChange={handleCheckboxChange}
+              />
+            </Grid>
+            <Grid item zeroMinWidth>
+              <Typography
+                variant="h6"
+                component="h6"
+                noWrap
+                style={{
+                  textDecoration: taskCompleted ? "line-through" : "none",
+                }}
+              >
+                {props.task.name}
+              </Typography>
+
+              <p>
+                {props.task.tag === ""
+                  ? "Uncategorized · "
+                  : props.task.tag + " · "}
+                {props.task.dueDate === null
+                  ? "No due date"
+                  : "Due " + dateFormat(props.task.dueDate, "mmm dd, yyyy")}
+                {props.showEstTime
+                  ? " | Estimated " + props.task.estHr + "h"
+                  : ""}
+              </p>
+            </Grid>
+          </Grid>
+        </CardActionArea>
       </Card>
       <EditTaskDialog
         open={showUpdateTaskDialog}
@@ -77,6 +93,6 @@ export default function TaskCard(props: task) {
         handleRefreshPage={props.handleRefreshPage}
         existingTask={props.task}
       />
-    </div>
+    </>
   );
 }

@@ -2,13 +2,14 @@ import AddIcon from "@mui/icons-material/Add";
 import Container from "@mui/material/Container";
 import Fab from "@mui/material/Fab";
 import Snackbar from "@mui/material/Snackbar";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { useCallback, useEffect, useState } from "react";
 import {
   getStorageBackend,
   Task,
 } from "../../components/storage/StorageBackend";
 import AddTaskDialog from "../../components/userInterface/dialog/AddTaskDialog";
-import LoadingBackdrop from "../../components/userInterface/LoadingBackdrop";
 import TaskCard from "../../components/userInterface/TaskCard";
 
 const floatingButtonStyle = {
@@ -20,32 +21,36 @@ const floatingButtonStyle = {
   position: "fixed",
 };
 
-export default function AllTasksPage() {
-  const storageBackend = getStorageBackend();
+interface AllTaskPageProps {
+  showLoading(visibility: boolean): any;
+}
+
+export default function AllTasksPage(props: AllTaskPageProps) {
+  const [initialProps] = useState(props);
+  const theme = useTheme();
+  const isMobileScreenSize = useMediaQuery(theme.breakpoints.down("sm"));
   const [tasks, setTasks] = useState([] as Task[]);
   const [addTaskDialogEnabled, setAddTaskDialogEnabled] = useState(false);
-  const [showLoadingBackdrop, setShowLoadingBackdrop] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState("");
   const [showSnackBar, setShowSnackBar] = useState(false);
   const handleSnackbarClose = () => {
     setShowSnackBar(false);
   };
   const refreshTasks = useCallback(async () => {
-    setShowLoadingBackdrop(true);
-    let allTasks = [] as Task[];
+    const storageBackend = getStorageBackend();
+    initialProps.showLoading(true);
+    setTasks(storageBackend.localGetTasks());
     try {
-      allTasks = await storageBackend.getTasks();
+      setTasks(await storageBackend.getTasks());
     } catch (error: any) {
       setSnackBarMessage(error.message);
       setShowSnackBar(true);
-      allTasks = storageBackend.localGetTasks();
     }
-    setTasks(allTasks);
-    setShowLoadingBackdrop(false);
-  }, [storageBackend]);
+    initialProps.showLoading(false);
+  }, [initialProps]);
   useEffect(() => {
-    refreshTasks(); // eslint-disable-next-line
-  }, []);
+    refreshTasks();
+  }, [refreshTasks]);
   const showAddTaskDialog = () => {
     setAddTaskDialogEnabled(true);
   };
@@ -53,7 +58,7 @@ export default function AllTasksPage() {
     setAddTaskDialogEnabled(false);
   };
   return (
-    <Container>
+    <Container disableGutters={isMobileScreenSize}>
       <Fab
         variant="extended"
         color="secondary"
@@ -83,7 +88,6 @@ export default function AllTasksPage() {
         handleHideDialog={hideAddTaskDialog}
         handleRefreshPage={refreshTasks}
       />
-      <LoadingBackdrop open={showLoadingBackdrop} />
       <Snackbar
         open={showSnackBar}
         autoHideDuration={6000}

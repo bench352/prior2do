@@ -12,15 +12,23 @@ import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
 import Snackbar from "@mui/material/Snackbar";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { useCallback, useEffect, useState } from "react";
 import {
   getStorageBackend,
   Task,
 } from "../../components/storage/StorageBackend";
-import LoadingBackdrop from "../../components/userInterface/LoadingBackdrop";
 import TaskCard from "../../components/userInterface/TaskCard";
 
-export default function HomePage() {
+interface HomePageProps {
+  showLoading(visibility: boolean): any;
+}
+
+export default function HomePage(props: HomePageProps) {
+  const [initialProps] = useState(props);
+  const theme = useTheme();
+  const isMobileScreenSize = useMediaQuery(theme.breakpoints.down("sm"));
   const filterTodayPlannedTask = (unfilteredTasks: any[]) => {
     return unfilteredTasks
       .filter((task: Task) => task.plannedDate !== null)
@@ -31,45 +39,42 @@ export default function HomePage() {
       .map((task: Task) => (
         <TaskCard
           key={task.id}
-          task={task} // eslint-disable-next-line
+          task={task}
           handleRefreshPage={refreshTasks}
           showEstTime={true}
         />
       ));
   };
-  const storageBackend = getStorageBackend();
   const [tasks, setTasks] = useState([] as Task[]);
-  const [showLoadingBackdrop, setShowLoadingBackdrop] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState("");
   const [showSnackBar, setShowSnackBar] = useState(false);
   const handleSnackbarClose = () => {
     setShowSnackBar(false);
   };
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(
-    storageBackend.isWelcomeMessageShown()
+    getStorageBackend().isWelcomeMessageShown()
   );
   const refreshTasks = useCallback(async () => {
-    setShowLoadingBackdrop(true);
-    let allTasks = [] as Task[];
+    const storageBackend = getStorageBackend();
+    initialProps.showLoading(true);
+    setTasks(storageBackend.localGetTasks());
     try {
-      allTasks = await storageBackend.getTasks();
+      setTasks(await storageBackend.getTasks());
     } catch (error: any) {
       setSnackBarMessage(error.message);
       setShowSnackBar(true);
-      allTasks = storageBackend.localGetTasks();
     }
-    setTasks(allTasks);
-    setShowLoadingBackdrop(false);
-  }, [storageBackend]);
+    initialProps.showLoading(false);
+  }, [initialProps]);
   useEffect(() => {
-    refreshTasks(); // eslint-disable-next-line
-  }, []);
+    refreshTasks();
+  }, [refreshTasks]);
   const hideWelcomeMessage = () => {
     setShowWelcomeMessage(false);
-    storageBackend.hideWelcomeMessage();
+    getStorageBackend().hideWelcomeMessage();
   };
   return (
-    <Container>
+    <Container disableGutters={isMobileScreenSize}>
       {showWelcomeMessage ? (
         <Card sx={{ margin: "0px 0px 15px 0px" }}>
           <CardContent>
@@ -138,7 +143,6 @@ export default function HomePage() {
       ) : (
         ""
       )}
-      <LoadingBackdrop open={showLoadingBackdrop} />
       <Snackbar
         open={showSnackBar}
         autoHideDuration={6000}

@@ -1,17 +1,23 @@
 import Container from "@mui/material/Container";
 import Snackbar from "@mui/material/Snackbar";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { useCallback, useEffect, useState } from "react";
 import {
   getStorageBackend,
   Task,
 } from "../../components/storage/StorageBackend";
-import LoadingBackdrop from "../../components/userInterface/LoadingBackdrop";
 import TaskCard from "../../components/userInterface/TaskCard";
 
-export default function TaskDuePage() {
-  const storageBackend = getStorageBackend();
+interface TaskDuePageProps {
+  showLoading(visibility: boolean): any;
+}
+
+export default function TaskDuePage(props: TaskDuePageProps) {
+  const [initialProps] = useState(props);
+  const theme = useTheme();
+  const isMobileScreenSize = useMediaQuery(theme.breakpoints.down("sm"));
   const [tasks, setTasks] = useState([] as Task[]);
-  const [showLoadingBackdrop, setShowLoadingBackdrop] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState("");
   const [showSnackBar, setShowSnackBar] = useState(false);
 
@@ -19,23 +25,22 @@ export default function TaskDuePage() {
     setShowSnackBar(false);
   };
   const refreshTasks = useCallback(async () => {
-    setShowLoadingBackdrop(true);
-    let allTasks = [] as Task[];
+    const storageBackend = getStorageBackend();
+    initialProps.showLoading(true);
+    setTasks(storageBackend.localGetTasks());
     try {
-      allTasks = await storageBackend.getTasks();
+      setTasks(await storageBackend.getTasks());
     } catch (error: any) {
       setSnackBarMessage(error.message);
       setShowSnackBar(true);
-      allTasks = storageBackend.localGetTasks();
     }
-    setTasks(allTasks);
-    setShowLoadingBackdrop(false);
-  }, [storageBackend]);
+    initialProps.showLoading(false);
+  }, [initialProps]);
   useEffect(() => {
-    refreshTasks(); // eslint-disable-next-line
-  }, []);
+    refreshTasks();
+  }, [refreshTasks]);
   return (
-    <Container>
+    <Container disableGutters={isMobileScreenSize}>
       <h2>Task Due</h2>
       <p>All the tasks with a due date.</p>
       {tasks
@@ -53,7 +58,6 @@ export default function TaskDuePage() {
             showEstTime={false}
           />
         ))}
-      <LoadingBackdrop open={showLoadingBackdrop} />
       <Snackbar
         open={showSnackBar}
         autoHideDuration={6000}

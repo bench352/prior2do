@@ -8,13 +8,16 @@ import {
   getStorageBackend,
   Task,
 } from "../../components/storage/StorageBackend";
-import LoadingBackdrop from "../../components/userInterface/LoadingBackdrop";
 import TaskPlanCard from "../../components/userInterface/TaskPlanCard";
 
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
+}
+
+interface TaskPlanPageProps {
+  showLoading(visibility: boolean): any;
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -28,7 +31,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box>{children}</Box>}
     </div>
   );
 }
@@ -40,32 +43,31 @@ function a11yProps(index: number) {
   };
 }
 
-export default function TaskPlanPage() {
-  const storageBackend = getStorageBackend();
+export default function TaskPlanPage(props: TaskPlanPageProps) {
+  const [initialProps] = useState(props);
+
   const [value, setValue] = useState(0);
   const [tasks, setTasks] = useState([] as Task[]);
-  const [showLoadingBackdrop, setShowLoadingBackdrop] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState("");
   const [showSnackBar, setShowSnackBar] = useState(false);
   const handleSnackbarClose = () => {
     setShowSnackBar(false);
   };
   const refreshTasks = useCallback(async () => {
-    setShowLoadingBackdrop(true);
-    let allTasks = [] as Task[];
+    const storageBackend = getStorageBackend();
+    initialProps.showLoading(true);
+    setTasks(storageBackend.localGetTasks());
     try {
-      allTasks = await storageBackend.getTasks();
+      setTasks(await storageBackend.getTasks());
     } catch (error: any) {
       setSnackBarMessage(error.message);
       setShowSnackBar(true);
-      allTasks = storageBackend.localGetTasks();
     }
-    setTasks(allTasks);
-    setShowLoadingBackdrop(false);
-  }, [storageBackend]);
+    initialProps.showLoading(false);
+  }, [initialProps]);
   useEffect(() => {
-    refreshTasks(); // eslint-disable-next-line
-  }, []);
+    refreshTasks();
+  }, [refreshTasks]);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -89,7 +91,6 @@ export default function TaskPlanPage() {
           <Tab label="Unplanned Tasks" {...a11yProps(1)} />
         </Tabs>
       </Box>
-
       <TabPanel value={value} index={0}>
         {tasks
           .filter((task: Task) => task.plannedDate !== null)
@@ -117,7 +118,6 @@ export default function TaskPlanPage() {
             />
           ))}
       </TabPanel>
-      <LoadingBackdrop open={showLoadingBackdrop} />
       <Snackbar
         open={showSnackBar}
         autoHideDuration={6000}

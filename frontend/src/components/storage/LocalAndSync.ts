@@ -93,38 +93,30 @@ export class LocalAndSync extends LocalStorageOnly {
     await this.remoteAddTask(task);
   }
   async remoteAddTask(task: Task) {
-    try {
-      const response = await fetch("http://" + getServerAddress() + "/tasks", {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer " + getAccessToken(),
-          "Content-Type": "application/json;charset=utf-8",
-        },
-        body: JSON.stringify([task]),
-      });
-      if (!response.ok) {
-        alert(await response.text());
-      }
-    } catch (error) {
-      alert("Connection failed: " + error);
+    const response = await fetch("http://" + getServerAddress() + "/tasks", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + getAccessToken(),
+        "Content-Type": "application/json;charset=utf-8",
+      },
+      body: JSON.stringify([task]),
+    });
+    if (!response.ok) {
+      alert(await response.text());
     }
   }
 
   async remoteBulkAddTask(tasks: Task[]) {
-    try {
-      const response = await fetch("http://" + getServerAddress() + "/tasks", {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer " + getAccessToken(),
-          "Content-Type": "application/json;charset=utf-8",
-        },
-        body: JSON.stringify(tasks),
-      });
-      if (!response.ok) {
-        alert(await response.text());
-      }
-    } catch (error) {
-      alert("Connection failed: " + error);
+    const response = await fetch("http://" + getServerAddress() + "/tasks", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + getAccessToken(),
+        "Content-Type": "application/json;charset=utf-8",
+      },
+      body: JSON.stringify(tasks),
+    });
+    if (!response.ok) {
+      alert(await response.text());
     }
   }
 
@@ -135,38 +127,30 @@ export class LocalAndSync extends LocalStorageOnly {
   }
 
   async remoteUpdateTask(taskToUpdate: Task) {
-    try {
-      const response = await fetch("http://" + getServerAddress() + "/tasks", {
-        method: "PUT",
-        headers: {
-          Authorization: "Bearer " + getAccessToken(),
-          "Content-Type": "application/json;charset=utf-8",
-        },
-        body: JSON.stringify([taskToUpdate]),
-      });
-      if (!response.ok) {
-        alert(await response.text());
-      }
-    } catch (error) {
-      alert("Connection failed: " + error);
+    const response = await fetch("http://" + getServerAddress() + "/tasks", {
+      method: "PUT",
+      headers: {
+        Authorization: "Bearer " + getAccessToken(),
+        "Content-Type": "application/json;charset=utf-8",
+      },
+      body: JSON.stringify([taskToUpdate]),
+    });
+    if (!response.ok) {
+      alert(await response.text());
     }
   }
 
   async remoteBulkUpdateTask(tasks: Task[]) {
-    try {
-      const response = await fetch("http://" + getServerAddress() + "/tasks", {
-        method: "PUT",
-        headers: {
-          Authorization: "Bearer " + getAccessToken(),
-          "Content-Type": "application/json;charset=utf-8",
-        },
-        body: JSON.stringify(tasks),
-      });
-      if (!response.ok) {
-        alert(await response.text());
-      }
-    } catch (error) {
-      alert("Connection failed: " + error);
+    const response = await fetch("http://" + getServerAddress() + "/tasks", {
+      method: "PUT",
+      headers: {
+        Authorization: "Bearer " + getAccessToken(),
+        "Content-Type": "application/json;charset=utf-8",
+      },
+      body: JSON.stringify(tasks),
+    });
+    if (!response.ok) {
+      alert(await response.text());
     }
   }
 
@@ -176,21 +160,17 @@ export class LocalAndSync extends LocalStorageOnly {
     await this.remoteDeleteTaskById(id);
   }
   async remoteDeleteTaskById(id: String) {
-    try {
-      const response = await fetch(
-        "http://" + getServerAddress() + "/tasks/" + id,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: "Bearer " + getAccessToken(),
-          },
-        }
-      );
-      if (!response.ok) {
-        alert(await response.text());
+    const response = await fetch(
+      "http://" + getServerAddress() + "/tasks/" + id,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: "Bearer " + getAccessToken(),
+        },
       }
-    } catch (error) {
-      alert("Connection failed: " + error);
+    );
+    if (!response.ok) {
+      alert(await response.text());
     }
   }
 }

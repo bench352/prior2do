@@ -17,7 +17,9 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import { useTheme } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { useState } from "react";
 import { isLoggedIn } from "../../components/storage/Accounts";
 import {
@@ -30,12 +32,15 @@ import ConfirmDialog from "../../components/userInterface/dialog/ConfirmDialog";
 import ConfirmReadFileDialog from "../../components/userInterface/dialog/ConfirmReadFileDialog";
 import LicenseDialog from "../../components/userInterface/dialog/LicenseDialog";
 import SingleTextInputDialog from "../../components/userInterface/dialog/SingleTextInputDialog";
+import { appVersion } from "../../Const/Const";
 
 interface SettingsPageProps {
   showUser(visibility: boolean): any;
 }
 
 export default function SettingsPage(props: SettingsPageProps) {
+  const theme = useTheme();
+  const isMobileScreenSize = useMediaQuery(theme.breakpoints.down("sm"));
   const [dialogVisibility, setDialogVisibility] = useState({
     importJSONData: false,
     exportJSONData: false,
@@ -64,8 +69,8 @@ export default function SettingsPage(props: SettingsPageProps) {
     props.showUser(e.target.checked);
   };
   return (
-    <Container>
-      <Grid container spacing={2} columns={{ xs: 6, sm: 12, md: 12 }}>
+    <Container disableGutters={isMobileScreenSize}>
+      <Grid container spacing={2} columns={{ xs: 6, sm: 6, md: 12 }}>
         <Grid item xs={6}>
           <h2>Managing App Data</h2>
           <List sx={{ width: "100%" }}>
@@ -118,13 +123,13 @@ export default function SettingsPage(props: SettingsPageProps) {
               </ListItemButton>
             </ListItem>
           </List>
-          <h2>About The App</h2>
+          <h2>About This App</h2>
           <List sx={{ width: "100%" }}>
             <ListItem>
               <ListItemIcon>
                 <InfoOutlinedIcon />
               </ListItemIcon>
-              <ListItemText primary="App Version" secondary="0.1.0" />
+              <ListItemText primary="App Version" secondary={appVersion} />
             </ListItem>
             <ListItem disablePadding>
               <ListItemButton

@@ -1,11 +1,14 @@
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import BackupOutlinedIcon from "@mui/icons-material/BackupOutlined";
 import DevicesOutlinedIcon from "@mui/icons-material/DevicesOutlined";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Grid";
+import InputAdornment from "@mui/material/InputAdornment";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
@@ -34,11 +37,18 @@ export default function NotLoggedIn(props: NotLoggedInProps) {
     });
   };
   const confirmSignup = async () => {
-    await signup(loginForm.username, loginForm.password);
+    try {
+      await signup(loginForm.username, loginForm.password);
+      props.setLoginStateFunc(
+        await login(loginForm.username, loginForm.password)
+      );
+    } catch (error: any) {
+      alert(error.message);
+    }
   };
   return (
     <div>
-      <Grid container spacing={2} columns={{ xs: 6, sm: 12, md: 12 }}>
+      <Grid container spacing={2} columns={{ xs: 6, sm: 6, md: 12 }}>
         <Grid item xs={6}>
           <Card>
             <CardContent>
@@ -63,9 +73,14 @@ export default function NotLoggedIn(props: NotLoggedInProps) {
                   type="text"
                   value={loginForm.username}
                   onChange={handleInputChange}
-                  InputLabelProps={{
-                    shrink: true,
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <AccountCircleOutlinedIcon />
+                      </InputAdornment>
+                    ),
                   }}
+                  variant="standard"
                 />
                 <TextField
                   id="password"
@@ -74,9 +89,14 @@ export default function NotLoggedIn(props: NotLoggedInProps) {
                   type="password"
                   value={loginForm.password}
                   onChange={handleInputChange}
-                  InputLabelProps={{
-                    shrink: true,
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <LockOutlinedIcon />
+                      </InputAdornment>
+                    ),
                   }}
+                  variant="standard"
                 />
               </Box>
               <Stack
@@ -108,7 +128,7 @@ export default function NotLoggedIn(props: NotLoggedInProps) {
           </Card>
         </Grid>
         <Grid item xs={6}>
-          <Card sx={{ display: { xs: "none", sm: "block", md: "block" } }}>
+          <Card sx={{ display: { xs: "none", sm: "none", md: "block" } }}>
             <CardContent>
               <h2>Utilize Prior2Do to Your Full Potential</h2>
               <p>

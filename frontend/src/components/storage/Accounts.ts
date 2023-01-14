@@ -12,14 +12,16 @@ export async function signup(inputUser: string, inputPassword: string) {
         password: inputPassword,
       }),
     });
-    let result = await response.text();
-    if (result === '"signup success"') {
-      alert("Signup success!");
-    } else {
-      alert("Signup error: [" + result + "]");
+    let result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.detail);
     }
-  } catch (error) {
-    alert("Failed to connect to Prior2Do Sync server.");
+  } catch (error: any) {
+    if (error instanceof TypeError) {
+      throw new Error("Failed to connect to Prior2Do Sync server.");
+    } else {
+      throw new Error(error.message);
+    }
   }
 }
 
@@ -38,13 +40,13 @@ export async function login(
         password: inputPassword,
       }),
     });
+    let result = await response.json();
     if (response.ok) {
-      let result = await response.json();
       localStorage.setItem("p2d.accessToken", result["access_token"]);
       localStorage.setItem("p2d.username", inputUser);
       return true;
     } else {
-      alert("Login error: " + (await response.text()) + "");
+      alert("Login error: " + result.detail + "");
       return false;
     }
   } catch (error) {

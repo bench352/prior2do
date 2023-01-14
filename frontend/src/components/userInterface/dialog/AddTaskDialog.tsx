@@ -1,11 +1,12 @@
-import { FormControl } from "@mui/material";
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import { useTheme } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
-import React, { useState } from "react";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import React, { useEffect, useState } from "react";
 import { getStorageBackend } from "../../storage/StorageBackend";
 
 interface addTaskProps {
@@ -16,6 +17,8 @@ interface addTaskProps {
 
 export default function AddTaskDialog(props: addTaskProps) {
   const storageBackend = getStorageBackend();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const defaultValue = {
     name: "",
     due: "",
@@ -42,66 +45,67 @@ export default function AddTaskDialog(props: addTaskProps) {
     props.handleHideDialog();
     props.handleRefreshPage();
   };
+  useEffect(() => {
+    setFormValues(defaultValue);
+  }, [props.open]);
   return (
-    <Dialog open={props.open}>
+    <Dialog open={props.open} fullScreen={fullScreen}>
       <DialogTitle>Add Task</DialogTitle>
-      <FormControl onSubmit={handleSubmit}>
-        <div
-          style={{
-            padding: "10px 10px",
+      <DialogContent
+        sx={{
+          "& .MuiTextField-root": { m: 1, width: "25ch" },
+          display: "flex",
+          width: "100%",
+          flexWrap: "wrap",
+          flexDirection: "column",
+        }}
+      >
+        <TextField
+          required
+          autoFocus
+          id="name"
+          name="name"
+          label="Name"
+          type="text"
+          style={{ width: "auto" }}
+          value={formValues.name}
+          onChange={handleInputChange}
+          InputLabelProps={{
+            shrink: true,
           }}
-        >
-          <Box
-            component="form"
-            autoComplete="off"
-            sx={{
-              "& .MuiTextField-root": { m: 1, width: "25ch" },
-              display: "flex",
-              flexWrap: "wrap",
-              flexDirection: "column",
-            }}
-          >
-            <TextField
-              required
-              autoFocus
-              id="name"
-              name="name"
-              label="Name"
-              type="text"
-              value={formValues.name}
-              onChange={handleInputChange}
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-            <TextField
-              id="due"
-              name="due"
-              label="Due Date"
-              type="date"
-              value={formValues.due}
-              onChange={handleInputChange}
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-            <TextField
-              id="tag"
-              name="tag"
-              label="Tag"
-              type="text"
-              value={formValues.tag}
-              onChange={handleInputChange}
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Box>
-        </div>
-      </FormControl>
+        />
+        <TextField
+          id="due"
+          name="due"
+          label="Due Date"
+          type="date"
+          style={{ width: "auto" }}
+          value={formValues.due}
+          onChange={handleInputChange}
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+        <TextField
+          id="tag"
+          name="tag"
+          label="Tag"
+          type="text"
+          style={{ width: "auto" }}
+          value={formValues.tag}
+          onChange={handleInputChange}
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      </DialogContent>
       <DialogActions>
-        <Button onClick={props.handleHideDialog}>Cancel</Button>
-        <Button onClick={handleSubmit}>Add</Button>
+        <Button autoFocus onClick={props.handleHideDialog}>
+          Cancel
+        </Button>
+        <Button autoFocus onClick={handleSubmit}>
+          Add
+        </Button>
       </DialogActions>
     </Dialog>
   );

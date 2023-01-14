@@ -1,16 +1,10 @@
-import FlagCircleOutlinedIcon from "@mui/icons-material/FlagCircleOutlined";
-import { Checkbox } from "@mui/material";
+import { CardActionArea, Checkbox, Typography } from "@mui/material";
 import Card from "@mui/material/Card";
-import IconButton from "@mui/material/IconButton";
+import Grid from "@mui/material/Grid";
 import dateFormat from "dateformat";
 import { useState } from "react";
 import { getStorageBackend, Task } from "../storage/StorageBackend";
 import TaskPlanDialog from "./dialog/TaskPlanDialog";
-const buttonStyle = {
-  display: "flex",
-  alignItems: "center",
-  width: 50,
-};
 
 interface task {
   task: Task;
@@ -36,45 +30,65 @@ export default function TaskPlanCard(props: task) {
     });
   };
   return (
-    <div>
-      <Card sx={{ padding: "10px 10px", margin: "15px 0px", display: "flex" }}>
-        <div style={buttonStyle}>
-          <Checkbox
-            name="completed"
-            checked={taskCompleted}
-            onChange={handleCheckboxChange}
-          />
-        </div>
-        <div>
-          <h3>{props.task.name}</h3>
-          <p>
-            {props.task.tag === ""
-              ? "Uncategorized · "
-              : props.task.tag + " · "}
-            {props.task.dueDate === null
-              ? "No due date"
-              : "Due " + dateFormat(props.task.dueDate, "mmm dd, yyyy")}
-          </p>
-          <p>
-            {props.task.plannedDate !== null
-              ? "Planned on " +
-                dateFormat(props.task.plannedDate, "mmm dd, yyyy") +
-                " | Estimated " +
-                props.task.estHr +
-                "h"
-              : "No plan"}
-          </p>
-        </div>
-        <div style={buttonStyle}>
-          <IconButton
-            color="primary"
-            aria-label="Edit task"
-            component="label"
-            onClick={handleShowDialog}
+    <>
+      <Card sx={{ margin: "15px 0px" }}>
+        <CardActionArea
+          sx={{
+            padding: "10px 10px",
+            display: "flex",
+            justifyContent: "flex-start",
+          }}
+          onClick={handleShowDialog}
+        >
+          <Grid
+            container
+            direction="row"
+            wrap="nowrap"
+            justifyContent="flex-start"
+            alignItems="center"
+            spacing={1}
           >
-            <FlagCircleOutlinedIcon />
-          </IconButton>
-        </div>
+            <Grid item>
+              <Checkbox
+                name="completed"
+                checked={taskCompleted}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                onChange={handleCheckboxChange}
+              />
+            </Grid>
+            <Grid item zeroMinWidth>
+              <Typography
+                variant="h6"
+                component="h6"
+                noWrap
+                style={{
+                  textDecoration: taskCompleted ? "line-through" : "none",
+                }}
+              >
+                {props.task.name}
+              </Typography>
+              <p>
+                {props.task.tag === ""
+                  ? "Uncategorized · "
+                  : props.task.tag + " · "}
+                {props.task.dueDate === null
+                  ? "No due date"
+                  : "Due " + dateFormat(props.task.dueDate, "mmm dd, yyyy")}
+              </p>
+              <p>
+                {props.task.plannedDate !== null
+                  ? "Planned on " +
+                    dateFormat(props.task.plannedDate, "mmm dd, yyyy") +
+                    " | Estimated " +
+                    props.task.estHr +
+                    "h"
+                  : "No plan"}
+              </p>
+            </Grid>
+          </Grid>
+        </CardActionArea>
       </Card>
       <TaskPlanDialog
         open={showUpdateTaskDialog}
@@ -82,6 +96,6 @@ export default function TaskPlanCard(props: task) {
         handleRefreshPage={props.handleRefreshPage}
         existingTask={props.task}
       />
-    </div>
+    </>
   );
 }

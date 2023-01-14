@@ -1,12 +1,13 @@
-import { FormControl } from "@mui/material";
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import { useTheme } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import dateFormat from "dateformat";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getStorageBackend, Task } from "../../storage/StorageBackend";
 
 interface editTaskProps {
@@ -18,6 +19,8 @@ interface editTaskProps {
 
 export default function TaskPlanDialog(props: editTaskProps) {
   const storageBackend = getStorageBackend();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const defaultValue = {
     planned:
       props.existingTask.plannedDate === null
@@ -46,59 +49,60 @@ export default function TaskPlanDialog(props: editTaskProps) {
     props.handleHideDialog();
     props.handleRefreshPage();
   };
+  useEffect(() => {
+    setFormValues(defaultValue);
+  }, [props.open]);
   return (
-    <Dialog open={props.open}>
+    <Dialog open={props.open} fullScreen={fullScreen}>
       <DialogTitle>Task Plan</DialogTitle>
-      <FormControl onSubmit={handleSubmit}>
-        <div style={{ padding: "10px 10px" }}>
-          <Box
-            component="form"
-            autoComplete="off"
-            sx={{
-              "& .MuiTextField-root": { m: 1, width: "25ch" },
-              display: "flex",
-              flexWrap: "wrap",
-              flexDirection: "column",
-            }}
-          >
-            <TextField
-              id="name"
-              name="name"
-              label="Name"
-              type="text"
-              value={props.existingTask.name}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              InputProps={{
-                readOnly: true,
-              }}
-            />
-            <TextField
-              id="planned"
-              name="planned"
-              label="Planned On"
-              type="date"
-              value={formValues.planned}
-              onChange={handleInputChange}
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-            <TextField
-              id="estHr"
-              name="est"
-              label="Estimated Time (hr)"
-              type="number"
-              value={formValues.est}
-              onChange={handleInputChange}
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Box>
-        </div>
-      </FormControl>
+      <DialogContent
+        sx={{
+          "& .MuiTextField-root": { m: 1, width: "25ch" },
+          display: "flex",
+          width: "100%",
+          flexWrap: "wrap",
+          flexDirection: "column",
+        }}
+      >
+        <TextField
+          id="name"
+          name="name"
+          label="Name"
+          type="text"
+          style={{ width: "auto" }}
+          value={props.existingTask.name}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          InputProps={{
+            readOnly: true,
+          }}
+        />
+        <TextField
+          id="planned"
+          name="planned"
+          label="Planned On"
+          type="date"
+          style={{ width: "auto" }}
+          value={formValues.planned}
+          onChange={handleInputChange}
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+        <TextField
+          id="estHr"
+          name="est"
+          label="Estimated Time (hr)"
+          type="number"
+          style={{ width: "auto" }}
+          value={formValues.est}
+          onChange={handleInputChange}
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      </DialogContent>
       <DialogActions>
         <Button onClick={props.handleHideDialog}>Cancel</Button>
         <Button onClick={handleSubmit}>Update Plan</Button>
