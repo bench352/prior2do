@@ -50,7 +50,7 @@ export default function TaskPlanDialog(props: editTaskProps) {
     props.handleRefreshPage();
   };
   useEffect(() => {
-    setFormValues(defaultValue);
+    setFormValues(defaultValue); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.open]);
   return (
     <Dialog open={props.open} fullScreen={fullScreen}>
