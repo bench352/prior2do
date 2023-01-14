@@ -22,6 +22,7 @@ This release brings enhancements to the app feature and improvements to the user
 - The Add Task/Edit Task/Task Plan dialog is full-screen on mobile screen size.
 - The side navigation bar is now permanent on larger screen sizes. On mobile screen size, it will hover over the screen content instead.
 - On mobile screen size, the padding on the left/right side of the screen is now smaller.
+- The status bar of the app now matches the color of the app bar.
 
 **Bug Fix**
 
