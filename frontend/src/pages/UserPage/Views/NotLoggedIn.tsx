@@ -1,11 +1,14 @@
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import BackupOutlinedIcon from "@mui/icons-material/BackupOutlined";
 import DevicesOutlinedIcon from "@mui/icons-material/DevicesOutlined";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Grid";
+import InputAdornment from "@mui/material/InputAdornment";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
@@ -15,9 +18,6 @@ import TextField from "@mui/material/TextField";
 import { useState } from "react";
 import { login, signup } from "../../../components/storage/Accounts";
 import ConfirmDialog from "../../../components/userInterface/dialog/ConfirmDialog";
-import InputAdornment from "@mui/material/InputAdornment";
-import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 interface NotLoggedInProps {
   setLoginStateFunc(isLoggedIn: boolean): any;

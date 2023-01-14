@@ -49,36 +49,43 @@ export default function TaskPlanCard(props: task) {
             spacing={1}
           >
             <Grid item>
-            <Checkbox
-              name="completed"
-              checked={taskCompleted}
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              onChange={handleCheckboxChange}
-            />
+              <Checkbox
+                name="completed"
+                checked={taskCompleted}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                onChange={handleCheckboxChange}
+              />
             </Grid>
             <Grid item zeroMinWidth>
-              <Typography variant="h6" component="h6" noWrap>
-              {props.task.name}
+              <Typography
+                variant="h6"
+                component="h6"
+                noWrap
+                style={{
+                  textDecoration: taskCompleted ? "line-through" : "none",
+                }}
+              >
+                {props.task.name}
               </Typography>
               <p>
-              {props.task.tag === ""
-                ? "Uncategorized · "
-                : props.task.tag + " · "}
-              {props.task.dueDate === null
-                ? "No due date"
-                : "Due " + dateFormat(props.task.dueDate, "mmm dd, yyyy")}
-            </p>
-            <p>
-              {props.task.plannedDate !== null
-                ? "Planned on " +
-                  dateFormat(props.task.plannedDate, "mmm dd, yyyy") +
-                  " | Estimated " +
-                  props.task.estHr +
-                  "h"
-                : "No plan"}
-            </p>
+                {props.task.tag === ""
+                  ? "Uncategorized · "
+                  : props.task.tag + " · "}
+                {props.task.dueDate === null
+                  ? "No due date"
+                  : "Due " + dateFormat(props.task.dueDate, "mmm dd, yyyy")}
+              </p>
+              <p>
+                {props.task.plannedDate !== null
+                  ? "Planned on " +
+                    dateFormat(props.task.plannedDate, "mmm dd, yyyy") +
+                    " | Estimated " +
+                    props.task.estHr +
+                    "h"
+                  : "No plan"}
+              </p>
             </Grid>
           </Grid>
         </CardActionArea>

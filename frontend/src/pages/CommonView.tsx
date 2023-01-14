@@ -22,7 +22,12 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import { Link, Route, Routes } from "react-router-dom";
-import { isSyncEnabled } from "../components/storage/StorageBackend";
+import {
+  isReleaseDialogShown,
+  isSyncEnabled,
+  markCurrentVersionViewed,
+} from "../components/storage/StorageBackend";
+import ReleaseDialog from "../components/userInterface/dialog/ReleaseDialog";
 import AllTasksPage from "./AllTasksPage/AllTasksPage";
 import HomePage from "./HomePage/HomePage";
 import SettingsPage from "./SettingsPage/SettingsPage";
@@ -35,6 +40,13 @@ export default function CommonView() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showUser, setShowUser] = useState(isSyncEnabled());
   const [showLoading, setShowLoading] = useState(false);
+  const [showReleaseDialog, setShowReleaseDialog] = useState(
+    isReleaseDialogShown()
+  );
+  const handleCloseReleaseDialog = () => {
+    markCurrentVersionViewed();
+    setShowReleaseDialog(false);
+  };
   const changeUserOptionVisibility = (visibility: boolean) => {
     setShowUser(visibility);
   };
@@ -231,6 +243,10 @@ export default function CommonView() {
           />
         </Routes>
       </Box>
+      <ReleaseDialog
+        open={showReleaseDialog}
+        handleHideDialog={handleCloseReleaseDialog}
+      />
     </Box>
   );
 }

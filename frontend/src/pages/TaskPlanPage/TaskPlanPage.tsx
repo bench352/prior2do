@@ -44,7 +44,8 @@ function a11yProps(index: number) {
 }
 
 export default function TaskPlanPage(props: TaskPlanPageProps) {
-  const storageBackend = getStorageBackend();
+  const [initialProps] = useState(props);
+
   const [value, setValue] = useState(0);
   const [tasks, setTasks] = useState([] as Task[]);
   const [snackBarMessage, setSnackBarMessage] = useState("");
@@ -53,7 +54,8 @@ export default function TaskPlanPage(props: TaskPlanPageProps) {
     setShowSnackBar(false);
   };
   const refreshTasks = useCallback(async () => {
-    props.showLoading(true);
+    const storageBackend = getStorageBackend();
+    initialProps.showLoading(true);
     setTasks(storageBackend.localGetTasks());
     try {
       setTasks(await storageBackend.getTasks());
@@ -61,11 +63,11 @@ export default function TaskPlanPage(props: TaskPlanPageProps) {
       setSnackBarMessage(error.message);
       setShowSnackBar(true);
     }
-    props.showLoading(false);
-  }, [storageBackend]);
+    initialProps.showLoading(false);
+  }, [initialProps]);
   useEffect(() => {
-    refreshTasks(); // eslint-disable-next-line
-  }, []);
+    refreshTasks();
+  }, [refreshTasks]);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };

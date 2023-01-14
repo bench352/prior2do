@@ -26,6 +26,7 @@ interface HomePageProps {
 }
 
 export default function HomePage(props: HomePageProps) {
+  const [initialProps] = useState(props);
   const theme = useTheme();
   const isMobileScreenSize = useMediaQuery(theme.breakpoints.down("sm"));
   const filterTodayPlannedTask = (unfilteredTasks: any[]) => {
@@ -38,13 +39,12 @@ export default function HomePage(props: HomePageProps) {
       .map((task: Task) => (
         <TaskCard
           key={task.id}
-          task={task} // eslint-disable-next-line
+          task={task}
           handleRefreshPage={refreshTasks}
           showEstTime={true}
         />
       ));
   };
-  const storageBackend = getStorageBackend();
   const [tasks, setTasks] = useState([] as Task[]);
   const [snackBarMessage, setSnackBarMessage] = useState("");
   const [showSnackBar, setShowSnackBar] = useState(false);
@@ -52,10 +52,11 @@ export default function HomePage(props: HomePageProps) {
     setShowSnackBar(false);
   };
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(
-    storageBackend.isWelcomeMessageShown()
+    getStorageBackend().isWelcomeMessageShown()
   );
   const refreshTasks = useCallback(async () => {
-    props.showLoading(true);
+    const storageBackend = getStorageBackend();
+    initialProps.showLoading(true);
     setTasks(storageBackend.localGetTasks());
     try {
       setTasks(await storageBackend.getTasks());
@@ -63,14 +64,14 @@ export default function HomePage(props: HomePageProps) {
       setSnackBarMessage(error.message);
       setShowSnackBar(true);
     }
-    props.showLoading(false);
-  }, [storageBackend]);
+    initialProps.showLoading(false);
+  }, [initialProps]);
   useEffect(() => {
-    refreshTasks(); // eslint-disable-next-line
-  }, []);
+    refreshTasks();
+  }, [refreshTasks]);
   const hideWelcomeMessage = () => {
     setShowWelcomeMessage(false);
-    storageBackend.hideWelcomeMessage();
+    getStorageBackend().hideWelcomeMessage();
   };
   return (
     <Container disableGutters={isMobileScreenSize}>

@@ -26,9 +26,9 @@ interface AllTaskPageProps {
 }
 
 export default function AllTasksPage(props: AllTaskPageProps) {
+  const [initialProps] = useState(props);
   const theme = useTheme();
   const isMobileScreenSize = useMediaQuery(theme.breakpoints.down("sm"));
-  const storageBackend = getStorageBackend();
   const [tasks, setTasks] = useState([] as Task[]);
   const [addTaskDialogEnabled, setAddTaskDialogEnabled] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState("");
@@ -37,7 +37,8 @@ export default function AllTasksPage(props: AllTaskPageProps) {
     setShowSnackBar(false);
   };
   const refreshTasks = useCallback(async () => {
-    props.showLoading(true);
+    const storageBackend = getStorageBackend();
+    initialProps.showLoading(true);
     setTasks(storageBackend.localGetTasks());
     try {
       setTasks(await storageBackend.getTasks());
@@ -45,11 +46,11 @@ export default function AllTasksPage(props: AllTaskPageProps) {
       setSnackBarMessage(error.message);
       setShowSnackBar(true);
     }
-    props.showLoading(false);
-  }, [storageBackend]);
+    initialProps.showLoading(false);
+  }, [initialProps]);
   useEffect(() => {
-    refreshTasks(); // eslint-disable-next-line
-  }, []);
+    refreshTasks();
+  }, [refreshTasks]);
   const showAddTaskDialog = () => {
     setAddTaskDialogEnabled(true);
   };

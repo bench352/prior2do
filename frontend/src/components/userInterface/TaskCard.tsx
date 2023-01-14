@@ -61,7 +61,14 @@ export default function TaskCard(props: task) {
               />
             </Grid>
             <Grid item zeroMinWidth>
-              <Typography variant="h6" component="h6" noWrap>
+              <Typography
+                variant="h6"
+                component="h6"
+                noWrap
+                style={{
+                  textDecoration: taskCompleted ? "line-through" : "none",
+                }}
+              >
                 {props.task.name}
               </Typography>
 

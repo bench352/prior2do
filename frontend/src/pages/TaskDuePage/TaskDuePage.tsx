@@ -14,9 +14,9 @@ interface TaskDuePageProps {
 }
 
 export default function TaskDuePage(props: TaskDuePageProps) {
+  const [initialProps] = useState(props);
   const theme = useTheme();
   const isMobileScreenSize = useMediaQuery(theme.breakpoints.down("sm"));
-  const storageBackend = getStorageBackend();
   const [tasks, setTasks] = useState([] as Task[]);
   const [snackBarMessage, setSnackBarMessage] = useState("");
   const [showSnackBar, setShowSnackBar] = useState(false);
@@ -25,7 +25,8 @@ export default function TaskDuePage(props: TaskDuePageProps) {
     setShowSnackBar(false);
   };
   const refreshTasks = useCallback(async () => {
-    props.showLoading(true);
+    const storageBackend = getStorageBackend();
+    initialProps.showLoading(true);
     setTasks(storageBackend.localGetTasks());
     try {
       setTasks(await storageBackend.getTasks());
@@ -33,11 +34,11 @@ export default function TaskDuePage(props: TaskDuePageProps) {
       setSnackBarMessage(error.message);
       setShowSnackBar(true);
     }
-    props.showLoading(false);
-  }, [storageBackend]);
+    initialProps.showLoading(false);
+  }, [initialProps]);
   useEffect(() => {
-    refreshTasks(); // eslint-disable-next-line
-  }, []);
+    refreshTasks();
+  }, [refreshTasks]);
   return (
     <Container disableGutters={isMobileScreenSize}>
       <h2>Task Due</h2>

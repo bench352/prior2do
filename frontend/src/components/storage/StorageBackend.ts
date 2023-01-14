@@ -1,6 +1,7 @@
 import { isLoggedIn } from "./Accounts";
 import { LocalAndSync } from "./LocalAndSync";
 import LocalStorageOnly from "./LocalStorageOnly";
+import { appVersion } from "../../Const/Const";
 
 export interface Task {
   id: string;
@@ -50,4 +51,18 @@ export async function testServerConnection() {
   } catch (error) {
     alert("Failed to connect to Prior2Do Sync server.");
   }
+}
+
+export function isReleaseDialogShown(): boolean {
+  if (localStorage.getItem("p2d.lastViewedVersion") === null) {
+    return true;
+  } else if (localStorage.getItem("p2d.lastViewedVersion") !== appVersion) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+export function markCurrentVersionViewed() {
+  localStorage.setItem("p2d.lastViewedVersion", appVersion);
 }
