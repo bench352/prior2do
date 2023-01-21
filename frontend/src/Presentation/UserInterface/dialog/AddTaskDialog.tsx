@@ -7,7 +7,7 @@ import { useTheme } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import React, { useEffect, useState } from "react";
-import { getStorageBackend } from "../../storage/StorageBackend";
+import { getStorageBackend } from "../../../components/storage/StorageBackend";
 
 interface addTaskProps {
   open: boolean;
@@ -46,7 +46,7 @@ export default function AddTaskDialog(props: addTaskProps) {
     props.handleRefreshPage();
   };
   useEffect(() => {
-    setFormValues(defaultValue); // eslint-disable-next-line react-hooks/exhaustive-deps
+    setFormValues(defaultValue);
   }, [props.open]);
   return (
     <Dialog open={props.open} fullScreen={fullScreen}>

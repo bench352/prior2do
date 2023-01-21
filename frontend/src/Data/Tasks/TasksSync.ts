@@ -1,11 +1,15 @@
-import { getAccessToken } from "./Accounts";
-import LocalStorageOnly from "./LocalStorageOnly";
-import { getServerAddress, Task } from "./StorageBackend";
+import { getAccessToken } from "../../components/storage/Accounts";
+import { TaskV0 } from "../../components/storage/StorageBackend";
+import { TasksBase } from "./TasksBase";
+import { getLocalLastUpdatedTimestamp,localSetLastUpdatedTimestamp } from "../Timestamps";
 
 const localStore = require("store");
 
-export class LocalAndSync extends LocalStorageOnly {
-  async getTasks(): Promise<Task[]> {
+export class TasksSync extends TasksBase {
+  cleanupCompleted() {
+    throw new Error("Method not implemented.");
+  }
+  async getTasks(): Promise<TaskV0[]> {
     try {
       const response = await fetch("http://" + getServerAddress() + "/tasks", {
         method: "GET",
@@ -13,17 +17,17 @@ export class LocalAndSync extends LocalStorageOnly {
       });
       if (response.ok) {
         let remoteData = await response.json();
-        let olderTasks: Task[];
-        let newerTasks: Task[];
-        let localLastUpdated: number = this.localGetLastUpdatedTimestamp();
+        let olderTasks: TaskV0[];
+        let newerTasks: TaskV0[];
+        let localLastUpdated: number = getLocalLastUpdatedTimestamp();
         let remoteLastUpdated: number = remoteData["lastUpdated"];
         let olderTasksAreLocalTasks = false;
         if (localLastUpdated > remoteLastUpdated) {
-          olderTasks = remoteData["tasks"] as Task[];
-          newerTasks = localStore.get("p2d.tasks") as Task[];
+          olderTasks = remoteData["tasks"] as TaskV0[];
+          newerTasks = localStore.get("p2d.tasks") as TaskV0[];
         } else {
-          olderTasks = localStore.get("p2d.tasks") as Task[];
-          newerTasks = remoteData["tasks"] as Task[];
+          olderTasks = localStore.get("p2d.tasks") as TaskV0[];
+          newerTasks = remoteData["tasks"] as TaskV0[];
           olderTasksAreLocalTasks = true;
         }
         let olderTasksIds: Set<string> = new Set();
@@ -63,8 +67,8 @@ export class LocalAndSync extends LocalStorageOnly {
           for (const id of tasksIdsToDelete) {
             await this.remoteDeleteTaskById(id);
           }
-          let tasksToAdd = [] as Task[];
-          let tasksToUpdate = [] as Task[];
+          let tasksToAdd = [] as TaskV0[];
+          let tasksToUpdate = [] as TaskV0[];
           for (const task of newerTasks) {
             if (tasksIdsToAdd.has(task.id)) {
               tasksToAdd.push(task);
@@ -87,12 +91,12 @@ export class LocalAndSync extends LocalStorageOnly {
       }
     }
   }
-  async addTask(task: Task) {
+  async addTask(task: TaskV0) {
     this.localAddTask(task);
-    this.localSetLastUpdatedTimestamp();
+    localSetLastUpdatedTimestamp();
     await this.remoteAddTask(task);
   }
-  async remoteAddTask(task: Task) {
+  async remoteAddTask(task: TaskV0) {
     const response = await fetch("http://" + getServerAddress() + "/tasks", {
       method: "POST",
       headers: {
@@ -106,7 +110,7 @@ export class LocalAndSync extends LocalStorageOnly {
     }
   }
 
-  async remoteBulkAddTask(tasks: Task[]) {
+  async remoteBulkAddTask(tasks: TaskV0[]) {
     const response = await fetch("http://" + getServerAddress() + "/tasks", {
       method: "POST",
       headers: {
@@ -120,13 +124,13 @@ export class LocalAndSync extends LocalStorageOnly {
     }
   }
 
-  async updateTask(taskToUpdate: Task) {
+  async updateTask(taskToUpdate: TaskV0) {
     this.localUpdateTask(taskToUpdate);
-    this.localSetLastUpdatedTimestamp();
+    localSetLastUpdatedTimestamp();
     await this.remoteUpdateTask(taskToUpdate);
   }
 
-  async remoteUpdateTask(taskToUpdate: Task) {
+  async remoteUpdateTask(taskToUpdate: TaskV0) {
     const response = await fetch("http://" + getServerAddress() + "/tasks", {
       method: "PUT",
       headers: {
@@ -140,7 +144,7 @@ export class LocalAndSync extends LocalStorageOnly {
     }
   }
 
-  async remoteBulkUpdateTask(tasks: Task[]) {
+  async remoteBulkUpdateTask(tasks: TaskV0[]) {
     const response = await fetch("http://" + getServerAddress() + "/tasks", {
       method: "PUT",
       headers: {
@@ -156,7 +160,7 @@ export class LocalAndSync extends LocalStorageOnly {
 
   async deleteTaskById(id: string) {
     this.localDeleteTaskById(id);
-    this.localSetLastUpdatedTimestamp();
+    localSetLastUpdatedTimestamp();
     await this.remoteDeleteTaskById(id);
   }
   async remoteDeleteTaskById(id: String) {

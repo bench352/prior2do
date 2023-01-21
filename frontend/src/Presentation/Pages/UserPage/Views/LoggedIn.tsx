@@ -15,9 +15,9 @@ import {
   getUsername,
   logout,
   updatePassword,
-} from "../../../components/storage/Accounts";
-import ConfirmDialog from "../../../components/userInterface/dialog/ConfirmDialog";
-import SingleTextInputDialog from "../../../components/userInterface/dialog/SingleTextInputDialog";
+} from "../../../../components/storage/Accounts";
+import ConfirmDialog from "../../../UserInterface/dialog/ConfirmDialog";
+import SingleTextInputDialog from "../../../UserInterface/dialog/SingleTextInputDialog";
 
 interface LoggedInProps {
   setLoginStateFunc(isLoggedIn: boolean): any;

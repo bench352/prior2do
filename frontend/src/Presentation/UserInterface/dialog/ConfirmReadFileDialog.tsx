@@ -4,7 +4,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { getStorageBackend } from "../../storage/StorageBackend";
+import { getStorageBackend } from "../../../components/storage/StorageBackend";
 
 interface confirmDialogProps {
   open: boolean;

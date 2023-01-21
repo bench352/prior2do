@@ -8,26 +8,25 @@ import TextField from "@mui/material/TextField";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import dateFormat from "dateformat";
 import React, { useEffect, useState } from "react";
-import { getStorageBackend, Task } from "../../storage/StorageBackend";
+import { getStorageBackend, TaskV0 } from "../../../components/storage/StorageBackend";
 
 interface editTaskProps {
   open: boolean;
   handleHideDialog(): any;
   handleRefreshPage(): any;
-  existingTask: Task;
+  existingTask: TaskV0;
 }
 
-export default function EditTaskDialog(props: editTaskProps) {
+export default function TaskPlanDialog(props: editTaskProps) {
   const storageBackend = getStorageBackend();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const defaultValue = {
-    name: props.existingTask.name,
-    due:
-      props.existingTask.dueDate === null
+    planned:
+      props.existingTask.plannedDate === null
         ? ""
-        : dateFormat(props.existingTask.dueDate, "yyyy-mm-dd"),
-    tag: props.existingTask.tag,
+        : dateFormat(props.existingTask.plannedDate, "yyyy-mm-dd"),
+    est: props.existingTask.estHr,
   };
   const [formValues, setFormValues] = useState(defaultValue);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,30 +36,25 @@ export default function EditTaskDialog(props: editTaskProps) {
       [name]: value,
     });
   };
-  const handleDeleteTask = () => {
-    storageBackend.deleteTaskById(props.existingTask.id);
-    props.handleHideDialog();
-    props.handleRefreshPage();
-  };
   const handleSubmit = () => {
     storageBackend.updateTask({
       id: props.existingTask.id,
-      name: formValues.name,
-      dueDate: new Date(formValues.due),
-      estHr: props.existingTask.estHr,
-      plannedDate: props.existingTask.plannedDate,
+      name: props.existingTask.name,
+      dueDate: props.existingTask.dueDate,
+      estHr: (formValues.est as unknown) !== "" ? formValues.est : 0,
+      plannedDate: new Date(formValues.planned),
       completed: props.existingTask.completed,
-      tag: formValues.tag,
+      tag: props.existingTask.tag,
     });
     props.handleHideDialog();
     props.handleRefreshPage();
   };
   useEffect(() => {
-    setFormValues(defaultValue); // eslint-disable-next-line react-hooks/exhaustive-deps
+    setFormValues(defaultValue); 
   }, [props.open]);
   return (
     <Dialog open={props.open} fullScreen={fullScreen}>
-      <DialogTitle>Edit Task</DialogTitle>
+      <DialogTitle>Task Plan</DialogTitle>
       <DialogContent
         sx={{
           "& .MuiTextField-root": { m: 1, width: "25ch" },
@@ -71,38 +65,38 @@ export default function EditTaskDialog(props: editTaskProps) {
         }}
       >
         <TextField
-          required
-          autoFocus
           id="name"
           name="name"
           label="Name"
           type="text"
           style={{ width: "auto" }}
-          value={formValues.name}
-          onChange={handleInputChange}
+          value={props.existingTask.name}
           InputLabelProps={{
             shrink: true,
           }}
+          InputProps={{
+            readOnly: true,
+          }}
         />
         <TextField
-          id="due"
-          name="due"
-          label="Due Date"
+          id="planned"
+          name="planned"
+          label="Planned On"
           type="date"
           style={{ width: "auto" }}
-          value={formValues.due}
+          value={formValues.planned}
           onChange={handleInputChange}
           InputLabelProps={{
             shrink: true,
           }}
         />
         <TextField
-          id="tag"
-          name="tag"
-          label="Tag"
-          type="text"
+          id="estHr"
+          name="est"
+          label="Estimated Time (hr)"
+          type="number"
           style={{ width: "auto" }}
-          value={formValues.tag}
+          value={formValues.est}
           onChange={handleInputChange}
           InputLabelProps={{
             shrink: true,
@@ -111,10 +105,7 @@ export default function EditTaskDialog(props: editTaskProps) {
       </DialogContent>
       <DialogActions>
         <Button onClick={props.handleHideDialog}>Cancel</Button>
-        <Button color="error" onClick={handleDeleteTask}>
-          Delete
-        </Button>
-        <Button onClick={handleSubmit}>Update</Button>
+        <Button onClick={handleSubmit}>Update Plan</Button>
       </DialogActions>
     </Dialog>
   );

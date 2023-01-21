@@ -32,7 +32,7 @@ import ConfirmDialog from "../../components/userInterface/dialog/ConfirmDialog";
 import ConfirmReadFileDialog from "../../components/userInterface/dialog/ConfirmReadFileDialog";
 import LicenseDialog from "../../components/userInterface/dialog/LicenseDialog";
 import SingleTextInputDialog from "../../components/userInterface/dialog/SingleTextInputDialog";
-import { appVersion } from "../../Const/Const";
+import { appVersion } from "../../Const";
 
 interface SettingsPageProps {
   showUser(visibility: boolean): any;

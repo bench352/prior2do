@@ -27,13 +27,13 @@ import {
   isSyncEnabled,
   markCurrentVersionViewed,
 } from "../components/storage/StorageBackend";
-import ReleaseDialog from "../components/userInterface/dialog/ReleaseDialog";
-import AllTasksPage from "./AllTasksPage/AllTasksPage";
-import HomePage from "./HomePage/HomePage";
-import SettingsPage from "./SettingsPage/SettingsPage";
-import TaskDuePage from "./TaskDuePage/TaskDuePage";
-import TaskPlanPage from "./TaskPlanPage/TaskPlanPage";
-import UserPage from "./UserPage/UserPage";
+import ReleaseDialog from "./UserInterface/dialog/ReleaseDialog";
+import AllTasksPage from "./Pages/AllTasksPage/AllTasksPage";
+import HomePage from "./Pages/HomePage/HomePage";
+import SettingsPage from "./Pages/SettingsPage/SettingsPage";
+import TaskDuePage from "./Pages/TaskDuePage/TaskDuePage";
+import TaskPlanPage from "./Pages/TaskPlanPage/TaskPlanPage";
+import UserPage from "./Pages/UserPage/UserPage";
 const drawerWidth = 240;
 
 export default function CommonView() {

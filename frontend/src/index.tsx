@@ -8,7 +8,7 @@ import { HashRouter } from "react-router-dom";
 
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import "./index.css";
-import CommonView from "./pages/CommonView";
+import CommonView from "./Presentation/CommonView";
 import reportWebVitals from "./reportWebVitals";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 
@@ -33,7 +33,7 @@ root.render(
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://cra.link/PWA
-serviceWorkerRegistration.register();
+serviceWorkerRegistration.unregister(); // TODO Change back to register() before release
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

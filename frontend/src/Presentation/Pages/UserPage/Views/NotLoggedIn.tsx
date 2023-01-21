@@ -16,8 +16,8 @@ import ListItemText from "@mui/material/ListItemText";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import { useState } from "react";
-import { login, signup } from "../../../components/storage/Accounts";
-import ConfirmDialog from "../../../components/userInterface/dialog/ConfirmDialog";
+import { login, signup } from "../../../../components/storage/Accounts";
+import ConfirmDialog from "../../../UserInterface/dialog/ConfirmDialog";
 
 interface NotLoggedInProps {
   setLoginStateFunc(isLoggedIn: boolean): any;

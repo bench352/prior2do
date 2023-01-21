@@ -7,10 +7,10 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useCallback, useEffect, useState } from "react";
 import {
   getStorageBackend,
-  Task,
-} from "../../components/storage/StorageBackend";
-import AddTaskDialog from "../../components/userInterface/dialog/AddTaskDialog";
-import TaskCard from "../../components/userInterface/TaskCard";
+  TaskV0,
+} from "../../../components/storage/StorageBackend";
+import AddTaskDialog from "../../UserInterface/dialog/AddTaskDialog";
+import TaskCard from "../../../components/userInterface/TaskCard";
 
 const floatingButtonStyle = {
   margin: 0,
@@ -29,7 +29,7 @@ export default function AllTasksPage(props: AllTaskPageProps) {
   const [initialProps] = useState(props);
   const theme = useTheme();
   const isMobileScreenSize = useMediaQuery(theme.breakpoints.down("sm"));
-  const [tasks, setTasks] = useState([] as Task[]);
+  const [tasks, setTasks] = useState([] as TaskV0[]);
   const [addTaskDialogEnabled, setAddTaskDialogEnabled] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState("");
   const [showSnackBar, setShowSnackBar] = useState(false);
@@ -74,7 +74,7 @@ export default function AllTasksPage(props: AllTaskPageProps) {
         All your tasks at a glance. Add new tasks or update the details of
         existing tasks.
       </p>
-      {tasks.map((task: Task) => (
+      {tasks.map((task: TaskV0) => (
         <TaskCard
           key={task.id}
           task={task}
