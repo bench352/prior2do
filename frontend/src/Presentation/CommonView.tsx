@@ -22,12 +22,8 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import { Link, Route, Routes } from "react-router-dom";
-import {
-  isReleaseDialogShown,
-  isSyncEnabled,
-  markCurrentVersionViewed,
-} from "../components/storage/StorageBackend";
-import ReleaseDialog from "./UserInterface/dialog/ReleaseDialog";
+import { SettingsController } from "../Controller/Settings";
+import ReleaseDialog from "./Components/dialog/ReleaseDialog";
 import AllTasksPage from "./Pages/AllTasksPage/AllTasksPage";
 import HomePage from "./Pages/HomePage/HomePage";
 import SettingsPage from "./Pages/SettingsPage/SettingsPage";
@@ -37,14 +33,15 @@ import UserPage from "./Pages/UserPage/UserPage";
 const drawerWidth = 240;
 
 export default function CommonView() {
+  let settingsCon = new SettingsController();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [showUser, setShowUser] = useState(isSyncEnabled());
+  const [showUser, setShowUser] = useState(settingsCon.getIsSyncEnabled());
   const [showLoading, setShowLoading] = useState(false);
   const [showReleaseDialog, setShowReleaseDialog] = useState(
-    isReleaseDialogShown()
+    settingsCon.isReleaseDialogShown()
   );
   const handleCloseReleaseDialog = () => {
-    markCurrentVersionViewed();
+    settingsCon.markCurrentVersionViewed();
     setShowReleaseDialog(false);
   };
   const changeUserOptionVisibility = (visibility: boolean) => {

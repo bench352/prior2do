@@ -1,16 +1,16 @@
-import { TaskV0 } from "../../components/storage/StorageBackend";
+import { Task } from "../schemas";
 import { TasksBase } from "./TasksBase";
 
 export default class TasksLocalStorage extends TasksBase {
-  async getTasks(): Promise<TaskV0[]> {
-    return this.localGetTasks();
+  async getTasks(): Promise<Task[]> {
+    return this.lo calGetTasks();
   }
 
-  async addTask(task: TaskV0) {
+  async addTask(task: Task) {
     this.localAddTask(task);
   }
 
-  async updateTask(taskToUpdate: TaskV0) {
+  async updateTask(taskToUpdate: Task) {
     this.localUpdateTask(taskToUpdate);
   }
 
@@ -21,7 +21,7 @@ export default class TasksLocalStorage extends TasksBase {
   cleanupCompleted() {
     let tasks = this.localGetTasks();
     const updatedTasks = tasks.filter(
-      (task: TaskV0) => task.completed === false
+      (task: Task) => task.completed === false
     );
     this.updateTasksLocalStorage(updatedTasks);
   }

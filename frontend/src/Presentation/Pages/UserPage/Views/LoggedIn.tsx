@@ -10,25 +10,23 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { useState } from "react";
-import {
-  deleteAccount,
-  getUsername,
-  logout,
-  updatePassword,
-} from "../../../../components/storage/Accounts";
-import ConfirmDialog from "../../../UserInterface/dialog/ConfirmDialog";
-import SingleTextInputDialog from "../../../UserInterface/dialog/SingleTextInputDialog";
+import ConfirmDialog from "../../../Components/dialog/ConfirmDialog";
+import SingleTextInputDialog from "../../../Components/dialog/SingleTextInputDialog";
+import { AccountsController } from "../../../../Controller/Accounts";
 
 interface LoggedInProps {
   setLoginStateFunc(isLoggedIn: boolean): any;
 }
+
+const accountsCon = new AccountsController();
 
 export default function LoggedIn(props: LoggedInProps) {
   const [confirmDeleteDialogShow, setConfirmDeleteDialogShow] = useState(false);
   const [changePasswordDialogShow, setChangePasswordDialogShow] =
     useState(false);
   const confirmedDeleteAccount = async () => {
-    props.setLoginStateFunc(!(await deleteAccount()));
+    await accountsCon.deleteAccount();
+    props.setLoginStateFunc(false);
   };
   const handleConfirmDeleteClose = () => {
     setConfirmDeleteDialogShow(false);
@@ -37,14 +35,14 @@ export default function LoggedIn(props: LoggedInProps) {
     setChangePasswordDialogShow(false);
   };
   const handleNewPasswordValue = (newPassword: string) => {
-    updatePassword(newPassword);
+    accountsCon.updatePassword(newPassword);
   };
   return (
     <div>
       <Card>
         <CardHeader
           avatar={<Avatar></Avatar>}
-          title={getUsername()}
+          title={accountsCon.getUsername()}
           subheader="What's in your mind?"
         />
       </Card>
@@ -76,7 +74,7 @@ export default function LoggedIn(props: LoggedInProps) {
         <ListItem disablePadding>
           <ListItemButton
             onClick={() => {
-              logout();
+              accountsCon.logout();
               props.setLoginStateFunc(false);
             }}
           >

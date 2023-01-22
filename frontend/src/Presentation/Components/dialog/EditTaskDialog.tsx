@@ -8,25 +8,28 @@ import TextField from "@mui/material/TextField";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import dateFormat from "dateformat";
 import React, { useEffect, useState } from "react";
-import { getStorageBackend, TaskV0 } from "../../../components/storage/StorageBackend";
+import { Task } from "../../../Data/schemas";
+import { TasksController } from "../../../Controller/Tasks";
 
 interface editTaskProps {
   open: boolean;
   handleHideDialog(): any;
   handleRefreshPage(): any;
-  existingTask: TaskV0;
+  existingTask: Task;
 }
 
-export default function TaskPlanDialog(props: editTaskProps) {
-  const storageBackend = getStorageBackend();
+const tasksCon = new TasksController();
+
+export default function EditTaskDialog(props: editTaskProps) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const defaultValue = {
-    planned:
-      props.existingTask.plannedDate === null
+    name: props.existingTask.name,
+    due:
+      props.existingTask.dueDate === null
         ? ""
-        : dateFormat(props.existingTask.plannedDate, "yyyy-mm-dd"),
-    est: props.existingTask.estHr,
+        : dateFormat(props.existingTask.dueDate, "yyyy-mm-dd"),
+    tag: props.existingTask.tagId,
   };
   const [formValues, setFormValues] = useState(defaultValue);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,25 +39,24 @@ export default function TaskPlanDialog(props: editTaskProps) {
       [name]: value,
     });
   };
+  const handleDeleteTask = () => {
+    tasksCon.deleteTaskById(props.existingTask.id);
+    props.handleHideDialog();
+    props.handleRefreshPage();
+  };
   const handleSubmit = () => {
-    storageBackend.updateTask({
-      id: props.existingTask.id,
-      name: props.existingTask.name,
-      dueDate: props.existingTask.dueDate,
-      estHr: (formValues.est as unknown) !== "" ? formValues.est : 0,
-      plannedDate: new Date(formValues.planned),
-      completed: props.existingTask.completed,
-      tag: props.existingTask.tag,
-    });
+    tasksCon.updateTask(
+      props.existingTask // TODO Fix implementation based on new schema
+    );
     props.handleHideDialog();
     props.handleRefreshPage();
   };
   useEffect(() => {
-    setFormValues(defaultValue); 
+    setFormValues(defaultValue);
   }, [props.open]);
   return (
     <Dialog open={props.open} fullScreen={fullScreen}>
-      <DialogTitle>Task Plan</DialogTitle>
+      <DialogTitle>Edit Task</DialogTitle>
       <DialogContent
         sx={{
           "& .MuiTextField-root": { m: 1, width: "25ch" },
@@ -65,38 +67,38 @@ export default function TaskPlanDialog(props: editTaskProps) {
         }}
       >
         <TextField
+          required
+          autoFocus
           id="name"
           name="name"
           label="Name"
           type="text"
           style={{ width: "auto" }}
-          value={props.existingTask.name}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          InputProps={{
-            readOnly: true,
-          }}
-        />
-        <TextField
-          id="planned"
-          name="planned"
-          label="Planned On"
-          type="date"
-          style={{ width: "auto" }}
-          value={formValues.planned}
+          value={formValues.name}
           onChange={handleInputChange}
           InputLabelProps={{
             shrink: true,
           }}
         />
         <TextField
-          id="estHr"
-          name="est"
-          label="Estimated Time (hr)"
-          type="number"
+          id="due"
+          name="due"
+          label="Due Date"
+          type="date"
           style={{ width: "auto" }}
-          value={formValues.est}
+          value={formValues.due}
+          onChange={handleInputChange}
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+        <TextField
+          id="tag"
+          name="tag"
+          label="Tag"
+          type="text"
+          style={{ width: "auto" }}
+          value={formValues.tag}
           onChange={handleInputChange}
           InputLabelProps={{
             shrink: true,
@@ -105,7 +107,10 @@ export default function TaskPlanDialog(props: editTaskProps) {
       </DialogContent>
       <DialogActions>
         <Button onClick={props.handleHideDialog}>Cancel</Button>
-        <Button onClick={handleSubmit}>Update Plan</Button>
+        <Button color="error" onClick={handleDeleteTask}>
+          Delete
+        </Button>
+        <Button onClick={handleSubmit}>Update</Button>
       </DialogActions>
     </Dialog>
   );

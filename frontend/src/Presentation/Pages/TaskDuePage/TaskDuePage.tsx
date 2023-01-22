@@ -3,15 +3,15 @@ import Snackbar from "@mui/material/Snackbar";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useCallback, useEffect, useState } from "react";
-import {
-  getStorageBackend,
-  Task,
-} from "../../components/storage/StorageBackend";
-import TaskCard from "../../components/userInterface/TaskCard";
+import TaskCard from "../../Components/TaskCard";
+import { Task } from "../../../Data/schemas";
+import { TasksController } from "../../../Controller/Tasks";
 
 interface TaskDuePageProps {
   showLoading(visibility: boolean): any;
 }
+
+const tasksCon = new TasksController();
 
 export default function TaskDuePage(props: TaskDuePageProps) {
   const [initialProps] = useState(props);
@@ -25,11 +25,10 @@ export default function TaskDuePage(props: TaskDuePageProps) {
     setShowSnackBar(false);
   };
   const refreshTasks = useCallback(async () => {
-    const storageBackend = getStorageBackend();
     initialProps.showLoading(true);
-    setTasks(storageBackend.localGetTasks());
+    setTasks(tasksCon.offlineGetTasks());
     try {
-      setTasks(await storageBackend.getTasks());
+      setTasks(await tasksCon.getTasks());
     } catch (error: any) {
       setSnackBarMessage(error.message);
       setShowSnackBar(true);

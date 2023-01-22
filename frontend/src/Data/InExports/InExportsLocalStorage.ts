@@ -1,7 +1,9 @@
 import { TasksController } from "../../Controller/Tasks";
+import { localSetLastUpdatedTimestamp } from "../Timestamps";
 import { InExportsBase } from "./InExportsBase";
 
 const FileSaver = require("file-saver");
+const localStore = require("store");
 
 export class InExportsLocalStorage extends InExportsBase {
   async exportDataToJson() {
@@ -16,7 +18,10 @@ export class InExportsLocalStorage extends InExportsBase {
   }
 
   async importDataFromJson(jsonFile: string) {
-    // TODO Implement import data
-    this.localSetLastUpdatedTimestamp(); // TODO move to settings
+    let jsonObject = JSON.parse(jsonFile); // TODO implement updated import function
+    if (jsonObject["tasks"] !== null) {
+      localStore.set("p2d.tasks", jsonObject["tasks"]);
+    }
+    localSetLastUpdatedTimestamp();
   }
 }

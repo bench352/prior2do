@@ -1,21 +1,21 @@
-import { CardActionArea, Checkbox } from "@mui/material";
+import { CardActionArea, Checkbox, Typography } from "@mui/material";
 import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
 import dateFormat from "dateformat";
 import { useState } from "react";
-import { getStorageBackend, Task } from "../storage/StorageBackend";
-import EditTaskDialog from "./dialog/EditTaskDialog";
+import TaskPlanDialog from "./dialog/TaskPlanDialog";
+import { Task } from "../../Data/schemas";
+import { TasksController } from "../../Controller/Tasks";
 
 interface task {
   task: Task;
   handleRefreshPage(): any;
-  showEstTime: boolean;
 }
 
-export default function TaskCard(props: task) {
+const tasksCon = new TasksController();
+
+export default function TaskPlanCard(props: task) {
   const [taskCompleted, setTaskCompleted] = useState(props.task.completed);
-  const storageBackend = getStorageBackend();
   const [showUpdateTaskDialog, setShowUpdateTaskDialog] = useState(false);
   const handleHideDialog = () => {
     setShowUpdateTaskDialog(false);
@@ -23,12 +23,10 @@ export default function TaskCard(props: task) {
   const handleShowDialog = () => {
     setShowUpdateTaskDialog(true);
   };
-  const handleCheckboxChange = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { checked } = e.target;
     setTaskCompleted(checked);
-    await storageBackend.updateTask({
+    tasksCon.updateTask({
       ...props.task,
       completed: checked,
     });
@@ -38,7 +36,9 @@ export default function TaskCard(props: task) {
       <Card sx={{ margin: "15px 0px" }}>
         <CardActionArea
           sx={{
-            padding: "10px 5px",
+            padding: "10px 10px",
+            display: "flex",
+            justifyContent: "flex-start",
           }}
           onClick={handleShowDialog}
         >
@@ -71,23 +71,28 @@ export default function TaskCard(props: task) {
               >
                 {props.task.name}
               </Typography>
-
               <p>
-                {props.task.tag === ""
+                {props.task.tagId === "" // TODO Update tag implementation
                   ? "Uncategorized · "
-                  : props.task.tag + " · "}
+                  : props.task.tagId + " · "}
                 {props.task.dueDate === null
                   ? "No due date"
                   : "Due " + dateFormat(props.task.dueDate, "mmm dd, yyyy")}
-                {props.showEstTime
-                  ? " | Estimated " + props.task.estHr + "h"
-                  : ""}
+              </p>
+              <p>
+                {props.task.planned[0].date !== null
+                  ? "Planned on " +
+                    dateFormat(props.task.planned[0].date, "mmm dd, yyyy") +
+                    " | Estimated " +
+                    props.task.estimatedHours +
+                    "h"
+                  : "No plan"}
               </p>
             </Grid>
           </Grid>
         </CardActionArea>
       </Card>
-      <EditTaskDialog
+      <TaskPlanDialog
         open={showUpdateTaskDialog}
         handleHideDialog={handleHideDialog}
         handleRefreshPage={props.handleRefreshPage}

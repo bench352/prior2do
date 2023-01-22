@@ -6,25 +6,31 @@ function getSettingsBackend(): SettingsBase {
 }
 
 export class SettingsController {
-    getIsWelcomeShown() {
-        return getSettingsBackend().getIsWelcomeShown();
-    }
-    hideWelcomeMessage() {
-        return getSettingsBackend().hideWelcomeMessage();
-    }
-    getIsSyncEnabled() {
-        return getSettingsBackend().getIsSyncEnabled();
-    }
-    setIsSyncEnabled(enabled:boolean) {
-        getSettingsBackend().setIsSyncEnabled(enabled);
-    }
-    getServerAddress() {
-        return getSettingsBackend().getServerAddress();
-    }
-    setServerAddress(address:string) {
-        getSettingsBackend().setServerAddress(address);
-    }
-    async testServerConnection(): Promise<string> {
-        
-    }
+  getIsWelcomeShown() {
+    return getSettingsBackend().getIsWelcomeShown();
+  }
+  hideWelcomeMessage() {
+    return getSettingsBackend().hideWelcomeMessage();
+  }
+  getIsSyncEnabled() {
+    return getSettingsBackend().getIsSyncEnabled();
+  }
+  setIsSyncEnabled(enabled: boolean) {
+    getSettingsBackend().setIsSyncEnabled(enabled);
+  }
+  getServerAddress() {
+    return getSettingsBackend().getServerAddress();
+  }
+  setServerAddress(address: string) {
+    getSettingsBackend().setServerAddress(address);
+  }
+  async getServerConnectionStatus(): Promise<string> {
+    return await getSettingsBackend().getServerConnectionStatus();
+  }
+  isReleaseDialogShown(): boolean {
+    return getSettingsBackend().isReleaseDialogShown();
+  }
+  markCurrentVersionViewed() {
+    getSettingsBackend().markCurrentVersionViewed()
+  }
 }

@@ -1,4 +1,5 @@
 import { appVersion } from "../../Const";
+
 const localStore = require("store");
 
 export abstract class SettingsBase {
@@ -8,7 +9,6 @@ export abstract class SettingsBase {
   hideWelcomeMessage() {
     localStore.set("p2d.hideWelcomeMsg", true);
   }
-
   getIsSyncEnabled() {
     return localStore.get("p2d.syncEnabled") === true;
   }

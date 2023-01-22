@@ -16,12 +16,14 @@ import ListItemText from "@mui/material/ListItemText";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import { useState } from "react";
-import { login, signup } from "../../../../components/storage/Accounts";
-import ConfirmDialog from "../../../UserInterface/dialog/ConfirmDialog";
+import ConfirmDialog from "../../../Components/dialog/ConfirmDialog";
+import { AccountsController } from "../../../../Controller/Accounts";
 
 interface NotLoggedInProps {
   setLoginStateFunc(isLoggedIn: boolean): any;
 }
+
+const accountsCon = new AccountsController();
 
 export default function NotLoggedIn(props: NotLoggedInProps) {
   const [loginForm, setLoginForm] = useState({ username: "", password: "" });
@@ -38,10 +40,9 @@ export default function NotLoggedIn(props: NotLoggedInProps) {
   };
   const confirmSignup = async () => {
     try {
-      await signup(loginForm.username, loginForm.password);
-      props.setLoginStateFunc(
-        await login(loginForm.username, loginForm.password)
-      );
+      await accountsCon.signup(loginForm.username, loginForm.password);
+      await accountsCon.login(loginForm.username, loginForm.password); //TODO Fix login function based on new implementation
+      props.setLoginStateFunc(true);
     } catch (error: any) {
       alert(error.message);
     }
@@ -108,9 +109,12 @@ export default function NotLoggedIn(props: NotLoggedInProps) {
                 <Button
                   variant="contained"
                   onClick={async () => {
-                    props.setLoginStateFunc(
-                      await login(loginForm.username, loginForm.password)
+                    await accountsCon.login(
+                      // TODO update login error handling based on new implementation
+                      loginForm.username,
+                      loginForm.password
                     );
+                    props.setLoginStateFunc(true);
                   }}
                 >
                   Login

@@ -7,7 +7,7 @@ import { useTheme } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import React, { useEffect, useState } from "react";
-import { getStorageBackend } from "../../../components/storage/StorageBackend";
+import { TasksController } from "../../../Controller/Tasks";
 
 interface addTaskProps {
   open: boolean;
@@ -15,8 +15,9 @@ interface addTaskProps {
   handleRefreshPage(): any;
 }
 
+const tasksCon = new TasksController();
+
 export default function AddTaskDialog(props: addTaskProps) {
-  const storageBackend = getStorageBackend();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const defaultValue = {
@@ -33,14 +34,17 @@ export default function AddTaskDialog(props: addTaskProps) {
     });
   };
   const handleSubmit = async () => {
-    await storageBackend.addTask({
-      id: storageBackend.getNewUniqueId(),
+    await tasksCon.addTask({
+      id: tasksCon.getNewUniqueId(),
       name: formValues.name,
       dueDate: new Date(formValues.due),
-      estHr: 0,
-      plannedDate: null,
-      tag: formValues.tag,
+      estimatedHours: 0,
+      planned: [],
+      tagId: formValues.tag,
       completed: false,
+      description: "",
+      subTasks: [],
+      issueId: ""
     });
     props.handleHideDialog();
     props.handleRefreshPage();

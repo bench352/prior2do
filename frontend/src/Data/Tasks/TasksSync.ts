@@ -1,33 +1,36 @@
-import { getAccessToken } from "../../components/storage/Accounts";
-import { TaskV0 } from "../../components/storage/StorageBackend";
+import { Task } from "../schemas";
 import { TasksBase } from "./TasksBase";
+import { SettingsController } from "../../Controller/Settings";
 import { getLocalLastUpdatedTimestamp,localSetLastUpdatedTimestamp } from "../Timestamps";
+import { AccountsController } from "../../Controller/Accounts";
 
 const localStore = require("store");
+const accountsCon = new AccountsController();
 
 export class TasksSync extends TasksBase {
+  settingsCon=new SettingsController();
   cleanupCompleted() {
     throw new Error("Method not implemented.");
   }
-  async getTasks(): Promise<TaskV0[]> {
+  async getTasks(): Promise<Task[]> {
     try {
-      const response = await fetch("http://" + getServerAddress() + "/tasks", {
+      const response = await fetch("http://" + this.settingsCon.getServerAddress() + "/tasks", {
         method: "GET",
-        headers: { Authorization: "Bearer " + getAccessToken() },
+        headers: { Authorization: "Bearer " + accountsCon.getAccessToken() },
       });
       if (response.ok) {
         let remoteData = await response.json();
-        let olderTasks: TaskV0[];
-        let newerTasks: TaskV0[];
+        let olderTasks: Task[];
+        let newerTasks: Task[];
         let localLastUpdated: number = getLocalLastUpdatedTimestamp();
         let remoteLastUpdated: number = remoteData["lastUpdated"];
         let olderTasksAreLocalTasks = false;
         if (localLastUpdated > remoteLastUpdated) {
-          olderTasks = remoteData["tasks"] as TaskV0[];
-          newerTasks = localStore.get("p2d.tasks") as TaskV0[];
+          olderTasks = remoteData["tasks"] as Task[];
+          newerTasks = localStore.get("p2d.tasks") as Task[];
         } else {
-          olderTasks = localStore.get("p2d.tasks") as TaskV0[];
-          newerTasks = remoteData["tasks"] as TaskV0[];
+          olderTasks = localStore.get("p2d.tasks") as Task[];
+          newerTasks = remoteData["tasks"] as Task[];
           olderTasksAreLocalTasks = true;
         }
         let olderTasksIds: Set<string> = new Set();
@@ -67,8 +70,8 @@ export class TasksSync extends TasksBase {
           for (const id of tasksIdsToDelete) {
             await this.remoteDeleteTaskById(id);
           }
-          let tasksToAdd = [] as TaskV0[];
-          let tasksToUpdate = [] as TaskV0[];
+          let tasksToAdd = [] as Task[];
+          let tasksToUpdate = [] as Task[];
           for (const task of newerTasks) {
             if (tasksIdsToAdd.has(task.id)) {
               tasksToAdd.push(task);
@@ -91,16 +94,16 @@ export class TasksSync extends TasksBase {
       }
     }
   }
-  async addTask(task: TaskV0) {
+  async addTask(task: Task) {
     this.localAddTask(task);
     localSetLastUpdatedTimestamp();
     await this.remoteAddTask(task);
   }
-  async remoteAddTask(task: TaskV0) {
-    const response = await fetch("http://" + getServerAddress() + "/tasks", {
+  async remoteAddTask(task: Task) {
+    const response = await fetch("http://" + this.settingsCon.getServerAddress() + "/tasks", {
       method: "POST",
       headers: {
-        Authorization: "Bearer " + getAccessToken(),
+        Authorization: "Bearer " + accountsCon.getAccessToken(),
         "Content-Type": "application/json;charset=utf-8",
       },
       body: JSON.stringify([task]),
@@ -110,11 +113,11 @@ export class TasksSync extends TasksBase {
     }
   }
 
-  async remoteBulkAddTask(tasks: TaskV0[]) {
-    const response = await fetch("http://" + getServerAddress() + "/tasks", {
+  async remoteBulkAddTask(tasks: Task[]) {
+    const response = await fetch("http://" + this.settingsCon.getServerAddress() + "/tasks", {
       method: "POST",
       headers: {
-        Authorization: "Bearer " + getAccessToken(),
+        Authorization: "Bearer " + accountsCon.getAccessToken(),
         "Content-Type": "application/json;charset=utf-8",
       },
       body: JSON.stringify(tasks),
@@ -124,17 +127,17 @@ export class TasksSync extends TasksBase {
     }
   }
 
-  async updateTask(taskToUpdate: TaskV0) {
+  async updateTask(taskToUpdate: Task) {
     this.localUpdateTask(taskToUpdate);
     localSetLastUpdatedTimestamp();
     await this.remoteUpdateTask(taskToUpdate);
   }
 
-  async remoteUpdateTask(taskToUpdate: TaskV0) {
-    const response = await fetch("http://" + getServerAddress() + "/tasks", {
+  async remoteUpdateTask(taskToUpdate: Task) {
+    const response = await fetch("http://" + this.settingsCon.getServerAddress() + "/tasks", {
       method: "PUT",
       headers: {
-        Authorization: "Bearer " + getAccessToken(),
+        Authorization: "Bearer " + accountsCon.getAccessToken(),
         "Content-Type": "application/json;charset=utf-8",
       },
       body: JSON.stringify([taskToUpdate]),
@@ -144,11 +147,11 @@ export class TasksSync extends TasksBase {
     }
   }
 
-  async remoteBulkUpdateTask(tasks: TaskV0[]) {
-    const response = await fetch("http://" + getServerAddress() + "/tasks", {
+  async remoteBulkUpdateTask(tasks: Task[]) {
+    const response = await fetch("http://" + this.settingsCon.getServerAddress() + "/tasks", {
       method: "PUT",
       headers: {
-        Authorization: "Bearer " + getAccessToken(),
+        Authorization: "Bearer " + accountsCon.getAccessToken(),
         "Content-Type": "application/json;charset=utf-8",
       },
       body: JSON.stringify(tasks),
@@ -165,11 +168,11 @@ export class TasksSync extends TasksBase {
   }
   async remoteDeleteTaskById(id: String) {
     const response = await fetch(
-      "http://" + getServerAddress() + "/tasks/" + id,
+      "http://" + this.settingsCon.getServerAddress() + "/tasks/" + id,
       {
         method: "DELETE",
         headers: {
-          Authorization: "Bearer " + getAccessToken(),
+          Authorization: "Bearer " + accountsCon.getAccessToken(),
         },
       }
     );

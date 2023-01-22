@@ -28,7 +28,13 @@ export class TasksController {
   async deleteTaskById(id: string) {
     await getTasksBackend().deleteTaskById(id);
   }
-  offlineGetTasks(task: Task) {
-    return getTasksBackend().localGetTasks(task);
+  offlineGetTasks() {
+    return getTasksBackend().localGetTasks();
+  }
+  async cleanupCompleted() {
+    await getTasksBackend().cleanupCompleted();
+  }
+  getNewUniqueId() {
+    return getTasksBackend().getNewUniqueId();
   }
 }

@@ -15,15 +15,16 @@ import Snackbar from "@mui/material/Snackbar";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useCallback, useEffect, useState } from "react";
-import {
-  getStorageBackend,
-  Task,
-} from "../../components/storage/StorageBackend";
-import TaskCard from "../../components/userInterface/TaskCard";
-
+import TaskCard from "../../Components/TaskCard";
+import { Task } from "../../../Data/schemas";
+import { TasksController } from "../../../Controller/Tasks";
+import { SettingsController } from "../../../Controller/Settings";
 interface HomePageProps {
   showLoading(visibility: boolean): any;
 }
+
+const settingsCon = new SettingsController();
+const tasksCon = new TasksController();
 
 export default function HomePage(props: HomePageProps) {
   const [initialProps] = useState(props);
@@ -31,10 +32,11 @@ export default function HomePage(props: HomePageProps) {
   const isMobileScreenSize = useMediaQuery(theme.breakpoints.down("sm"));
   const filterTodayPlannedTask = (unfilteredTasks: any[]) => {
     return unfilteredTasks
-      .filter((task: Task) => task.plannedDate !== null)
+      .filter((task: Task) => task.planned !== null) // TODO Implement WORKING filter function based on new schema
       .filter(
         (task: Task) =>
-          new Date(task.plannedDate as Date).getDate() === new Date().getDate()
+          new Date(task.planned[0].date as Date).getDate() ===
+          new Date().getDate()
       )
       .map((task: Task) => (
         <TaskCard
@@ -52,14 +54,13 @@ export default function HomePage(props: HomePageProps) {
     setShowSnackBar(false);
   };
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(
-    getStorageBackend().isWelcomeMessageShown()
+    settingsCon.getIsWelcomeShown()
   );
   const refreshTasks = useCallback(async () => {
-    const storageBackend = getStorageBackend();
     initialProps.showLoading(true);
-    setTasks(storageBackend.localGetTasks());
+    setTasks(tasksCon.offlineGetTasks());
     try {
-      setTasks(await storageBackend.getTasks());
+      setTasks(await tasksCon.getTasks());
     } catch (error: any) {
       setSnackBarMessage(error.message);
       setShowSnackBar(true);
@@ -71,7 +72,7 @@ export default function HomePage(props: HomePageProps) {
   }, [refreshTasks]);
   const hideWelcomeMessage = () => {
     setShowWelcomeMessage(false);
-    getStorageBackend().hideWelcomeMessage();
+    settingsCon.hideWelcomeMessage();
   };
   return (
     <Container disableGutters={isMobileScreenSize}>

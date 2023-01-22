@@ -4,17 +4,17 @@ import Snackbar from "@mui/material/Snackbar";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import { useCallback, useEffect, useState } from "react";
-import {
-  getStorageBackend,
-  Task,
-} from "../../components/storage/StorageBackend";
-import TaskPlanCard from "../../components/userInterface/TaskPlanCard";
+import { TasksController } from "../../../Controller/Tasks";
+import { Task } from "../../../Data/schemas";
+import TaskPlanCard from "../../Components/TaskPlanCard";
 
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
 }
+
+const tasksCon = new TasksController();
 
 interface TaskPlanPageProps {
   showLoading(visibility: boolean): any;
@@ -54,11 +54,10 @@ export default function TaskPlanPage(props: TaskPlanPageProps) {
     setShowSnackBar(false);
   };
   const refreshTasks = useCallback(async () => {
-    const storageBackend = getStorageBackend();
     initialProps.showLoading(true);
-    setTasks(storageBackend.localGetTasks());
+    setTasks(tasksCon.offlineGetTasks());
     try {
-      setTasks(await storageBackend.getTasks());
+      setTasks(await tasksCon.getTasks());
     } catch (error: any) {
       setSnackBarMessage(error.message);
       setShowSnackBar(true);
@@ -92,12 +91,14 @@ export default function TaskPlanPage(props: TaskPlanPageProps) {
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
+        {" "}
+        {/* TODO Implement WORKING filter function based on new schema */}
         {tasks
-          .filter((task: Task) => task.plannedDate !== null)
+          .filter((task: Task) => task.planned[0].date !== null)
           .sort(
             (a: Task, b: Task) =>
-              new Date(a.plannedDate as Date).getTime() -
-              new Date(b.plannedDate as Date).getTime()
+              new Date(a.planned[0].date as Date).getTime() -
+              new Date(b.planned[0].date as Date).getTime()
           )
           .map((task: Task) => (
             <TaskPlanCard
@@ -109,7 +110,7 @@ export default function TaskPlanPage(props: TaskPlanPageProps) {
       </TabPanel>
       <TabPanel value={value} index={1}>
         {tasks
-          .filter((task: Task) => task.plannedDate === null)
+          .filter((task: Task) => task.planned[0].date === null)
           .map((task: Task) => (
             <TaskPlanCard
               key={task.id}

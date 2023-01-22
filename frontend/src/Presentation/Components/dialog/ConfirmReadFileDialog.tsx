@@ -4,7 +4,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { getStorageBackend } from "../../../components/storage/StorageBackend";
+import { InExportsController } from "../../../Controller/InExports";
 
 interface confirmDialogProps {
   open: boolean;
@@ -12,6 +12,8 @@ interface confirmDialogProps {
   message: string;
   handleClose(): any;
 }
+
+const inExportsCon = new InExportsController();
 
 export default function ConfirmReadFileDialog(props: confirmDialogProps) {
   const fileUploadInputChange = (
@@ -21,7 +23,7 @@ export default function ConfirmReadFileDialog(props: confirmDialogProps) {
       const files = Array.from(event.target.files);
       const reader = new FileReader();
       reader.onload = () => {
-        getStorageBackend().importDataFromJson(
+        inExportsCon.importDataFromJson(
           reader.result ? reader.result.toString() : ""
         );
         props.handleClose();

@@ -21,22 +21,24 @@ import { useTheme } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useState } from "react";
-import { isLoggedIn } from "../../components/storage/Accounts";
-import {
-  getServerAddress,
-  getStorageBackend,
-  setServerAddress,
-  testServerConnection,
-} from "../../components/storage/StorageBackend";
-import ConfirmDialog from "../../components/userInterface/dialog/ConfirmDialog";
-import ConfirmReadFileDialog from "../../components/userInterface/dialog/ConfirmReadFileDialog";
-import LicenseDialog from "../../components/userInterface/dialog/LicenseDialog";
-import SingleTextInputDialog from "../../components/userInterface/dialog/SingleTextInputDialog";
-import { appVersion } from "../../Const";
+import { SettingsController } from "../../../Controller/Settings";
+import { appVersion } from "../../../Const";
+import { AccountsController } from "../../../Controller/Accounts";
+import { InExportsController } from "../../../Controller/InExports";
+import { TasksController } from "../../../Controller/Tasks";
+import LicenseDialog from "../../Components/dialog/LicenseDialog";
+import SingleTextInputDialog from "../../Components/dialog/SingleTextInputDialog";
+import ConfirmDialog from "../../Components/dialog/ConfirmDialog";
+import ConfirmReadFileDialog from "../../Components/dialog/ConfirmReadFileDialog";
 
 interface SettingsPageProps {
   showUser(visibility: boolean): any;
 }
+
+const settingsCon = new SettingsController();
+const inExportsCon = new InExportsController();
+const accountsCon = new AccountsController();
+const tasksCon = new TasksController();
 
 export default function SettingsPage(props: SettingsPageProps) {
   const theme = useTheme();
@@ -50,7 +52,7 @@ export default function SettingsPage(props: SettingsPageProps) {
     licenseDialog: false,
   });
   const [syncOptionEnabled, setSyncOptionEnabled] = useState(
-    getStorageBackend().isSyncEnabled()
+    settingsCon.getIsSyncEnabled()
   );
   const updateVisibility = (item: string, visibility: boolean) => {
     setDialogVisibility({
@@ -58,14 +60,16 @@ export default function SettingsPage(props: SettingsPageProps) {
       [item]: visibility,
     });
   };
-  const [syncServerIPAddr, setSyncServerIPAddr] = useState(getServerAddress());
+  const [syncServerIPAddr, setSyncServerIPAddr] = useState(
+    settingsCon.getServerAddress()
+  );
   const handleSetSyncServerIPAddr = (addr: string) => {
     setSyncServerIPAddr(addr);
-    setServerAddress(addr);
+    settingsCon.setServerAddress(addr);
   };
   const handleSyncOptionChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSyncOptionEnabled(e.target.checked);
-    getStorageBackend().setIsSyncEnabled(e.target.checked);
+    settingsCon.setIsSyncEnabled(e.target.checked);
     props.showUser(e.target.checked);
   };
   return (
@@ -198,7 +202,7 @@ export default function SettingsPage(props: SettingsPageProps) {
                 <ListItem disablePadding>
                   <ListItemButton
                     onClick={async () => {
-                      await testServerConnection();
+                      alert(await settingsCon.getServerConnectionStatus());
                     }}
                   >
                     <ListItemIcon>
@@ -219,7 +223,7 @@ export default function SettingsPage(props: SettingsPageProps) {
         open={dialogVisibility.importJSONData}
         title="Confirm Import Data?"
         message={
-          isLoggedIn()
+          accountsCon.isLoggedIn()
             ? "Existing data stored locally in the app will be erased and replaced by data from the JSON file. The update will be reflected on the Prior2Do Sync server upon the next connection to the server. Do you confirm importing data from a JSON file?"
             : "Existing data in the app will be erased and replaced by data from the JSON file. Do you confirm importing data from a JSON file?"
         }
@@ -230,11 +234,11 @@ export default function SettingsPage(props: SettingsPageProps) {
       <ConfirmDialog
         open={dialogVisibility.exportJSONData}
         confirmAction={() => {
-          getStorageBackend().exportDataToJson();
+          inExportsCon.exportDataToJson();
         }}
         title="Confirm Export Data?"
         message={
-          isLoggedIn()
+          accountsCon.isLoggedIn()
             ? "Only task data stored locally in the app will be exported as a JSON file. Please make sure you fetch the latest task data from the Prior2Do server before exporting the data from the app. Do you confirm doing so?"
             : "Existing task data stored in the app will be exported as a JSON file. Do you confirm doing so?"
         }
@@ -244,12 +248,12 @@ export default function SettingsPage(props: SettingsPageProps) {
       />
       <ConfirmDialog
         open={dialogVisibility.cleanupCompleted}
-        confirmAction={() => {
-          getStorageBackend().cleanupCompleted();
+        confirmAction={async () => {
+          await tasksCon.cleanupCompleted();
         }}
         title="Confirm Cleanup All Completed Tasks?"
         message={
-          isLoggedIn()
+          accountsCon.isLoggedIn()
             ? 'All tasks stored locally in the app marked as "completed" will be deleted and cannot be recovered. The update will be reflected on the Prior2Do Sync server upon the next connection to the server. Do you confirm doing so?'
             : 'All tasks that are marked as "completed" will be deleted and cannot be recovered. Do you confirm doing so?'
         }
