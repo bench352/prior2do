@@ -1,5 +1,3 @@
-import DateRangeOutlinedIcon from "@mui/icons-material/DateRangeOutlined";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import ListAltOutlinedIcon from "@mui/icons-material/ListAltOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import OutlinedFlagSharpIcon from "@mui/icons-material/OutlinedFlagSharp";
@@ -12,7 +10,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import CssBaseline from "@mui/material/CssBaseline";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
-import IconButton from "@mui/material/IconButton";
+import TagEditDialog from "./Components/dialog/TagEditDialog";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -20,63 +18,125 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Link, Route, Routes } from "react-router-dom";
 import { SettingsController } from "../Controller/Settings";
 import ReleaseDialog from "./Components/dialog/ReleaseDialog";
-import AllTasksPage from "./Pages/AllTasksPage/AllTasksPage";
+import TasksPage from "./Pages/TasksPage/TasksPage";
 import HomePage from "./Pages/HomePage/HomePage";
 import SettingsPage from "./Pages/SettingsPage/SettingsPage";
 import TaskDuePage from "./Pages/TaskDuePage/TaskDuePage";
 import TaskPlanPage from "./Pages/TaskPlanPage/TaskPlanPage";
 import UserPage from "./Pages/UserPage/UserPage";
+import AddIcon from "@mui/icons-material/Add";
+import TagIcon from "@mui/icons-material/Tag";
+import IconButton from "@mui/material/IconButton";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
+import ListSubheader from "@mui/material/ListSubheader";
+import { TagsController } from "../Controller/Tags";
+import SingleTextInputDialog from "./Components/dialog/SingleTextInputDialog";
+import { Tag, Task } from "../Data/schemas";
+import { getNewUniqueId } from "../Controller/Uuid";
+import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import { TasksController } from "../Controller/Tasks";
+import Snackbar from "@mui/material/Snackbar";
 const drawerWidth = 240;
+
+export interface TasksViewProps {
+  tasks: Task[];
+  handleRefreshPage(): any;
+}
+
+const tasksCon = new TasksController();
+const tagsCon = new TagsController();
 
 export default function CommonView() {
   let settingsCon = new SettingsController();
   const [mobileOpen, setMobileOpen] = useState(false);
+
   const [showUser, setShowUser] = useState(settingsCon.getIsSyncEnabled());
   const [showLoading, setShowLoading] = useState(false);
+  const [showTagEditDialog, setShowTagEditDialog] = useState(false);
   const [showReleaseDialog, setShowReleaseDialog] = useState(
     settingsCon.isReleaseDialogShown()
   );
+  const [showInfoSnackBar, setShowInfoSnackBar] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState("");
+  const createInfoSnackBar = (message: string) => {
+    setSnackBarMessage(message);
+    setShowInfoSnackBar(true);
+  };
+  const [tasks, setTasks] = useState([] as Task[]);
+  const [tags, setTags] = useState([] as Tag[]);
+  const refreshPage = useCallback(async () => {
+    setShowLoading(true);
+    setTasks(tasksCon.offlineGetTasks());
+    try {
+      setTasks(await tasksCon.getTasks());
+    } catch (error: any) {
+      createInfoSnackBar(error.message);
+    }
+    try {
+      setTags(await tagsCon.getTags());
+    } catch (error: any) {
+      createInfoSnackBar(error.message);
+    }
+    setShowLoading(false);
+  }, []);
+  const [showAddTagDialog, setShowAddTagDialog] = useState(false);
   const handleCloseReleaseDialog = () => {
     settingsCon.markCurrentVersionViewed();
     setShowReleaseDialog(false);
   };
+  const handleCloseAddTagDialog = () => {
+    setShowAddTagDialog(false);
+  };
   const changeUserOptionVisibility = (visibility: boolean) => {
     setShowUser(visibility);
-  };
-  const changeLoadingVisibility = (visibility: boolean) => {
-    setShowLoading(visibility);
   };
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
-
+  const handleCloseTagEditDialog = () => {
+    setShowTagEditDialog(false);
+  };
+  const createTag = (name: string) => {
+    tagsCon.createTag({ name: name, id: getNewUniqueId() });
+    refreshPage();
+  };
+  useEffect(() => {
+    refreshPage();
+  }, [refreshPage]);
   const drawer = (
     <div>
       <Toolbar />
       <Divider />
-      <List>
+      <List subheader={<ListSubheader>Features</ListSubheader>}>
         {[
           {
-            name: "Home",
-            icon: <HomeOutlinedIcon />,
+            name: "Dashboard",
+            icon: <DashboardOutlinedIcon />,
             link: "/",
           },
           {
-            name: "All Tasks",
+            name: "Tasks",
             icon: <ListAltOutlinedIcon />,
             link: "/tasks",
           },
           {
-            name: "Task Due",
-            icon: <DateRangeOutlinedIcon />,
-            link: "/due",
+            name: "Calendar",
+            icon: <CalendarMonthOutlinedIcon />,
+            link: "/calendar",
           },
           {
-            name: "Task Plan",
+            name: "Issues",
+            icon: <ArticleOutlinedIcon />,
+            link: "/issues",
+          },
+          {
+            name: "Plan",
             icon: <OutlinedFlagSharpIcon />,
             link: "/plan",
           },
@@ -94,6 +154,51 @@ export default function CommonView() {
             </ListItemButton>
           </ListItem>
         ))}
+      </List>
+      <Divider />
+      <List
+        subheader={
+          <ListSubheader>
+            Tags
+            <IconButton
+              aria-label="delete"
+              size="small"
+              onClick={() => {
+                setShowTagEditDialog(true);
+              }}
+            >
+              <EditOutlinedIcon fontSize="small" />
+            </IconButton>
+          </ListSubheader>
+        }
+      >
+        {tags
+          .sort((a: Tag, b: Tag) => a.name.localeCompare(b.name))
+          .map((tag) => (
+            <ListItem
+              disablePadding
+              key={tag.name}
+              component={Link}
+              to={`/tasks?tagId=${tag.id}`}
+              sx={{ "&:link": { color: "black" } }}
+            >
+              <ListItemButton>
+                <Chip icon={<TagIcon />} label={tag.name} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        <ListItem disablePadding sx={{ "&:link": { color: "black" } }}>
+          <ListItemButton
+            onClick={() => {
+              setShowAddTagDialog(true);
+            }}
+          >
+            <ListItemIcon>
+              <AddIcon />
+            </ListItemIcon>
+            <ListItemText primary="Add Tag" />
+          </ListItemButton>
+        </ListItem>
       </List>
       <Divider />
       <List>
@@ -155,7 +260,7 @@ export default function CommonView() {
             Prior2Do
           </Typography>
           <Chip
-            label="Beta"
+            label="Pre-release"
             color="secondary"
             size="small"
             sx={{ marginLeft: "10px" }}
@@ -219,19 +324,29 @@ export default function CommonView() {
         <Routes>
           <Route
             path="/*"
-            element={<HomePage showLoading={changeLoadingVisibility} />}
+            element={<HomePage tasks={tasks} handleRefreshPage={refreshPage} />}
           />
           <Route
             path="tasks"
-            element={<AllTasksPage showLoading={changeLoadingVisibility} />}
+            element={
+              <TasksPage
+                tasks={tasks}
+                handleRefreshPage={refreshPage}
+                createInfoSnackBar={createInfoSnackBar}
+              />
+            }
           />
           <Route
-            path="due"
-            element={<TaskDuePage showLoading={changeLoadingVisibility} />}
+            path="calendar"
+            element={
+              <TaskDuePage tasks={tasks} handleRefreshPage={refreshPage} />
+            }
           />
           <Route
             path="plan"
-            element={<TaskPlanPage showLoading={changeLoadingVisibility} />}
+            element={
+              <TaskPlanPage tasks={tasks} handleRefreshPage={refreshPage} />
+            }
           />
           <Route path="user" element={<UserPage />} />
           <Route
@@ -243,6 +358,27 @@ export default function CommonView() {
       <ReleaseDialog
         open={showReleaseDialog}
         handleHideDialog={handleCloseReleaseDialog}
+      />
+      <TagEditDialog
+        open={showTagEditDialog}
+        tags={tags}
+        handleHideDialog={handleCloseTagEditDialog}
+        handleRefreshPage={refreshPage}
+      />
+      <SingleTextInputDialog
+        title="Create A New Tag"
+        message="Enter the name for the new tag"
+        open={showAddTagDialog}
+        handleClose={handleCloseAddTagDialog}
+        setConfirmValue={createTag}
+      />
+      <Snackbar
+        open={showInfoSnackBar}
+        autoHideDuration={6000}
+        onClose={() => {
+          setShowInfoSnackBar(false);
+        }}
+        message={snackBarMessage}
       />
     </Box>
   );

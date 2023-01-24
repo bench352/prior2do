@@ -20,14 +20,12 @@ export interface Task extends IdBasedResource {
   completed: boolean;
   planned: WorkSession[];
   subTasks: SubTask[];
-  tagId: string;
-  issueId: string;
+  tagId: string | null;
+  issueId: string | null;
 }
 
 export interface Issue extends IdBasedResource {
   description: string;
 }
 
-export interface Tag extends IdBasedResource {
-  color: string;
-}
+export interface Tag extends IdBasedResource {}

@@ -7,8 +7,9 @@ export abstract class TagsBase {
   abstract getTags(): Promise<Tag[]>;
   abstract updateTag(tag: Tag): any;
   abstract deleteTag(tagId: string): any;
+  abstract getTagById(tagId: string): Promise<Tag>;
   localGetTags(): Tag[] {
-    return localStore.get("p2d.tags");
+    return localStore.get("p2d.tags") || [];
   }
   updateTagsLocalStorage(tags: Tag[]) {
     localStore.set("p2d.tags", tags);

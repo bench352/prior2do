@@ -3,22 +3,38 @@ import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import dateFormat from "dateformat";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { TagsController } from "../../Controller/Tags";
 import { TasksController } from "../../Controller/Tasks";
-import { Task } from "../../Data/schemas";
+import { Tag, Task } from "../../Data/schemas";
+import TagOutlinedIcon from "@mui/icons-material/TagOutlined";
+import Chip from "@mui/material/Chip";
+import Stack from "@mui/material/Stack";
 import EditTaskDialog from "./dialog/EditTaskDialog";
+import EventOutlinedIcon from "@mui/icons-material/EventOutlined";
+import TimelapseOutlinedIcon from "@mui/icons-material/TimelapseOutlined";
 
 interface task {
   task: Task;
   handleRefreshPage(): any;
-  showEstTime: boolean;
 }
 
 const tasksCon = new TasksController();
+const tagsCon = new TagsController();
 
 export default function TaskCard(props: task) {
   const [taskCompleted, setTaskCompleted] = useState(props.task.completed);
   const [showUpdateTaskDialog, setShowUpdateTaskDialog] = useState(false);
+  const [tag, setTag] = useState(null as Tag | null);
+  const refreshTags = useCallback(async () => {
+    if (props.task.tagId != null) {
+      try {
+        setTag(await tagsCon.getTagById(props.task.tagId));
+      } catch (error: any) {
+        setTag(null);
+      }
+    }
+  }, [props]);
   const handleHideDialog = () => {
     setShowUpdateTaskDialog(false);
   };
@@ -35,6 +51,9 @@ export default function TaskCard(props: task) {
       completed: checked,
     });
   };
+  useEffect(() => {
+    refreshTags();
+  }, [refreshTags, props]);
   return (
     <>
       <Card sx={{ margin: "15px 0px" }}>
@@ -74,17 +93,36 @@ export default function TaskCard(props: task) {
                 {props.task.name}
               </Typography>
 
-              <p>
-                {props.task.tagId === "" // TODO update task tag implementation
-                  ? "Uncategorized · "
-                  : props.task.tagId + " · "}
-                {props.task.dueDate === null
-                  ? "No due date"
-                  : "Due " + dateFormat(props.task.dueDate, "mmm dd, yyyy")}
-                {props.showEstTime
-                  ? " | Estimated " + props.task.estimatedHours + "h"
-                  : ""}
-              </p>
+              <Stack direction="row" spacing={1}>
+                {props.task.dueDate !== null ? (
+                  <Chip
+                    icon={<EventOutlinedIcon fontSize="small" />}
+                    size="small"
+                    label={dateFormat(props.task.dueDate, "mmm dd, yyyy")}
+                  />
+                ) : (
+                  ""
+                )}
+
+                {props.task.estimatedHours > 0 ? (
+                  <Chip
+                    icon={<TimelapseOutlinedIcon fontSize="small" />}
+                    size="small"
+                    label={`${props.task.estimatedHours}h`}
+                  />
+                ) : (
+                  ""
+                )}
+                {tag != null ? (
+                  <Chip
+                    icon={<TagOutlinedIcon fontSize="small" />}
+                    size="small"
+                    label={tag.name}
+                  />
+                ) : (
+                  ""
+                )}
+              </Stack>
             </Grid>
           </Grid>
         </CardActionArea>

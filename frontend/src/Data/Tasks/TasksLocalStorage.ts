@@ -3,7 +3,7 @@ import { TasksBase } from "./TasksBase";
 
 export default class TasksLocalStorage extends TasksBase {
   async getTasks(): Promise<Task[]> {
-    return this.lo calGetTasks();
+    return this.localGetTasks();
   }
 
   async addTask(task: Task) {
@@ -16,13 +16,17 @@ export default class TasksLocalStorage extends TasksBase {
 
   async deleteTaskById(id: string) {
     this.localDeleteTaskById(id);
-
   }
   cleanupCompleted() {
     let tasks = this.localGetTasks();
-    const updatedTasks = tasks.filter(
-      (task: Task) => task.completed === false
-    );
+    const updatedTasks = tasks.filter((task: Task) => task.completed === false);
+    this.updateTasksLocalStorage(updatedTasks);
+  }
+  removeTagAssociation(tagId: string) {
+    let tasks = this.localGetTasks();
+    const updatedTasks = tasks.map((task) => {
+      return task.tagId === tagId ? { ...task, tagId: null } : task;
+    });
     this.updateTasksLocalStorage(updatedTasks);
   }
 }

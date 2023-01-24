@@ -11,65 +11,35 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
-import Snackbar from "@mui/material/Snackbar";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useCallback, useEffect, useState } from "react";
-import TaskCard from "../../Components/TaskCard";
-import { Task } from "../../../Data/schemas";
-import { TasksController } from "../../../Controller/Tasks";
+import { useState } from "react";
 import { SettingsController } from "../../../Controller/Settings";
-interface HomePageProps {
-  showLoading(visibility: boolean): any;
-}
+import { Task } from "../../../Data/schemas";
+import { TasksViewProps } from "../../CommonView";
+import TaskCard from "../../Components/TaskCard";
 
 const settingsCon = new SettingsController();
-const tasksCon = new TasksController();
 
-export default function HomePage(props: HomePageProps) {
-  const [initialProps] = useState(props);
+export default function HomePage(props: TasksViewProps) {
   const theme = useTheme();
   const isMobileScreenSize = useMediaQuery(theme.breakpoints.down("sm"));
-  const filterTodayPlannedTask = (unfilteredTasks: any[]) => {
-    return unfilteredTasks
-      .filter((task: Task) => task.planned !== null) // TODO Implement WORKING filter function based on new schema
-      .filter(
-        (task: Task) =>
-          new Date(task.planned[0].date as Date).getDate() ===
-          new Date().getDate()
-      )
-      .map((task: Task) => (
+  const filterTodayPlannedTask = (unfilteredTasks: Task[]) => {
+    return unfilteredTasks.map(
+      (
+        task: Task // TODO implement filter based on new task plan implementation
+      ) => (
         <TaskCard
           key={task.id}
           task={task}
-          handleRefreshPage={refreshTasks}
-          showEstTime={true}
+          handleRefreshPage={props.handleRefreshPage}
         />
-      ));
-  };
-  const [tasks, setTasks] = useState([] as Task[]);
-  const [snackBarMessage, setSnackBarMessage] = useState("");
-  const [showSnackBar, setShowSnackBar] = useState(false);
-  const handleSnackbarClose = () => {
-    setShowSnackBar(false);
+      )
+    );
   };
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(
     settingsCon.getIsWelcomeShown()
   );
-  const refreshTasks = useCallback(async () => {
-    initialProps.showLoading(true);
-    setTasks(tasksCon.offlineGetTasks());
-    try {
-      setTasks(await tasksCon.getTasks());
-    } catch (error: any) {
-      setSnackBarMessage(error.message);
-      setShowSnackBar(true);
-    }
-    initialProps.showLoading(false);
-  }, [initialProps]);
-  useEffect(() => {
-    refreshTasks();
-  }, [refreshTasks]);
   const hideWelcomeMessage = () => {
     setShowWelcomeMessage(false);
     settingsCon.hideWelcomeMessage();
@@ -138,18 +108,12 @@ export default function HomePage(props: HomePageProps) {
       )}
 
       <h2>Planned On Today</h2>
-      {filterTodayPlannedTask(tasks)}
-      {filterTodayPlannedTask(tasks).length === 0 ? (
+      {filterTodayPlannedTask(props.tasks)}
+      {filterTodayPlannedTask(props.tasks).length === 0 ? (
         <p>No tasks planned on today. Enjoy your peace of mind!</p>
       ) : (
         ""
       )}
-      <Snackbar
-        open={showSnackBar}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        message={snackBarMessage}
-      />
     </Container>
   );
 }

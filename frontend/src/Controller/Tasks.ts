@@ -17,6 +17,7 @@ function getTasksBackend(): TasksBase {
 
 export class TasksController {
   async getTasks(): Promise<Task[]> {
+    console.log("Getting tasks")
     return getTasksBackend().getTasks();
   }
   async addTask(task: Task) {

@@ -1,23 +1,16 @@
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
-import Snackbar from "@mui/material/Snackbar";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import { useCallback, useEffect, useState } from "react";
-import { TasksController } from "../../../Controller/Tasks";
+import { useState } from "react";
 import { Task } from "../../../Data/schemas";
+import { TasksViewProps } from "../../CommonView";
 import TaskPlanCard from "../../Components/TaskPlanCard";
 
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
-}
-
-const tasksCon = new TasksController();
-
-interface TaskPlanPageProps {
-  showLoading(visibility: boolean): any;
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -43,34 +36,11 @@ function a11yProps(index: number) {
   };
 }
 
-export default function TaskPlanPage(props: TaskPlanPageProps) {
-  const [initialProps] = useState(props);
-
+export default function TaskPlanPage(props: TasksViewProps) {
   const [value, setValue] = useState(0);
-  const [tasks, setTasks] = useState([] as Task[]);
-  const [snackBarMessage, setSnackBarMessage] = useState("");
-  const [showSnackBar, setShowSnackBar] = useState(false);
-  const handleSnackbarClose = () => {
-    setShowSnackBar(false);
-  };
-  const refreshTasks = useCallback(async () => {
-    initialProps.showLoading(true);
-    setTasks(tasksCon.offlineGetTasks());
-    try {
-      setTasks(await tasksCon.getTasks());
-    } catch (error: any) {
-      setSnackBarMessage(error.message);
-      setShowSnackBar(true);
-    }
-    initialProps.showLoading(false);
-  }, [initialProps]);
-  useEffect(() => {
-    refreshTasks();
-  }, [refreshTasks]);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
-
   return (
     <Container>
       <h2>Task Plan</h2>
@@ -93,7 +63,7 @@ export default function TaskPlanPage(props: TaskPlanPageProps) {
       <TabPanel value={value} index={0}>
         {" "}
         {/* TODO Implement WORKING filter function based on new schema */}
-        {tasks
+        {props.tasks
           .filter((task: Task) => task.planned[0].date !== null)
           .sort(
             (a: Task, b: Task) =>
@@ -104,27 +74,21 @@ export default function TaskPlanPage(props: TaskPlanPageProps) {
             <TaskPlanCard
               key={task.id}
               task={task}
-              handleRefreshPage={refreshTasks}
+              handleRefreshPage={props.handleRefreshPage}
             />
           ))}
       </TabPanel>
       <TabPanel value={value} index={1}>
-        {tasks
+        {props.tasks
           .filter((task: Task) => task.planned[0].date === null)
           .map((task: Task) => (
             <TaskPlanCard
               key={task.id}
               task={task}
-              handleRefreshPage={refreshTasks}
+              handleRefreshPage={props.handleRefreshPage}
             />
           ))}
       </TabPanel>
-      <Snackbar
-        open={showSnackBar}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        message={snackBarMessage}
-      />
     </Container>
   );
 }
