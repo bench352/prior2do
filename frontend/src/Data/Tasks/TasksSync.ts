@@ -1,23 +1,32 @@
 import { Task } from "../schemas";
 import { TasksBase } from "./TasksBase";
 import { SettingsController } from "../../Controller/Settings";
-import { getLocalLastUpdatedTimestamp,localSetLastUpdatedTimestamp } from "../Timestamps";
+import {
+  getLocalLastUpdatedTimestamp,
+  localSetLastUpdatedTimestamp,
+} from "../Timestamps";
 import { AccountsController } from "../../Controller/Accounts";
 
 const localStore = require("store");
 const accountsCon = new AccountsController();
 
 export class TasksSync extends TasksBase {
-  settingsCon=new SettingsController();
+  getTaskById(id: string): Promise<Task> {
+    throw new Error("Method not implemented.");
+  }
+  settingsCon = new SettingsController();
   cleanupCompleted() {
     throw new Error("Method not implemented.");
   }
   async getTasks(): Promise<Task[]> {
     try {
-      const response = await fetch("http://" + this.settingsCon.getServerAddress() + "/tasks", {
-        method: "GET",
-        headers: { Authorization: "Bearer " + accountsCon.getAccessToken() },
-      });
+      const response = await fetch(
+        "http://" + this.settingsCon.getServerAddress() + "/tasks",
+        {
+          method: "GET",
+          headers: { Authorization: "Bearer " + accountsCon.getAccessToken() },
+        }
+      );
       if (response.ok) {
         let remoteData = await response.json();
         let olderTasks: Task[];
@@ -100,28 +109,34 @@ export class TasksSync extends TasksBase {
     await this.remoteAddTask(task);
   }
   async remoteAddTask(task: Task) {
-    const response = await fetch("http://" + this.settingsCon.getServerAddress() + "/tasks", {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + accountsCon.getAccessToken(),
-        "Content-Type": "application/json;charset=utf-8",
-      },
-      body: JSON.stringify([task]),
-    });
+    const response = await fetch(
+      "http://" + this.settingsCon.getServerAddress() + "/tasks",
+      {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + accountsCon.getAccessToken(),
+          "Content-Type": "application/json;charset=utf-8",
+        },
+        body: JSON.stringify([task]),
+      }
+    );
     if (!response.ok) {
       alert(await response.text());
     }
   }
 
   async remoteBulkAddTask(tasks: Task[]) {
-    const response = await fetch("http://" + this.settingsCon.getServerAddress() + "/tasks", {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + accountsCon.getAccessToken(),
-        "Content-Type": "application/json;charset=utf-8",
-      },
-      body: JSON.stringify(tasks),
-    });
+    const response = await fetch(
+      "http://" + this.settingsCon.getServerAddress() + "/tasks",
+      {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + accountsCon.getAccessToken(),
+          "Content-Type": "application/json;charset=utf-8",
+        },
+        body: JSON.stringify(tasks),
+      }
+    );
     if (!response.ok) {
       alert(await response.text());
     }
@@ -134,28 +149,34 @@ export class TasksSync extends TasksBase {
   }
 
   async remoteUpdateTask(taskToUpdate: Task) {
-    const response = await fetch("http://" + this.settingsCon.getServerAddress() + "/tasks", {
-      method: "PUT",
-      headers: {
-        Authorization: "Bearer " + accountsCon.getAccessToken(),
-        "Content-Type": "application/json;charset=utf-8",
-      },
-      body: JSON.stringify([taskToUpdate]),
-    });
+    const response = await fetch(
+      "http://" + this.settingsCon.getServerAddress() + "/tasks",
+      {
+        method: "PUT",
+        headers: {
+          Authorization: "Bearer " + accountsCon.getAccessToken(),
+          "Content-Type": "application/json;charset=utf-8",
+        },
+        body: JSON.stringify([taskToUpdate]),
+      }
+    );
     if (!response.ok) {
       alert(await response.text());
     }
   }
 
   async remoteBulkUpdateTask(tasks: Task[]) {
-    const response = await fetch("http://" + this.settingsCon.getServerAddress() + "/tasks", {
-      method: "PUT",
-      headers: {
-        Authorization: "Bearer " + accountsCon.getAccessToken(),
-        "Content-Type": "application/json;charset=utf-8",
-      },
-      body: JSON.stringify(tasks),
-    });
+    const response = await fetch(
+      "http://" + this.settingsCon.getServerAddress() + "/tasks",
+      {
+        method: "PUT",
+        headers: {
+          Authorization: "Bearer " + accountsCon.getAccessToken(),
+          "Content-Type": "application/json;charset=utf-8",
+        },
+        body: JSON.stringify(tasks),
+      }
+    );
     if (!response.ok) {
       alert(await response.text());
     }

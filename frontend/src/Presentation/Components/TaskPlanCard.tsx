@@ -1,11 +1,13 @@
 import { CardActionArea, Checkbox, Typography } from "@mui/material";
 import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
-import dateFormat from "dateformat";
 import { useState } from "react";
 import TaskPlanDialog from "./dialog/TaskPlanDialog";
 import { Task } from "../../Data/schemas";
 import { TasksController } from "../../Controller/Tasks";
+import IconButton from "@mui/material/IconButton";
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+
 
 interface task {
   task: Task;
@@ -40,7 +42,7 @@ export default function TaskPlanCard(props: task) {
             display: "flex",
             justifyContent: "flex-start",
           }}
-          onClick={handleShowDialog}
+          onClick={handleShowDialog} // FIXME button cannot appear as a descendant of button
         >
           <Grid
             container
@@ -60,7 +62,7 @@ export default function TaskPlanCard(props: task) {
                 onChange={handleCheckboxChange}
               />
             </Grid>
-            <Grid item zeroMinWidth>
+            <Grid item width="100%">
               <Typography
                 variant="h6"
                 component="h6"
@@ -71,33 +73,21 @@ export default function TaskPlanCard(props: task) {
               >
                 {props.task.name}
               </Typography>
-              <p>
-                {props.task.tagId === "" // TODO Update tag implementation
-                  ? "Uncategorized · "
-                  : props.task.tagId + " · "}
-                {props.task.dueDate === null
-                  ? "No due date"
-                  : "Due " + dateFormat(props.task.dueDate, "mmm dd, yyyy")}
-              </p>
-              <p>
-                {props.task.planned[0].date !== null
-                  ? "Planned on " +
-                    dateFormat(props.task.planned[0].date, "mmm dd, yyyy") +
-                    " | Estimated " +
-                    props.task.estimatedHours +
-                    "h"
-                  : "No plan"}
-              </p>
+            </Grid>
+            <Grid item>
+              <IconButton>
+                <AddOutlinedIcon />
+              </IconButton>
             </Grid>
           </Grid>
         </CardActionArea>
       </Card>
-      <TaskPlanDialog
+      {/* <TaskPlanDialog
         open={showUpdateTaskDialog}
         handleHideDialog={handleHideDialog}
         handleRefreshPage={props.handleRefreshPage}
         existingTask={props.task}
-      />
+      /> */}
     </>
   );
 }

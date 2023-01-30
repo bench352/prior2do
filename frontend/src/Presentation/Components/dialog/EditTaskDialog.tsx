@@ -1,25 +1,34 @@
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Stack from "@mui/material/Stack";
 import { useTheme } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import dateFormat from "dateformat";
-import React, { useEffect, useState, useMemo } from "react";
-import { Task } from "../../../Data/schemas";
-import { TasksController } from "../../../Controller/Tasks";
-import Stack from "@mui/material/Stack";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Grid from "@mui/material/Grid";
-import MenuItem from "@mui/material/MenuItem";
+import React, { useEffect, useMemo, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 import { TagsController } from "../../../Controller/Tags";
-import { Tag } from "../../../Data/schemas";
-import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined";
+import { TasksController } from "../../../Controller/Tasks";
+import { Tag, Task } from "../../../Data/schemas";
 import ConfirmDialog from "./ConfirmDialog";
+import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
+import Tooltip from "@mui/material/Tooltip";
+import SubTasksView from "../views/SubTasksView";
+import { Box } from "@mui/material";
 
 interface editTaskProps {
   open: boolean;
@@ -34,8 +43,10 @@ const tagsCon = new TagsController();
 export default function EditTaskDialog(props: editTaskProps) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
-  const getTags = async () => {
-    setTags(await tagsCon.getTags());
+  const getTags = () => {
+    tagsCon.getTags().then((value) => {
+      setTags(value);
+    });
   };
   const defaultValue = useMemo(() => {
     return {
@@ -56,6 +67,10 @@ export default function EditTaskDialog(props: editTaskProps) {
     props.existingTask.tagId,
   ]);
   const [formValues, setFormValues] = useState(defaultValue);
+  const [titleEditMode, setTitleEditMode] = useState(false);
+  const [descEditMode, setDescEditMode] = useState(false);
+  const [subTasks, setSubTasks] = useState(props.existingTask.subTasks);
+
   const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
   const handleSelectChange = (e: SelectChangeEvent) => {
     setFormValues({
@@ -71,13 +86,13 @@ export default function EditTaskDialog(props: editTaskProps) {
       [name]: value,
     });
   };
+
   const handleDeleteTask = () => {
     tasksCon.deleteTaskById(props.existingTask.id);
     props.handleHideDialog();
     props.handleRefreshPage();
   };
   const handleSubmit = () => {
-    // BUG deselecting tag won't update the tag on UI
     tasksCon.updateTask({
       ...props.existingTask,
       name: formValues.name,
@@ -85,16 +100,30 @@ export default function EditTaskDialog(props: editTaskProps) {
       description: formValues.description,
       estimatedHours: parseFloat(formValues.estimatedHours),
       tagId: formValues.tagId !== "" ? formValues.tagId : null,
+      subTasks: subTasks,
     });
     props.handleHideDialog();
     props.handleRefreshPage();
   };
   useEffect(() => {
     setFormValues(defaultValue);
+    setSubTasks(props.existingTask.subTasks);
     getTags();
-  }, [defaultValue, props.open]);
+  }, [
+    defaultValue,
+    props.existingTask.tagId,
+    props.existingTask.subTasks,
+    props.open,
+  ]);
   return (
-    <Dialog open={props.open} fullScreen={fullScreen}>
+    <Dialog
+      open={props.open}
+      onClose={handleSubmit}
+      fullScreen={fullScreen}
+      fullWidth={true}
+      maxWidth="sm"
+      scroll="paper"
+    >
       <DialogTitle>
         <Stack
           direction="row"
@@ -103,46 +132,97 @@ export default function EditTaskDialog(props: editTaskProps) {
           spacing={1}
         >
           <TaskAltOutlinedIcon />
-          <h4>Task Details</h4>
+          {titleEditMode ? (
+            <TextField
+              id="name"
+              type="text"
+              name="name"
+              variant="standard"
+              fullWidth
+              value={formValues.name}
+              onChange={handleInputChange}
+            />
+          ) : (
+            <h4>{formValues.name}</h4>
+          )}
+          <Tooltip title={titleEditMode ? "Confirm" : "Rename"}>
+            <IconButton
+              onClick={() => {
+                setTitleEditMode(!titleEditMode);
+              }}
+            >
+              {titleEditMode ? (
+                <DoneOutlinedIcon fontSize="small" />
+              ) : (
+                <EditOutlinedIcon fontSize="small" />
+              )}
+            </IconButton>
+          </Tooltip>
         </Stack>
       </DialogTitle>
       <DialogContent>
-        <Grid container spacing={2} columns={{ xs: 6, md: 12 }}>
+        <Grid container spacing={3} columns={{ xs: 6, md: 12 }}>
           <Grid item xs={6}>
             <Stack spacing={1}>
-              <TextField
-                id="name"
-                type="text"
-                name="name"
-                label="Name"
-                variant="standard"
-                style={{ width: "100%" }}
-                value={formValues.name}
-                onChange={handleInputChange}
-              />
-              <TextField
-                id="description"
-                type="text"
-                name="description"
-                label="Description"
-                variant="standard"
-                style={{ width: "100%" }}
-                minRows={3}
-                value={formValues.description}
-                onChange={handleInputChange}
-                multiline
-              />
-            </Stack>
-          </Grid>
-          <Grid item xs={6}>
-            <Stack spacing={1}>
+              <Box>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography
+                    component="h5"
+                    sx={{ fontWeight: "bold" }}
+                    noWrap
+                    gutterBottom={false}
+                  >
+                    Description
+                  </Typography>
+                  <Tooltip title={descEditMode ? "Confirm" : "Edit"}>
+                    <IconButton
+                      onClick={() => {
+                        setDescEditMode(!descEditMode);
+                      }}
+                    >
+                      {descEditMode ? (
+                        <DoneOutlinedIcon fontSize="small" />
+                      ) : (
+                        <EditOutlinedIcon fontSize="small" />
+                      )}
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+                {descEditMode ? (
+                  <TextField
+                    id="description"
+                    type="text"
+                    name="description"
+                    variant="standard"
+                    fullWidth
+                    minRows={1}
+                    value={formValues.description}
+                    onChange={handleInputChange}
+                    multiline
+                  />
+                ) : (
+                  <ReactMarkdown
+                    children={
+                      formValues.description.trim().length === 0
+                        ? "(No description)"
+                        : formValues.description
+                    }
+                    remarkPlugins={[remarkGfm, remarkBreaks]}
+                  />
+                )}
+              </Box>
+
               <TextField
                 id="dueDate"
                 type="date"
                 name="dueDate"
                 label="Due Date"
                 variant="standard"
-                style={{ width: "100%" }}
+                fullWidth
                 InputLabelProps={{
                   shrink: true,
                 }}
@@ -153,9 +233,9 @@ export default function EditTaskDialog(props: editTaskProps) {
                 id="estHr"
                 type="number"
                 name="estimatedHours"
-                label="Estimated Hours"
+                label="Estimated Time (h)"
                 variant="standard"
-                style={{ width: "100%" }}
+                fullWidth
                 InputLabelProps={{
                   shrink: true,
                 }}
@@ -184,6 +264,11 @@ export default function EditTaskDialog(props: editTaskProps) {
               </FormControl>
             </Stack>
           </Grid>
+          <Grid item xs={6}>
+            <Stack spacing={1}>
+              <SubTasksView subTasks={subTasks} setSubTasks={setSubTasks} />
+            </Stack>
+          </Grid>
         </Grid>
       </DialogContent>
       <DialogActions>
@@ -195,7 +280,7 @@ export default function EditTaskDialog(props: editTaskProps) {
         >
           Delete
         </Button>
-        <Button onClick={handleSubmit}>OK</Button>
+        <Button onClick={handleSubmit}>Close</Button>
       </DialogActions>
       <ConfirmDialog
         open={showConfirmDeleteDialog}

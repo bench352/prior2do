@@ -278,6 +278,7 @@ export default function SettingsPage(props: SettingsPageProps) {
         setConfirmValue={handleSetSyncServerIPAddr}
         title="Set Server IP Address"
         message="Please enter an IP address/domain that allows you to access your server EXTERNALLY. Please specify the port (e.g. 192.168.1.101:8080) if your server is not serving at the default HTTP port."
+        defaultValue={syncServerIPAddr}
         handleClose={() => {
           updateVisibility("syncServerIPAddr", false);
         }}

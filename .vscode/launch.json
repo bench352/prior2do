@@ -14,6 +14,13 @@
       "env": {
         "NEO4J_PASSWORD": "password"
       }
+    },
+    {
+      "type": "msedge",
+      "request": "launch",
+      "name": "Debug Frontend",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}\\frontend"
     }
   ]
 }

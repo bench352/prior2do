@@ -16,13 +16,16 @@ import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
 import { TagsController } from "../../../Controller/Tags";
-import { Tag } from "../../../Data/schemas";
+import { SubTask, Tag } from "../../../Data/schemas";
 import { getNewUniqueId } from "../../../Controller/Uuid";
+import SubTasksView from "../views/SubTasksView";
 
 interface addTaskProps {
   open: boolean;
   handleHideDialog(): any;
   handleRefreshPage(): any;
+  defaultTagId: string;
+  defaultDate?: string;
 }
 
 const tasksCon = new TasksController();
@@ -48,6 +51,7 @@ export default function AddTaskDialog(props: addTaskProps) {
 
   const [formValues, setFormValues] = useState(defaultValue);
   const [tags, setTags] = useState([] as Tag[]);
+  const [subTasks, setSubTasks] = useState([] as SubTask[]);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormValues({
@@ -66,7 +70,7 @@ export default function AddTaskDialog(props: addTaskProps) {
       estimatedHours: parseFloat(formValues.estimatedHours),
       completed: false,
       planned: [],
-      subTasks: [],
+      subTasks: subTasks,
       tagId: formValues.tagId !== "" ? formValues.tagId : null,
       issueId: null,
       id: getNewUniqueId(),
@@ -75,9 +79,15 @@ export default function AddTaskDialog(props: addTaskProps) {
     props.handleRefreshPage();
   };
   useEffect(() => {
-    setFormValues(defaultValue);
+    setFormValues({
+      ...defaultValue,
+      tagId: props.defaultTagId,
+      dueDate: props.defaultDate || "",
+    });
+
+    setSubTasks([]);
     getTags();
-  }, [props.open]);
+  }, [props.defaultDate, props.defaultTagId, props.open]);
   return (
     <Dialog
       open={props.open}
@@ -85,6 +95,7 @@ export default function AddTaskDialog(props: addTaskProps) {
       fullWidth={true}
       maxWidth="sm"
       scroll="paper"
+      onClose={props.handleHideDialog}
     >
       <DialogTitle>
         <Stack
@@ -94,7 +105,7 @@ export default function AddTaskDialog(props: addTaskProps) {
           spacing={1}
         >
           <AddTaskOutlinedIcon />
-          <h4>Add Task</h4>
+          <h4>Create Task</h4>
         </Stack>
       </DialogTitle>
       <DialogContent>
@@ -110,6 +121,7 @@ export default function AddTaskDialog(props: addTaskProps) {
                 style={{ width: "100%" }}
                 value={formValues.name}
                 onChange={handleInputChange}
+                autoFocus
               />
               <TextField
                 id="description"
@@ -144,7 +156,7 @@ export default function AddTaskDialog(props: addTaskProps) {
                 id="estHr"
                 type="number"
                 name="estimatedHours"
-                label="Estimated Hours"
+                label="Estimated Time (h)"
                 variant="standard"
                 style={{ width: "100%" }}
                 InputLabelProps={{
@@ -173,17 +185,14 @@ export default function AddTaskDialog(props: addTaskProps) {
                     ))}
                 </Select>
               </FormControl>
+              <SubTasksView subTasks={subTasks} setSubTasks={setSubTasks} />
             </Stack>
           </Grid>
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button autoFocus onClick={props.handleHideDialog}>
-          Cancel
-        </Button>
-        <Button autoFocus onClick={handleSubmit}>
-          Add
-        </Button>
+        <Button onClick={props.handleHideDialog}>Cancel</Button>
+        <Button onClick={handleSubmit}>Add</Button>
       </DialogActions>
     </Dialog>
   );

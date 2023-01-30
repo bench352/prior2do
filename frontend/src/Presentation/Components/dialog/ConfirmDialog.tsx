@@ -20,7 +20,7 @@ export default function ConfirmDialog(props: confirmDialogProps) {
   };
 
   return (
-    <Dialog open={props.open}>
+    <Dialog open={props.open} onClose={props.handleClose}>
       <DialogTitle id="alert-dialog-title">{props.title}</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">

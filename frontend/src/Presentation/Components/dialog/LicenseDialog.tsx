@@ -11,7 +11,7 @@ interface licenseDialogProps {
 
 export default function LicenseDialog(props: licenseDialogProps) {
   return (
-    <Dialog open={props.open} scroll="paper">
+    <Dialog open={props.open} scroll="paper" onClose={props.handleHideDialog}>
       <DialogTitle>License</DialogTitle>
       <DialogContent dividers={true}>
         <p>

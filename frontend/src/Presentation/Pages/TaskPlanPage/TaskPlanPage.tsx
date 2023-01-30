@@ -1,94 +1,154 @@
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
-import Tab from "@mui/material/Tab";
-import Tabs from "@mui/material/Tabs";
-import { useState } from "react";
-import { Task } from "../../../Data/schemas";
+import Grid from "@mui/material/Grid";
 import { TasksViewProps } from "../../CommonView";
+import Box from "@mui/material/Box";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import React, { useState } from "react";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined";
+import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import { Tag } from "../../../Data/schemas";
 import TaskPlanCard from "../../Components/TaskPlanCard";
+import Tooltip from "@mui/material/Tooltip";
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
+interface TaskPlanPageProps extends TasksViewProps {
+  tags: Tag[];
 }
 
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
+export default function TaskPlanPage(props: TaskPlanPageProps) {
+  const [leftPaneView, setLeftPaneView] = useState("Tasks");
+  const handlePageViewChange = (
+    event: React.MouseEvent<HTMLElement>,
+    newSelection: string | null
+  ) => {
+    if (newSelection) setLeftPaneView(newSelection);
+  };
+  const [filterTagId, setFilterTagId] = useState("");
+  const handleFilterChange = (e: SelectChangeEvent) => {
+    setFilterTagId(e.target.value);
+  };
 
   return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box>{children}</Box>}
-    </div>
-  );
-}
-
-function a11yProps(index: number) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-}
-
-export default function TaskPlanPage(props: TasksViewProps) {
-  const [value, setValue] = useState(0);
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-  };
-  return (
-    <Container>
-      <h2>Task Plan</h2>
-      <p>
-        Always plan ahead of time so you won't get lost as you go. Schedule a
-        date for working on each task and estimate how much time you need to
-        complete it.
-      </p>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          aria-label="Task Plan View"
-          variant="fullWidth"
+    <Box>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        spacing={2}
+        sx={{ marginBottom: "10px" }}
+      >
+        <Typography
+          component="h1"
+          variant="h5"
+          sx={{ fontWeight: "bold" }}
+          noWrap
         >
-          <Tab label="Planned Tasks" {...a11yProps(0)} />
-          <Tab label="Unplanned Tasks" {...a11yProps(1)} />
-        </Tabs>
-      </Box>
-      <TabPanel value={value} index={0}>
-        {" "}
-        {/* TODO Implement WORKING filter function based on new schema */}
-        {props.tasks
-          .filter((task: Task) => task.planned[0].date !== null)
-          .sort(
-            (a: Task, b: Task) =>
-              new Date(a.planned[0].date as Date).getTime() -
-              new Date(b.planned[0].date as Date).getTime()
-          )
-          .map((task: Task) => (
-            <TaskPlanCard
-              key={task.id}
-              task={task}
-              handleRefreshPage={props.handleRefreshPage}
-            />
-          ))}
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        {props.tasks
-          .filter((task: Task) => task.planned[0].date === null)
-          .map((task: Task) => (
-            <TaskPlanCard
-              key={task.id}
-              task={task}
-              handleRefreshPage={props.handleRefreshPage}
-            />
-          ))}
-      </TabPanel>
-    </Container>
+          Task Plan
+        </Typography>
+        <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+          <InputLabel id="filter-by-tag">Filter By</InputLabel>
+          <Select
+            id="filter-by-tag"
+            value={filterTagId}
+            onChange={handleFilterChange}
+            label="Filter By"
+          >
+            <MenuItem value="">
+              <em>No Filter</em>
+            </MenuItem>
+            {props.tags.map((tag) => (
+              <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Stack>
+      <Grid
+        container
+        direction="row"
+        justifyContent="space-between"
+        alignItems="flex-start"
+        spacing={2}
+      >
+        <Grid item xs={4} sm={5} md={4}>
+          <>
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              sx={{ height: "40px" }}
+            >
+              <Typography
+                component="h2"
+                variant="h6"
+                sx={{ fontWeight: "bold" }}
+                noWrap
+              >
+                {leftPaneView}
+              </Typography>
+              <ToggleButtonGroup
+                exclusive
+                value={leftPaneView}
+                onChange={handlePageViewChange}
+                size="small"
+              >
+                <ToggleButton value="Tasks">
+                  <Tooltip title="View tasks">
+                    <TaskAltOutlinedIcon />
+                  </Tooltip>
+                </ToggleButton>
+                <ToggleButton value="Plans">
+                  <Tooltip title="View plans">
+                    <FlagOutlinedIcon />
+                  </Tooltip>
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Stack>
+            {props.tasks.map((task) => (
+              <TaskPlanCard
+                task={task}
+                handleRefreshPage={props.handleRefreshPage}
+                key={task.id}
+              />
+            ))}
+          </>
+        </Grid>
+        <Grid
+          item
+          xs={4}
+          sm={7}
+          md={8}
+          sx={{ display: { xs: "none", md: "block" } }}
+        >
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{ height: "40px" }}
+          >
+            <Typography
+              component="h2"
+              variant="h6"
+              sx={{ fontWeight: "bold" }}
+              noWrap
+            >
+              Calendar View
+            </Typography>
+          </Stack>
+          <FullCalendar
+            height="auto"
+            titleFormat={{ year: "numeric", month: "short" }}
+            plugins={[dayGridPlugin]}
+            initialView="dayGridMonth"
+          />
+        </Grid>
+      </Grid>
+    </Box>
   );
 }

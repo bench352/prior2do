@@ -3,16 +3,17 @@ import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import dateFormat from "dateformat";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { TagsController } from "../../Controller/Tags";
 import { TasksController } from "../../Controller/Tasks";
 import { Tag, Task } from "../../Data/schemas";
-import TagOutlinedIcon from "@mui/icons-material/TagOutlined";
+import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import EditTaskDialog from "./dialog/EditTaskDialog";
 import EventOutlinedIcon from "@mui/icons-material/EventOutlined";
-import TimelapseOutlinedIcon from "@mui/icons-material/TimelapseOutlined";
+import TimerOutlinedIcon from "@mui/icons-material/TimerOutlined";
+import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
 
 interface task {
   task: Task;
@@ -22,19 +23,33 @@ interface task {
 const tasksCon = new TasksController();
 const tagsCon = new TagsController();
 
+function TagChip(props: { tagId: string | null }) {
+  const [tag, setTag] = useState(null as Tag | null);
+  useEffect(() => {
+    let tagQue = props.tagId || "";
+    tagsCon
+      .getTagById(tagQue)
+      .then((value) => {
+        setTag(value);
+      })
+      .catch(() => {
+        setTag(null);
+      });
+  }, [props]);
+  return tag != null ? (
+    <Chip
+      icon={<LabelOutlinedIcon fontSize="small" />}
+      size="small"
+      label={tag.name}
+    />
+  ) : (
+    <></>
+  );
+}
+
 export default function TaskCard(props: task) {
   const [taskCompleted, setTaskCompleted] = useState(props.task.completed);
   const [showUpdateTaskDialog, setShowUpdateTaskDialog] = useState(false);
-  const [tag, setTag] = useState(null as Tag | null);
-  const refreshTags = useCallback(async () => {
-    if (props.task.tagId != null) {
-      try {
-        setTag(await tagsCon.getTagById(props.task.tagId));
-      } catch (error: any) {
-        setTag(null);
-      }
-    }
-  }, [props]);
   const handleHideDialog = () => {
     setShowUpdateTaskDialog(false);
   };
@@ -51,9 +66,6 @@ export default function TaskCard(props: task) {
       completed: checked,
     });
   };
-  useEffect(() => {
-    refreshTags();
-  }, [refreshTags, props]);
   return (
     <>
       <Card sx={{ margin: "15px 0px" }}>
@@ -93,7 +105,7 @@ export default function TaskCard(props: task) {
                 {props.task.name}
               </Typography>
 
-              <Stack direction="row" spacing={1}>
+              <Stack direction="row" spacing={1} overflow="auto">
                 {props.task.dueDate !== null ? (
                   <Chip
                     icon={<EventOutlinedIcon fontSize="small" />}
@@ -103,21 +115,24 @@ export default function TaskCard(props: task) {
                 ) : (
                   ""
                 )}
-
                 {props.task.estimatedHours > 0 ? (
                   <Chip
-                    icon={<TimelapseOutlinedIcon fontSize="small" />}
+                    icon={<TimerOutlinedIcon fontSize="small" />}
                     size="small"
                     label={`${props.task.estimatedHours}h`}
                   />
                 ) : (
                   ""
                 )}
-                {tag != null ? (
+                <TagChip tagId={props.task.tagId} />
+                {props.task.subTasks.length > 0 ? (
                   <Chip
-                    icon={<TagOutlinedIcon fontSize="small" />}
+                    icon={<CheckCircleOutlineOutlinedIcon fontSize="small" />}
                     size="small"
-                    label={tag.name}
+                    label={`${
+                      props.task.subTasks.filter((subTask) => subTask.completed)
+                        .length
+                    }/${props.task.subTasks.length}`}
                   />
                 ) : (
                   ""

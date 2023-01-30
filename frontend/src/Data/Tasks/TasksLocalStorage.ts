@@ -2,6 +2,12 @@ import { Task } from "../schemas";
 import { TasksBase } from "./TasksBase";
 
 export default class TasksLocalStorage extends TasksBase {
+  async getTaskById(id: string): Promise<Task> {
+    for (const task of this.localGetTasks()) {
+      if (task.id === id) return task;
+    }
+    throw new Error(`Task with id [${id}] not found!`);
+  }
   async getTasks(): Promise<Task[]> {
     return this.localGetTasks();
   }

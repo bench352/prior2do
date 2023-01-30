@@ -8,8 +8,7 @@ interface WorkSession {
   duration: number;
 }
 
-interface SubTask {
-  name: string;
+export interface SubTask extends IdBasedResource {
   completed: boolean;
 }
 

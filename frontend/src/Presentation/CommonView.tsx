@@ -25,11 +25,11 @@ import ReleaseDialog from "./Components/dialog/ReleaseDialog";
 import TasksPage from "./Pages/TasksPage/TasksPage";
 import HomePage from "./Pages/HomePage/HomePage";
 import SettingsPage from "./Pages/SettingsPage/SettingsPage";
-import TaskDuePage from "./Pages/TaskDuePage/TaskDuePage";
+import DueCalendarPage from "./Pages/DueCalPage/DueCalPage";
 import TaskPlanPage from "./Pages/TaskPlanPage/TaskPlanPage";
 import UserPage from "./Pages/UserPage/UserPage";
 import AddIcon from "@mui/icons-material/Add";
-import TagIcon from "@mui/icons-material/Tag";
+import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import IconButton from "@mui/material/IconButton";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
@@ -42,6 +42,8 @@ import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import { TasksController } from "../Controller/Tasks";
 import Snackbar from "@mui/material/Snackbar";
+import Tooltip from "@mui/material/Tooltip";
+import IssuesPage from "./Pages/IssuesPage/IssuesPage";
 const drawerWidth = 240;
 
 export interface TasksViewProps {
@@ -160,15 +162,17 @@ export default function CommonView() {
         subheader={
           <ListSubheader>
             Tags
-            <IconButton
-              aria-label="delete"
-              size="small"
-              onClick={() => {
-                setShowTagEditDialog(true);
-              }}
-            >
-              <EditOutlinedIcon fontSize="small" />
-            </IconButton>
+            <Tooltip title="Edit" placement="right">
+              <IconButton
+                aria-label="delete"
+                size="small"
+                onClick={() => {
+                  setShowTagEditDialog(true);
+                }}
+              >
+                <EditOutlinedIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           </ListSubheader>
         }
       >
@@ -183,7 +187,7 @@ export default function CommonView() {
               sx={{ "&:link": { color: "black" } }}
             >
               <ListItemButton>
-                <Chip icon={<TagIcon />} label={tag.name} />
+                <Chip icon={<LabelOutlinedIcon />} label={tag.name} />
               </ListItemButton>
             </ListItem>
           ))}
@@ -339,15 +343,24 @@ export default function CommonView() {
           <Route
             path="calendar"
             element={
-              <TaskDuePage tasks={tasks} handleRefreshPage={refreshPage} />
+              <DueCalendarPage
+                tasks={tasks}
+                tags={tags}
+                handleRefreshPage={refreshPage}
+              />
             }
           />
           <Route
             path="plan"
             element={
-              <TaskPlanPage tasks={tasks} handleRefreshPage={refreshPage} />
+              <TaskPlanPage
+                tasks={tasks}
+                tags={tags}
+                handleRefreshPage={refreshPage}
+              />
             }
           />
+          <Route path="issues" element={<IssuesPage />} />
           <Route path="user" element={<UserPage />} />
           <Route
             path="settings"

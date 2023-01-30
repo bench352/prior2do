@@ -16,6 +16,7 @@ import SingleTextInputDialog from "./SingleTextInputDialog";
 import { useState } from "react";
 import { TagsController } from "../../../Controller/Tags";
 import ConfirmDialog from "./ConfirmDialog";
+import Tooltip from "@mui/material/Tooltip";
 
 interface tagEditProps {
   open: boolean;
@@ -38,30 +39,35 @@ function TagItem(props: tagItemProps) {
     <>
       <ListItem
         secondaryAction={
-          <IconButton
-            edge="end"
-            aria-label="delete"
-            onClick={() => {
-              setShowDeleteTagDialog(true);
-            }}
-          >
-            <DeleteIcon />
-          </IconButton>
+          <Tooltip title="Delete" placement="right">
+            <IconButton
+              edge="end"
+              aria-label="delete"
+              onClick={() => {
+                setShowDeleteTagDialog(true);
+              }}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
         }
         disablePadding
       >
-        <ListItemButton
-          onClick={() => {
-            setShowEditTagDialog(true);
-          }}
-        >
-          <Chip icon={<TagOutlinedIcon />} label={props.tag.name} />
-        </ListItemButton>
+        <Tooltip title="Edit" placement="left">
+          <ListItemButton
+            onClick={() => {
+              setShowEditTagDialog(true);
+            }}
+          >
+            <Chip icon={<TagOutlinedIcon />} label={props.tag.name} />
+          </ListItemButton>
+        </Tooltip>
       </ListItem>
       <SingleTextInputDialog
         title="Edit Tag Name"
         message={`Enter a new name for [${props.tag.name}]`}
         open={showEditTagDialog}
+        defaultValue={props.tag.name}
         handleClose={() => {
           setShowEditTagDialog(false);
         }}

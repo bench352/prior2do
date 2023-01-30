@@ -17,9 +17,10 @@ function getTasksBackend(): TasksBase {
 
 export class TasksController {
   async getTasks(): Promise<Task[]> {
-    console.log("Getting tasks")
+    console.log("Getting tasks");
     return getTasksBackend().getTasks();
   }
+  async getTaskById(id: string): Promise<Task>{return await getTasksBackend().getTaskById(id)}
   async addTask(task: Task) {
     await getTasksBackend().addTask(task);
   }
