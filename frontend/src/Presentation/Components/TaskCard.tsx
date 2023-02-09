@@ -68,7 +68,7 @@ export default function TaskCard(props: task) {
   };
   return (
     <>
-      <Card sx={{ margin: "15px 0px" }}>
+      <Card sx={{ margin: "5px 0px" }}>
         <CardActionArea
           sx={{
             padding: "10px 5px",
@@ -110,7 +110,12 @@ export default function TaskCard(props: task) {
                   <Chip
                     icon={<EventOutlinedIcon fontSize="small" />}
                     size="small"
-                    label={dateFormat(props.task.dueDate, "mmm dd, yyyy")}
+                    label={
+                      dateFormat(Date.now(), "yyyy") ===
+                      dateFormat(props.task.dueDate, "yyyy")
+                        ? dateFormat(props.task.dueDate, "mmm dd")
+                        : dateFormat(props.task.dueDate, "mmm dd, yyyy")
+                    }
                   />
                 ) : (
                   ""

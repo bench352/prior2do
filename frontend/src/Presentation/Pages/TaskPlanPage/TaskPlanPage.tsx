@@ -64,7 +64,9 @@ export default function TaskPlanPage(props: TaskPlanPageProps) {
               <em>No Filter</em>
             </MenuItem>
             {props.tags.map((tag) => (
-              <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem>
+              <MenuItem key={tag.id} value={tag.id}>
+                {tag.name}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -75,8 +77,9 @@ export default function TaskPlanPage(props: TaskPlanPageProps) {
         justifyContent="space-between"
         alignItems="flex-start"
         spacing={2}
+        columns={{ xs: 4, md: 12 }}
       >
-        <Grid item xs={4} sm={5} md={4}>
+        <Grid item xs={4}>
           <>
             <Stack
               direction="row"
@@ -110,6 +113,7 @@ export default function TaskPlanPage(props: TaskPlanPageProps) {
                 </ToggleButton>
               </ToggleButtonGroup>
             </Stack>
+
             {props.tasks.map((task) => (
               <TaskPlanCard
                 task={task}
@@ -119,13 +123,7 @@ export default function TaskPlanPage(props: TaskPlanPageProps) {
             ))}
           </>
         </Grid>
-        <Grid
-          item
-          xs={4}
-          sm={7}
-          md={8}
-          sx={{ display: { xs: "none", md: "block" } }}
-        >
+        <Grid item xs={4} md={8} sx={{ display: { xs: "none", md: "block" } }}>
           <Stack
             direction="row"
             justifyContent="space-between"

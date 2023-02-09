@@ -1,13 +1,20 @@
 import { CardActionArea, Checkbox, Typography } from "@mui/material";
 import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TaskPlanDialog from "./dialog/TaskPlanDialog";
 import { Task } from "../../Data/schemas";
 import { TasksController } from "../../Controller/Tasks";
 import IconButton from "@mui/material/IconButton";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-
+import Chip from "@mui/material/Chip";
+import EventOutlinedIcon from "@mui/icons-material/EventOutlined";
+import TimerOutlinedIcon from "@mui/icons-material/TimerOutlined";
+import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
+import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
+import dateFormat from "dateformat";
+import { Tag } from "../../Data/schemas";
+import { TagsController } from "../../Controller/Tags";
 
 interface task {
   task: Task;
@@ -15,6 +22,33 @@ interface task {
 }
 
 const tasksCon = new TasksController();
+const tagsCon = new TagsController();
+
+function TagChip(props: { tagId: string | null }) {
+  const [tag, setTag] = useState(null as Tag | null);
+  useEffect(() => {
+    let tagQue = props.tagId || "";
+    tagsCon
+      .getTagById(tagQue)
+      .then((value) => {
+        setTag(value);
+      })
+      .catch(() => {
+        setTag(null);
+      });
+  }, [props]);
+  return tag != null ? (
+    <Grid item xs="auto">
+      <Chip
+        icon={<LabelOutlinedIcon fontSize="small" />}
+        size="small"
+        label={tag.name}
+      />
+    </Grid>
+  ) : (
+    <></>
+  );
+}
 
 export default function TaskPlanCard(props: task) {
   const [taskCompleted, setTaskCompleted] = useState(props.task.completed);
@@ -35,59 +69,121 @@ export default function TaskPlanCard(props: task) {
   };
   return (
     <>
-      <Card sx={{ margin: "15px 0px" }}>
-        <CardActionArea
-          sx={{
-            padding: "10px 10px",
-            display: "flex",
-            justifyContent: "flex-start",
-          }}
-          onClick={handleShowDialog} // FIXME button cannot appear as a descendant of button
+      <Card sx={{ margin: "15px 0px", width: "100%" }}>
+        <Grid
+          container
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          wrap="nowrap"
         >
-          <Grid
-            container
-            direction="row"
-            wrap="nowrap"
-            justifyContent="flex-start"
-            alignItems="center"
-            spacing={1}
-          >
-            <Grid item>
-              <Checkbox
-                name="completed"
-                checked={taskCompleted}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                onChange={handleCheckboxChange}
-              />
-            </Grid>
-            <Grid item width="100%">
-              <Typography
-                variant="h6"
-                component="h6"
-                noWrap
-                style={{
-                  textDecoration: taskCompleted ? "line-through" : "none",
-                }}
+          <Grid item zeroMinWidth xs>
+            <CardActionArea
+              onClick={handleShowDialog}
+              sx={{ padding: "10px 0px 10px 5px" }}
+            >
+              <Grid
+                container
+                direction="row"
+                wrap="nowrap"
+                justifyContent="flex-start"
+                alignItems="center"
               >
-                {props.task.name}
-              </Typography>
-            </Grid>
-            <Grid item>
-              <IconButton>
-                <AddOutlinedIcon />
-              </IconButton>
-            </Grid>
+                <Grid item>
+                  <Checkbox
+                    name="completed"
+                    checked={taskCompleted}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    onChange={handleCheckboxChange}
+                  />
+                </Grid>
+                <Grid item zeroMinWidth>
+                  <Typography
+                    variant="h6"
+                    component="h6"
+                    noWrap
+                    style={{
+                      textDecoration: taskCompleted ? "line-through" : "none",
+                    }}
+                  >
+                    {props.task.name}
+                  </Typography>
+                  <Grid
+                    container
+                    direction="row"
+                    justifyContent="flex-start"
+                    alignItems="center"
+                    columnSpacing={0.5}
+                    rowSpacing={0.5}
+                  >
+                    <Grid item xs="auto">
+                      {props.task.dueDate !== null ? (
+                        <Chip
+                          icon={<EventOutlinedIcon fontSize="small" />}
+                          size="small"
+                          label={
+                            dateFormat(Date.now(), "yyyy") ===
+                            dateFormat(props.task.dueDate, "yyyy")
+                              ? dateFormat(props.task.dueDate, "mmm dd")
+                              : dateFormat(props.task.dueDate, "mmm dd, yyyy")
+                          }
+                        />
+                      ) : (
+                        ""
+                      )}
+                    </Grid>
+
+                    {props.task.estimatedHours > 0 ? (
+                      <Grid item xs="auto">
+                        <Chip
+                          icon={<TimerOutlinedIcon fontSize="small" />}
+                          size="small"
+                          label={`${props.task.estimatedHours}h`}
+                        />
+                      </Grid>
+                    ) : (
+                      ""
+                    )}
+
+                    <TagChip tagId={props.task.tagId} />
+
+                    {props.task.subTasks.length > 0 ? (
+                      <Grid item xs="auto">
+                        <Chip
+                          icon={
+                            <CheckCircleOutlineOutlinedIcon fontSize="small" />
+                          }
+                          size="small"
+                          label={`${
+                            props.task.subTasks.filter(
+                              (subTask) => subTask.completed
+                            ).length
+                          }/${props.task.subTasks.length}`}
+                        />
+                      </Grid>
+                    ) : (
+                      ""
+                    )}
+                  </Grid>
+                </Grid>
+              </Grid>
+            </CardActionArea>
           </Grid>
-        </CardActionArea>
+          <Grid item xs="auto" sx={{ padding: "10px 5px 10px 0px" }}>
+            <IconButton>
+              <AddOutlinedIcon />
+            </IconButton>
+          </Grid>
+        </Grid>
       </Card>
-      {/* <TaskPlanDialog
+      <TaskPlanDialog
         open={showUpdateTaskDialog}
         handleHideDialog={handleHideDialog}
         handleRefreshPage={props.handleRefreshPage}
         existingTask={props.task}
-      /> */}
+      />
     </>
   );
 }

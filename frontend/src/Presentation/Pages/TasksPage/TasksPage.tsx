@@ -24,6 +24,8 @@ import ArrowUpwardOutlinedIcon from "@mui/icons-material/ArrowUpwardOutlined";
 import { Typography } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import TimerOutlinedIcon from "@mui/icons-material/TimerOutlined";
+import Collapse from "@mui/material/Collapse";
+import { TransitionGroup } from "react-transition-group";
 
 const floatingButtonStyle = {
   margin: 0,
@@ -174,45 +176,49 @@ export default function TasksPage(props: TasksPageProps) {
           </ToggleButtonGroup>
         </Stack>
       </Stack>
-
-      {props.tasks
-        .filter((task) => (tagFilter !== "" ? task.tagId === tagFilter : true))
-        .sort((a, b) => {
-          let evaluatedVal = 0;
-          switch (taskFilterOption) {
-            case "name":
-              evaluatedVal = a.name.localeCompare(b.name);
-              break;
-            case "due":
-              if (a.dueDate === null && b.dueDate === null)
-                return a.name.localeCompare(b.name);
-              else if (a.dueDate === null) return 1;
-              else if (b.dueDate === null) return -1;
-              else {
-                evaluatedVal =
-                  new Date(a.dueDate || 0).getTime() -
-                  new Date(b.dueDate || 0).getTime();
-              }
-              break;
-            case "estTime":
-              if (a.estimatedHours === 0) return a.name.localeCompare(b.name);
-              evaluatedVal = a.estimatedHours - b.estimatedHours;
-              break;
-            default:
-              return 0;
-          }
-          if (reverseSort) {
-            evaluatedVal *= -1;
-          }
-          return evaluatedVal;
-        })
-        .map((task: Task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            handleRefreshPage={props.handleRefreshPage}
-          />
-        ))}
+      <TransitionGroup>
+        {props.tasks
+          .filter((task) =>
+            tagFilter !== "" ? task.tagId === tagFilter : true
+          )
+          .sort((a, b) => {
+            let evaluatedVal = 0;
+            switch (taskFilterOption) {
+              case "name":
+                evaluatedVal = a.name.localeCompare(b.name);
+                break;
+              case "due":
+                if (a.dueDate === null && b.dueDate === null)
+                  return a.name.localeCompare(b.name);
+                else if (a.dueDate === null) return 1;
+                else if (b.dueDate === null) return -1;
+                else {
+                  evaluatedVal =
+                    new Date(a.dueDate || 0).getTime() -
+                    new Date(b.dueDate || 0).getTime();
+                }
+                break;
+              case "estTime":
+                if (a.estimatedHours === 0) return a.name.localeCompare(b.name);
+                evaluatedVal = a.estimatedHours - b.estimatedHours;
+                break;
+              default:
+                return 0;
+            }
+            if (reverseSort) {
+              evaluatedVal *= -1;
+            }
+            return evaluatedVal;
+          })
+          .map((task: Task) => (
+            <Collapse key={task.id}>
+              <TaskCard
+                task={task}
+                handleRefreshPage={props.handleRefreshPage}
+              />
+            </Collapse>
+          ))}
+      </TransitionGroup>
 
       <AddTaskDialog
         open={addTaskDialogEnabled}
