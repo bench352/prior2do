@@ -5,7 +5,7 @@ on:
       - "dev"
 jobs:
   frontend-linting:
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
     defaults:
       run:
         working-directory: ./frontend
@@ -19,7 +19,7 @@ jobs:
       - run: npm run build
       - run: npx eslint src
   backend-linting:
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
     defaults:
       run:
         working-directory: ./backend
