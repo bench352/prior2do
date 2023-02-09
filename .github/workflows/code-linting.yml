@@ -16,7 +16,6 @@ jobs:
         with:
           node-version: 16
       - run: npm install
-      - run: npm run build
       - run: npx eslint src
   backend-linting:
     runs-on: ubuntu-22.04
