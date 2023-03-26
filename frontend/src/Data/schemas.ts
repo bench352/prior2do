@@ -1,18 +1,22 @@
 export interface IdBasedResource {
   id: string;
+}
+
+export interface IdNameBasedResource extends IdBasedResource {
   name: string;
 }
 
-interface WorkSession {
+export interface WorkSession extends IdBasedResource {
+  taskId: string;
   date: Date;
   duration: number;
 }
 
-export interface SubTask extends IdBasedResource {
+export interface SubTask extends IdNameBasedResource {
   completed: boolean;
 }
 
-export interface Task extends IdBasedResource {
+export interface Task extends IdNameBasedResource {
   dueDate: Date | null;
   description: string;
   estimatedHours: number;
@@ -23,8 +27,8 @@ export interface Task extends IdBasedResource {
   issueId: string | null;
 }
 
-export interface Issue extends IdBasedResource {
+export interface Issue extends IdNameBasedResource {
   description: string;
 }
 
-export interface Tag extends IdBasedResource {}
+export interface Tag extends IdNameBasedResource {}

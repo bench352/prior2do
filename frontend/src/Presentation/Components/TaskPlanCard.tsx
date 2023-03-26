@@ -1,20 +1,20 @@
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
+import EventOutlinedIcon from "@mui/icons-material/EventOutlined";
+import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
+import TimerOutlinedIcon from "@mui/icons-material/TimerOutlined";
 import { CardActionArea, Checkbox, Typography } from "@mui/material";
 import Card from "@mui/material/Card";
-import Grid from "@mui/material/Grid";
-import { useState, useEffect } from "react";
-import TaskPlanDialog from "./dialog/TaskPlanDialog";
-import { Task } from "../../Data/schemas";
-import { TasksController } from "../../Controller/Tasks";
-import IconButton from "@mui/material/IconButton";
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import Chip from "@mui/material/Chip";
-import EventOutlinedIcon from "@mui/icons-material/EventOutlined";
-import TimerOutlinedIcon from "@mui/icons-material/TimerOutlined";
-import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
-import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
 import dateFormat from "dateformat";
-import { Tag } from "../../Data/schemas";
+import { useEffect, useState } from "react";
 import { TagsController } from "../../Controller/Tags";
+import { TasksController } from "../../Controller/Tasks";
+import { Tag, Task } from "../../Data/schemas";
+import AddWorkSessionDialog from "./dialog/AddWorkSessionDialog";
+import TaskPlanDialog from "./dialog/TaskPlanDialog";
 
 interface task {
   task: Task;
@@ -53,11 +53,18 @@ function TagChip(props: { tagId: string | null }) {
 export default function TaskPlanCard(props: task) {
   const [taskCompleted, setTaskCompleted] = useState(props.task.completed);
   const [showUpdateTaskDialog, setShowUpdateTaskDialog] = useState(false);
+  const [showAddSessionDialog, setShowAddSessionDialog] = useState(false);
   const handleHideDialog = () => {
     setShowUpdateTaskDialog(false);
   };
   const handleShowDialog = () => {
     setShowUpdateTaskDialog(true);
+  };
+  const handleHideAddDialog = () => {
+    setShowAddSessionDialog(false);
+  };
+  const handleShowAddDialog = () => {
+    setShowAddSessionDialog(true);
   };
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { checked } = e.target;
@@ -172,7 +179,7 @@ export default function TaskPlanCard(props: task) {
             </CardActionArea>
           </Grid>
           <Grid item xs="auto" sx={{ padding: "10px 5px 10px 0px" }}>
-            <IconButton>
+            <IconButton onClick={handleShowAddDialog}>
               <AddOutlinedIcon />
             </IconButton>
           </Grid>
@@ -184,6 +191,7 @@ export default function TaskPlanCard(props: task) {
         handleRefreshPage={props.handleRefreshPage}
         existingTask={props.task}
       />
+      <AddWorkSessionDialog open={showAddSessionDialog} taskId={props.task.id} handleClose={handleHideAddDialog} />
     </>
   );
 }
