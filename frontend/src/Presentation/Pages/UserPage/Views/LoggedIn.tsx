@@ -10,8 +10,8 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { useState } from "react";
-import ConfirmDialog from "../../../Components/dialog/ConfirmDialog";
-import SingleTextInputDialog from "../../../Components/dialog/SingleTextInputDialog";
+import ConfirmDialog from "../../../Components/dialog/misc/ConfirmDialog";
+import SingleTextInputDialog from "../../../Components/dialog/misc/SingleTextInputDialog";
 import { AccountsController } from "../../../../Controller/Accounts";
 
 interface LoggedInProps {

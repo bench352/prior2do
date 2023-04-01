@@ -11,8 +11,10 @@ export class WorkSessionsLocalStorage extends WorkSessionsBase {
     return this.localGetWorkSessions();
   }
   async getWorkSessionsByTaskId(taskId: string): Promise<WorkSession[]> {
-    return this.localGetWorkSessions().filter(
-      (session) => session.taskId === taskId
+    return (
+      this.localGetWorkSessions().filter(
+        (session) => session.taskId === taskId
+      ) || []
     );
   }
   async updateWorkSession(workSessionToUpdate: WorkSession) {

@@ -9,16 +9,16 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import AddTaskOutlinedIcon from "@mui/icons-material/AddTaskOutlined";
-import { TasksController } from "../../../Controller/Tasks";
+import { TasksController } from "../../../../Controller/Tasks";
 import Stack from "@mui/material/Stack";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
-import { TagsController } from "../../../Controller/Tags";
-import { SubTask, Tag } from "../../../Data/schemas";
-import { getNewUniqueId } from "../../../Controller/Uuid";
-import SubTasksView from "../views/SubTasksView";
+import { TagsController } from "../../../../Controller/Tags";
+import { SubTask, Tag } from "../../../../Data/schemas";
+import { getNewUniqueId } from "../../../../Controller/Uuid";
+import SubTasksView from "../../views/SubTasksView";
 
 interface addTaskProps {
   open: boolean;
@@ -69,7 +69,6 @@ export default function AddTaskDialog(props: addTaskProps) {
       description: formValues.description,
       estimatedHours: parseFloat(formValues.estimatedHours),
       completed: false,
-      planned: [],
       subTasks: subTasks,
       tagId: formValues.tagId !== "" ? formValues.tagId : null,
       issueId: null,

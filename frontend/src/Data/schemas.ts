@@ -21,14 +21,9 @@ export interface Task extends IdNameBasedResource {
   description: string;
   estimatedHours: number;
   completed: boolean;
-  planned: WorkSession[];
   subTasks: SubTask[];
   tagId: string | null;
   issueId: string | null;
-}
-
-export interface Issue extends IdNameBasedResource {
-  description: string;
 }
 
 export interface Tag extends IdNameBasedResource {}

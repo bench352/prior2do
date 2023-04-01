@@ -1,3 +1,8 @@
+import AddIcon from "@mui/icons-material/Add";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ListAltOutlinedIcon from "@mui/icons-material/ListAltOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import OutlinedFlagSharpIcon from "@mui/icons-material/OutlinedFlagSharp";
@@ -10,40 +15,34 @@ import CircularProgress from "@mui/material/CircularProgress";
 import CssBaseline from "@mui/material/CssBaseline";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
-import TagEditDialog from "./Components/dialog/TagEditDialog";
+import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import ListSubheader from "@mui/material/ListSubheader";
+import Snackbar from "@mui/material/Snackbar";
 import Toolbar from "@mui/material/Toolbar";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, Route, Routes } from "react-router-dom";
 import { SettingsController } from "../Controller/Settings";
-import ReleaseDialog from "./Components/dialog/ReleaseDialog";
-import TasksPage from "./Pages/TasksPage/TasksPage";
+import { TagsController } from "../Controller/Tags";
+import { TasksController } from "../Controller/Tasks";
+import { getNewUniqueId } from "../Controller/Uuid";
+import { WorkSessionsController } from "../Controller/WorkSessions";
+import { Tag, Task, WorkSession } from "../Data/schemas";
+import TagEditDialog from "./Components/dialog/TagEditDialog";
+import ReleaseDialog from "./Components/dialog/misc/ReleaseDialog";
+import SingleTextInputDialog from "./Components/dialog/misc/SingleTextInputDialog";
+import DueCalendarPage from "./Pages/DueCalPage/DueCalPage";
 import HomePage from "./Pages/HomePage/HomePage";
 import SettingsPage from "./Pages/SettingsPage/SettingsPage";
-import DueCalendarPage from "./Pages/DueCalPage/DueCalPage";
 import TaskPlanPage from "./Pages/TaskPlanPage/TaskPlanPage";
+import TasksPage from "./Pages/TasksPage/TasksPage";
 import UserPage from "./Pages/UserPage/UserPage";
-import AddIcon from "@mui/icons-material/Add";
-import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
-import IconButton from "@mui/material/IconButton";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
-import ListSubheader from "@mui/material/ListSubheader";
-import { TagsController } from "../Controller/Tags";
-import SingleTextInputDialog from "./Components/dialog/SingleTextInputDialog";
-import { Tag, Task } from "../Data/schemas";
-import { getNewUniqueId } from "../Controller/Uuid";
-import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
-import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
-import { TasksController } from "../Controller/Tasks";
-import Snackbar from "@mui/material/Snackbar";
-import Tooltip from "@mui/material/Tooltip";
-import IssuesPage from "./Pages/IssuesPage/IssuesPage";
 const drawerWidth = 240;
 
 export interface TasksViewProps {
@@ -53,6 +52,7 @@ export interface TasksViewProps {
 
 const tasksCon = new TasksController();
 const tagsCon = new TagsController();
+const workSessionsCon = new WorkSessionsController();
 
 export default function CommonView() {
   let settingsCon = new SettingsController();
@@ -72,6 +72,7 @@ export default function CommonView() {
   };
   const [tasks, setTasks] = useState([] as Task[]);
   const [tags, setTags] = useState([] as Tag[]);
+  const [workSessions, setWorkSessions] = useState([] as WorkSession[]);
   const refreshPage = useCallback(async () => {
     setShowLoading(true);
     setTasks(tasksCon.offlineGetTasks());
@@ -82,6 +83,11 @@ export default function CommonView() {
     }
     try {
       setTags(await tagsCon.getTags());
+    } catch (error: any) {
+      createInfoSnackBar(error.message);
+    }
+    try {
+      setWorkSessions(await workSessionsCon.getAllWorkSessions());
     } catch (error: any) {
       createInfoSnackBar(error.message);
     }
@@ -131,11 +137,6 @@ export default function CommonView() {
             name: "Calendar",
             icon: <CalendarMonthOutlinedIcon />,
             link: "/calendar",
-          },
-          {
-            name: "Issues",
-            icon: <ArticleOutlinedIcon />,
-            link: "/issues",
           },
           {
             name: "Plan",
@@ -356,11 +357,11 @@ export default function CommonView() {
               <TaskPlanPage
                 tasks={tasks}
                 tags={tags}
+                workSessions={workSessions}
                 handleRefreshPage={refreshPage}
               />
             }
           />
-          <Route path="issues" element={<IssuesPage />} />
           <Route path="user" element={<UserPage />} />
           <Route
             path="settings"

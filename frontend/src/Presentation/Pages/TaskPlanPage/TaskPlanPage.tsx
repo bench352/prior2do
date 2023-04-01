@@ -1,40 +1,102 @@
-import Grid from "@mui/material/Grid";
-import { TasksViewProps } from "../../CommonView";
-import Box from "@mui/material/Box";
-import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
+import FullCalendar from "@fullcalendar/react";
+import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
+import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-import React, { useState } from "react";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined";
-import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import { Tag } from "../../../Data/schemas";
-import TaskPlanCard from "../../Components/TaskPlanCard";
 import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import dateFormat from "dateformat";
+import React, { useCallback, useEffect, useState } from "react";
+import { TasksController } from "../../../Controller/Tasks";
+import { Tag, Task, WorkSession } from "../../../Data/schemas";
+import { TasksViewProps } from "../../CommonView";
+import TaskPlanCard from "../../Components/cards/TaskPlanCard";
+import WorkSessionCard from "../../Components/cards/WorkSessionCard";
+import EditWorkSessionDialog from "../../Components/dialog/plans/EditWorkSessionDialog";
 
 interface TaskPlanPageProps extends TasksViewProps {
   tags: Tag[];
+  workSessions: WorkSession[];
+}
+
+function ViewTasks(props: { tasks: Task[]; handleRefreshPage: () => any }) {
+  return (
+    <>
+      {props.tasks.map((task) => (
+        <TaskPlanCard
+          task={task}
+          handleRefreshPage={props.handleRefreshPage}
+          key={task.id}
+        />
+      ))}
+    </>
+  );
+}
+
+const tasksCon = new TasksController();
+
+function ViewPlans(props: {
+  workSessions: WorkSession[];
+  handleRefreshPage: () => any;
+}) {
+  const groupedObjects = props.workSessions.reduce((map, obj) => {
+    const date = dateFormat(obj.date, "mmm dd, yyyy");
+    map.has(date) ? map.get(date)?.push(obj) : map.set(date, [obj]);
+    return map;
+  }, new Map() as Map<string, WorkSession[]>);
+  const sortedGroups = Array.from(groupedObjects).sort(([a], [b]) =>
+    a.localeCompare(b)
+  );
+  return (
+    <>
+      {Array.from(sortedGroups).map(([date, sessions]) => (
+        <>
+          <h5>{date}</h5>
+          {sessions.map((session) => (
+            <WorkSessionCard
+              session={session}
+              handleRefreshPage={props.handleRefreshPage}
+            />
+          ))}
+        </>
+      ))}
+    </>
+  );
 }
 
 export default function TaskPlanPage(props: TaskPlanPageProps) {
   const [leftPaneView, setLeftPaneView] = useState("Tasks");
+  const [calendarSessions, setCalendarSessions] = useState([] as any[]);
+  const [selectedSession, setSelectedSession] = useState(
+    null as WorkSession | null
+  );
+  const [showEditSessionDialog, setShowEditSessionDialog] = useState(false);
   const handlePageViewChange = (
     event: React.MouseEvent<HTMLElement>,
     newSelection: string | null
   ) => {
     if (newSelection) setLeftPaneView(newSelection);
   };
-  const [filterTagId, setFilterTagId] = useState("");
-  const handleFilterChange = (e: SelectChangeEvent) => {
-    setFilterTagId(e.target.value);
-  };
 
+  const asyncGetCalView = useCallback(async () => {
+    let calPromises = props.workSessions.map(async (session) => {
+      const task = await tasksCon.getTaskById(session.taskId);
+      return {
+        id: session.id,
+        title: `[${session.duration}h] ${task.name}`,
+        date: dateFormat(session.date, "yyyy-mm-dd"),
+      };
+    });
+    let events = await Promise.all(calPromises);
+    setCalendarSessions(events);
+  }, [props.workSessions]);
+  useEffect(() => {
+    asyncGetCalView();
+  }, [asyncGetCalView, props]);
   return (
     <Box>
       <Stack
@@ -52,24 +114,6 @@ export default function TaskPlanPage(props: TaskPlanPageProps) {
         >
           Task Plan
         </Typography>
-        <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-          <InputLabel id="filter-by-tag">Filter By</InputLabel>
-          <Select
-            id="filter-by-tag"
-            value={filterTagId}
-            onChange={handleFilterChange}
-            label="Filter By"
-          >
-            <MenuItem value="">
-              <em>No Filter</em>
-            </MenuItem>
-            {props.tags.map((tag) => (
-              <MenuItem key={tag.id} value={tag.id}>
-                {tag.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
       </Stack>
       <Grid
         container
@@ -113,14 +157,22 @@ export default function TaskPlanPage(props: TaskPlanPageProps) {
                 </ToggleButton>
               </ToggleButtonGroup>
             </Stack>
-
-            {props.tasks.map((task) => (
-              <TaskPlanCard
-                task={task}
+            {leftPaneView === "Tasks" ? (
+              <ViewTasks
+                tasks={props.tasks}
                 handleRefreshPage={props.handleRefreshPage}
-                key={task.id}
               />
-            ))}
+            ) : (
+              ""
+            )}
+            {leftPaneView === "Plans" ? (
+              <ViewPlans
+                workSessions={props.workSessions}
+                handleRefreshPage={props.handleRefreshPage}
+              />
+            ) : (
+              ""
+            )}
           </>
         </Grid>
         <Grid item xs={4} md={8} sx={{ display: { xs: "none", md: "block" } }}>
@@ -143,10 +195,31 @@ export default function TaskPlanPage(props: TaskPlanPageProps) {
             height="auto"
             titleFormat={{ year: "numeric", month: "short" }}
             plugins={[dayGridPlugin]}
+            events={calendarSessions}
+            eventClick={(info) => {
+              setSelectedSession(
+                props.workSessions.find(
+                  (session) => session.id === info.event.id
+                ) as WorkSession
+              );
+              setShowEditSessionDialog(true);
+            }}
             initialView="dayGridMonth"
           />
         </Grid>
       </Grid>
+      {selectedSession ? (
+        <EditWorkSessionDialog
+          existingWorkSession={selectedSession}
+          open={showEditSessionDialog}
+          handleClose={() => {
+            setShowEditSessionDialog(false);
+          }}
+          handleRefreshPage={props.handleRefreshPage}
+        />
+      ) : (
+        ""
+      )}
     </Box>
   );
 }

@@ -16,7 +16,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import { useState } from "react";
-import ConfirmDialog from "../../../Components/dialog/ConfirmDialog";
+import ConfirmDialog from "../../../Components/dialog/misc/ConfirmDialog";
 import { AccountsController } from "../../../../Controller/Accounts";
 
 interface NotLoggedInProps {

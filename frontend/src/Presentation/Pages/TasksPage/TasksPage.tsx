@@ -8,8 +8,8 @@ import { useLocation } from "react-router-dom";
 import { TagsController } from "../../../Controller/Tags";
 import { Task } from "../../../Data/schemas";
 import { TasksViewProps } from "../../CommonView";
-import AddTaskDialog from "../../Components/dialog/AddTaskDialog";
-import TaskCard from "../../Components/TaskCard";
+import AddTaskDialog from "../../Components/dialog/tasks/AddTaskDialog";
+import TaskCard from "../../Components/cards/TaskCard";
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
 import InputBase from "@mui/material/InputBase";
@@ -92,7 +92,6 @@ export default function TasksPage(props: TasksPageProps) {
       description: "",
       estimatedHours: 0,
       completed: false,
-      planned: [],
       subTasks: [],
       tagId: tagFilter !== "" ? tagFilter : null,
       issueId: null,

@@ -26,10 +26,10 @@ import { appVersion } from "../../../Const";
 import { AccountsController } from "../../../Controller/Accounts";
 import { InExportsController } from "../../../Controller/InExports";
 import { TasksController } from "../../../Controller/Tasks";
-import LicenseDialog from "../../Components/dialog/LicenseDialog";
-import SingleTextInputDialog from "../../Components/dialog/SingleTextInputDialog";
-import ConfirmDialog from "../../Components/dialog/ConfirmDialog";
-import ConfirmReadFileDialog from "../../Components/dialog/ConfirmReadFileDialog";
+import LicenseDialog from "../../Components/dialog/misc/LicenseDialog";
+import SingleTextInputDialog from "../../Components/dialog/misc/SingleTextInputDialog";
+import ConfirmDialog from "../../Components/dialog/misc/ConfirmDialog";
+import ConfirmReadFileDialog from "../../Components/dialog/misc/ConfirmReadFileDialog";
 
 interface SettingsPageProps {
   showUser(visibility: boolean): any;

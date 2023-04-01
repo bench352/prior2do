@@ -4,7 +4,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { InExportsController } from "../../../Controller/InExports";
+import { InExportsController } from "../../../../Controller/InExports";
 
 interface confirmDialogProps {
   open: boolean;

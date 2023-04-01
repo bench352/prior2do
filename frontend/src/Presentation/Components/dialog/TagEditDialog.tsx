@@ -12,10 +12,10 @@ import DialogActions from "@mui/material/DialogActions";
 import ListItemButton from "@mui/material/ListItemButton";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
-import SingleTextInputDialog from "./SingleTextInputDialog";
+import SingleTextInputDialog from "./misc/SingleTextInputDialog";
 import { useState } from "react";
 import { TagsController } from "../../../Controller/Tags";
-import ConfirmDialog from "./ConfirmDialog";
+import ConfirmDialog from "./misc/ConfirmDialog";
 import Tooltip from "@mui/material/Tooltip";
 
 interface tagEditProps {

@@ -10,11 +10,11 @@ import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import dateFormat from "dateformat";
 import { useEffect, useState } from "react";
-import { TagsController } from "../../Controller/Tags";
-import { TasksController } from "../../Controller/Tasks";
-import { Tag, Task } from "../../Data/schemas";
-import AddWorkSessionDialog from "./dialog/AddWorkSessionDialog";
-import TaskPlanDialog from "./dialog/TaskPlanDialog";
+import { TagsController } from "../../../Controller/Tags";
+import { TasksController } from "../../../Controller/Tasks";
+import { Tag, Task } from "../../../Data/schemas";
+import AddWorkSessionDialog from "../dialog/plans/AddWorkSessionDialog";
+import TaskPlanDialog from "../dialog/plans/TaskPlanDialog";
 
 interface task {
   task: Task;

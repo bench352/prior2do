@@ -10,8 +10,8 @@ import InputAdornment from "@mui/material/InputAdornment";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import TimelapseOutlinedIcon from "@mui/icons-material/TimelapseOutlined";
 import Button from "@mui/material/Button";
-import { WorkSessionsController } from "../../../Controller/WorkSessions";
-import { getNewUniqueId } from "../../../Controller/Uuid";
+import { WorkSessionsController } from "../../../../Controller/WorkSessions";
+import { getNewUniqueId } from "../../../../Controller/Uuid";
 
 interface DialogProps {
   open: boolean;

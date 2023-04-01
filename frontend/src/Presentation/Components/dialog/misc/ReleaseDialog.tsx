@@ -3,7 +3,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import ReactMarkdown from "react-markdown";
-import { releaseContent } from "../../../Const";
+import { releaseContent } from "../../../../Const";
 
 import DialogTitle from "@mui/material/DialogTitle";
 

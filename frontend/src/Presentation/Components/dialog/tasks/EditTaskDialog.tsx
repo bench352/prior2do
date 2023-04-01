@@ -21,13 +21,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
-import { TagsController } from "../../../Controller/Tags";
-import { TasksController } from "../../../Controller/Tasks";
-import { Tag, Task } from "../../../Data/schemas";
-import ConfirmDialog from "./ConfirmDialog";
+import { TagsController } from "../../../../Controller/Tags";
+import { TasksController } from "../../../../Controller/Tasks";
+import { Tag, Task } from "../../../../Data/schemas";
+import ConfirmDialog from "../misc/ConfirmDialog";
 import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import Tooltip from "@mui/material/Tooltip";
-import SubTasksView from "../views/SubTasksView";
+import SubTasksView from "../../views/SubTasksView";
 import { Box } from "@mui/material";
 
 interface editTaskProps {
