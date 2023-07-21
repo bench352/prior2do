@@ -17,6 +17,7 @@ interface DialogProps {
   open: boolean;
   taskId: string;
   handleClose(): any;
+  handleRefreshPage(): any;
 }
 
 const defaultValue = {
@@ -46,6 +47,7 @@ export default function AddWorkSessionDialog(props: DialogProps) {
       duration: parseFloat(formValues.budgetedTime),
       id: getNewUniqueId(),
     });
+    props.handleRefreshPage();
     props.handleClose();
   };
   return (

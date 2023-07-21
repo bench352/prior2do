@@ -179,13 +179,19 @@ export default function TaskPlanDialog(props: editPlanProps) {
           <Grid item xs={6} md={7}>
             <Stack spacing={1}>
               <h3>Planned</h3>
-              {workSessions.map((session) => (
-                <WorkSessionItem
-                  session={session}
-                  handleRefreshPage={props.handleRefreshPage}
-                  key={session.id}
-                />
-              ))}
+              {workSessions
+                .sort(
+                  (a, b) =>
+                    new Date(a.date || 0).getTime() -
+                    new Date(b.date || 0).getTime()
+                )
+                .map((session) => (
+                  <WorkSessionItem
+                    session={session}
+                    handleRefreshPage={props.handleRefreshPage}
+                    key={session.id}
+                  />
+                ))}
               <Button
                 variant="outlined"
                 startIcon={<AddOutlinedIcon />}
@@ -205,6 +211,7 @@ export default function TaskPlanDialog(props: editPlanProps) {
       <AddWorkSessionDialog
         open={showAddSessionDialog}
         taskId={props.existingTask.id}
+        handleRefreshPage={props.handleRefreshPage}
         handleClose={() => {
           setShowAddSessionDialog(false);
         }}

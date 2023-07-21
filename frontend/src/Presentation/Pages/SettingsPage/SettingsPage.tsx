@@ -26,10 +26,12 @@ import { appVersion } from "../../../Const";
 import { AccountsController } from "../../../Controller/Accounts";
 import { InExportsController } from "../../../Controller/InExports";
 import { TasksController } from "../../../Controller/Tasks";
-import LicenseDialog from "../../Components/dialog/misc/LicenseDialog";
+import LicenseDialog from "../../Components/dialog/settings/LicenseDialog";
 import SingleTextInputDialog from "../../Components/dialog/misc/SingleTextInputDialog";
 import ConfirmDialog from "../../Components/dialog/misc/ConfirmDialog";
 import ConfirmReadFileDialog from "../../Components/dialog/misc/ConfirmReadFileDialog";
+import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
+import QuoteDialog from "../../Components/dialog/settings/QuoteDialog";
 
 interface SettingsPageProps {
   showUser(visibility: boolean): any;
@@ -48,6 +50,7 @@ export default function SettingsPage(props: SettingsPageProps) {
     exportJSONData: false,
     cleanupCompleted: false,
     deleteAllData: false,
+    configureQuote: false,
     syncServerIPAddr: false,
     licenseDialog: false,
   });
@@ -127,36 +130,18 @@ export default function SettingsPage(props: SettingsPageProps) {
               </ListItemButton>
             </ListItem>
           </List>
-          <h2>About This App</h2>
+          <h2>App Settings</h2>
           <List sx={{ width: "100%" }}>
-            <ListItem>
-              <ListItemIcon>
-                <InfoOutlinedIcon />
-              </ListItemIcon>
-              <ListItemText primary="App Version" secondary={appVersion} />
-            </ListItem>
             <ListItem disablePadding>
               <ListItemButton
                 onClick={() => {
-                  updateVisibility("licenseDialog", true);
+                  updateVisibility("configureQuote", true);
                 }}
               >
                 <ListItemIcon>
-                  <DescriptionOutlinedIcon />
+                  <FormatQuoteIcon />
                 </ListItemIcon>
-                <ListItemText primary="License" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton
-                onClick={() => {
-                  window.open("https://github.com/bench352/prior2do");
-                }}
-              >
-                <ListItemIcon>
-                  <GitHubIcon />
-                </ListItemIcon>
-                <ListItemText primary="Project GitHub Repository" />
+                <ListItemText primary="Configure Quote in Dashboard" />
               </ListItemButton>
             </ListItem>
           </List>
@@ -164,7 +149,7 @@ export default function SettingsPage(props: SettingsPageProps) {
         <Grid item xs={6}>
           <h2>Prior2Do Sync</h2>
           <Alert severity="info">
-            <AlertTitle>Self-hosting needed for Prior2Do Sync</AlertTitle>
+            <AlertTitle>Self-hosting required for Prior2Do Sync</AlertTitle>
             In order to enjoy the backup and sync feature, you need to{" "}
             <strong>host your own Prior2Do Sync server</strong> and configure
             the app to connect to it. You can still use the app standalone if
@@ -215,6 +200,39 @@ export default function SettingsPage(props: SettingsPageProps) {
             ) : (
               ""
             )}
+          </List>
+          <h2>About This App</h2>
+          <List sx={{ width: "100%" }}>
+            <ListItem>
+              <ListItemIcon>
+                <InfoOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText primary="App Version" secondary={appVersion} />
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => {
+                  updateVisibility("licenseDialog", true);
+                }}
+              >
+                <ListItemIcon>
+                  <DescriptionOutlinedIcon />
+                </ListItemIcon>
+                <ListItemText primary="License" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => {
+                  window.open("https://github.com/bench352/prior2do");
+                }}
+              >
+                <ListItemIcon>
+                  <GitHubIcon />
+                </ListItemIcon>
+                <ListItemText primary="Project GitHub Repository" />
+              </ListItemButton>
+            </ListItem>
           </List>
         </Grid>
       </Grid>
@@ -287,6 +305,12 @@ export default function SettingsPage(props: SettingsPageProps) {
         open={dialogVisibility.licenseDialog}
         handleHideDialog={() => {
           updateVisibility("licenseDialog", false);
+        }}
+      />
+      <QuoteDialog
+        open={dialogVisibility.configureQuote}
+        handleHideDialog={() => {
+          updateVisibility("configureQuote", false);
         }}
       />
     </Container>

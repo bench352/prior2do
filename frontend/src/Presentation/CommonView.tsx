@@ -35,7 +35,9 @@ import { getNewUniqueId } from "../Controller/Uuid";
 import { WorkSessionsController } from "../Controller/WorkSessions";
 import { Tag, Task, WorkSession } from "../Data/schemas";
 import TagEditDialog from "./Components/dialog/TagEditDialog";
-import ReleaseDialog from "./Components/dialog/misc/ReleaseDialog";
+import ReleaseDialog from "./Components/dialog/settings/ReleaseDialog";
+import LanguageIcon from "@mui/icons-material/Language";
+import LanguageSelectDialog from "./Components/dialog/misc/LanguageSelectDialog";
 import SingleTextInputDialog from "./Components/dialog/misc/SingleTextInputDialog";
 import DueCalendarPage from "./Pages/DueCalPage/DueCalPage";
 import HomePage from "./Pages/HomePage/HomePage";
@@ -43,6 +45,8 @@ import SettingsPage from "./Pages/SettingsPage/SettingsPage";
 import TaskPlanPage from "./Pages/TaskPlanPage/TaskPlanPage";
 import TasksPage from "./Pages/TasksPage/TasksPage";
 import UserPage from "./Pages/UserPage/UserPage";
+import { useTranslation } from "react-i18next";
+import { UILanguages } from "../Data/schemas";
 const drawerWidth = 240;
 
 export interface TasksViewProps {
@@ -55,6 +59,7 @@ const tagsCon = new TagsController();
 const workSessionsCon = new WorkSessionsController();
 
 export default function CommonView() {
+  const { i18n, t } = useTranslation();
   let settingsCon = new SettingsController();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -64,6 +69,8 @@ export default function CommonView() {
   const [showReleaseDialog, setShowReleaseDialog] = useState(
     settingsCon.isReleaseDialogShown()
   );
+  const [showLanguageSelectDialog, setShowLanguageSelectDialog] =
+    useState(false);
   const [showInfoSnackBar, setShowInfoSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState("");
   const createInfoSnackBar = (message: string) => {
@@ -121,25 +128,25 @@ export default function CommonView() {
     <div>
       <Toolbar />
       <Divider />
-      <List subheader={<ListSubheader>Features</ListSubheader>}>
+      <List subheader={<ListSubheader>{t("sideMenu.features")}</ListSubheader>}>
         {[
           {
-            name: "Dashboard",
+            name: t("sideMenu.dashboard"),
             icon: <DashboardOutlinedIcon />,
             link: "/",
           },
           {
-            name: "Tasks",
+            name: t("sideMenu.tasks"),
             icon: <ListAltOutlinedIcon />,
             link: "/tasks",
           },
           {
-            name: "Calendar",
+            name: t("sideMenu.calendar"),
             icon: <CalendarMonthOutlinedIcon />,
             link: "/calendar",
           },
           {
-            name: "Plan",
+            name: t("sideMenu.plan"),
             icon: <OutlinedFlagSharpIcon />,
             link: "/plan",
           },
@@ -162,8 +169,8 @@ export default function CommonView() {
       <List
         subheader={
           <ListSubheader>
-            Tags
-            <Tooltip title="Edit" placement="right">
+            {t("sideMenu.tags")}
+            <Tooltip title={t("sideMenu.toolTip.tagEdit")} placement="right">
               <IconButton
                 aria-label="delete"
                 size="small"
@@ -201,7 +208,7 @@ export default function CommonView() {
             <ListItemIcon>
               <AddIcon />
             </ListItemIcon>
-            <ListItemText primary="Add Tag" />
+            <ListItemText primary={t("sideMenu.addTag")} />
           </ListItemButton>
         </ListItem>
       </List>
@@ -218,7 +225,7 @@ export default function CommonView() {
               <ListItemIcon>
                 <PersonOutlineOutlinedIcon />
               </ListItemIcon>
-              <ListItemText primary="User" />
+              <ListItemText primary={t("sideMenu.user")} />
             </ListItemButton>
           </ListItem>
         ) : (
@@ -234,7 +241,25 @@ export default function CommonView() {
             <ListItemIcon>
               <SettingsOutlinedIcon />
             </ListItemIcon>
-            <ListItemText primary="Settings" />
+            <ListItemText primary={t("sideMenu.settings")} />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding sx={{ "&:link": { color: "black" } }}>
+          <ListItemButton
+            onClick={() => {
+              setShowLanguageSelectDialog(true);
+            }}
+          >
+            <ListItemIcon>
+              <LanguageIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                t("sideMenu.language") +
+                (i18n.language !== "en" ? " (Language)" : "")
+              }
+              secondary={UILanguages[i18n.language]}
+            />
           </ListItemButton>
         </ListItem>
       </List>
@@ -262,10 +287,11 @@ export default function CommonView() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div">
-            Prior2Do
+            {t("navBar.appName") +
+              (i18n.language !== "en" ? " (Prior2Do)" : "")}
           </Typography>
           <Chip
-            label="Pre-release"
+            label={t("navBar.tag")}
             color="secondary"
             size="small"
             sx={{ marginLeft: "10px" }}
@@ -329,7 +355,13 @@ export default function CommonView() {
         <Routes>
           <Route
             path="/*"
-            element={<HomePage tasks={tasks} handleRefreshPage={refreshPage} />}
+            element={
+              <HomePage
+                tasks={tasks}
+                workSessions={workSessions}
+                handleRefreshPage={refreshPage}
+              />
+            }
           />
           <Route
             path="tasks"
@@ -385,6 +417,13 @@ export default function CommonView() {
         open={showAddTagDialog}
         handleClose={handleCloseAddTagDialog}
         setConfirmValue={createTag}
+      />
+      <LanguageSelectDialog
+        open={showLanguageSelectDialog}
+        handleClose={() => {
+          setShowLanguageSelectDialog(false);
+        }}
+        handleLanguageChange={i18n.changeLanguage}
       />
       <Snackbar
         open={showInfoSnackBar}

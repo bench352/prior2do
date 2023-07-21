@@ -15,11 +15,13 @@ import { TasksController } from "../../../Controller/Tasks";
 import { Tag, Task } from "../../../Data/schemas";
 import AddWorkSessionDialog from "../dialog/plans/AddWorkSessionDialog";
 import TaskPlanDialog from "../dialog/plans/TaskPlanDialog";
+import Tooltip from "@mui/material/Tooltip";
 
 interface task {
   task: Task;
   handleRefreshPage(): any;
 }
+
 
 const tasksCon = new TasksController();
 const tagsCon = new TagsController();
@@ -179,9 +181,11 @@ export default function TaskPlanCard(props: task) {
             </CardActionArea>
           </Grid>
           <Grid item xs="auto" sx={{ padding: "10px 5px 10px 0px" }}>
-            <IconButton onClick={handleShowAddDialog}>
-              <AddOutlinedIcon />
-            </IconButton>
+            <Tooltip title="Add plan">
+              <IconButton onClick={handleShowAddDialog}>
+                <AddOutlinedIcon />
+              </IconButton>
+            </Tooltip>
           </Grid>
         </Grid>
       </Card>
@@ -191,7 +195,12 @@ export default function TaskPlanCard(props: task) {
         handleRefreshPage={props.handleRefreshPage}
         existingTask={props.task}
       />
-      <AddWorkSessionDialog open={showAddSessionDialog} taskId={props.task.id} handleClose={handleHideAddDialog} />
+      <AddWorkSessionDialog
+        open={showAddSessionDialog}
+        taskId={props.task.id}
+        handleRefreshPage={props.handleRefreshPage}
+        handleClose={handleHideAddDialog}
+      />
     </>
   );
 }

@@ -2,6 +2,15 @@ import { WorkSession } from "../schemas";
 import { WorkSessionsBase } from "./WorkSessionsBase";
 
 export class WorkSessionsLocalStorage extends WorkSessionsBase {
+  async getWorkSessionById(id: string): Promise<WorkSession> {
+    let foundSession = this.localGetWorkSessions().find(
+      (session) => session.id === id
+    );
+    if (foundSession === undefined) {
+      throw new Error("WorkSession not found");
+    }
+    return foundSession;
+  }
   async createWorkSession(workSession: WorkSession) {
     let workSessions = this.localGetWorkSessions();
     workSessions.push(workSession);

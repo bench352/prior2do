@@ -14,6 +14,7 @@ import Chip from "@mui/material/Chip";
 import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
 import DragIndicatorOutlinedIcon from "@mui/icons-material/DragIndicatorOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import { useTranslation } from "react-i18next";
 
 function SubTaskCard(props: {
   subTask: SubTask;
@@ -63,6 +64,7 @@ export default function SubTasksView(props: {
   subTasks: SubTask[];
   setSubTasks(subTasks: SubTask[]): any;
 }) {
+  const { t } = useTranslation();
   const [addSubTaskField, setAddSubTaskField] = useState("");
   const handleAddSubtasksChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -97,7 +99,7 @@ export default function SubTasksView(props: {
         spacing={1}
       >
         <Typography component="h5" sx={{ fontWeight: "bold" }} noWrap>
-          Subtasks
+          {t("views.subTasks.title")}
         </Typography>
         {props.subTasks.length > 0 ? (
           <Chip
@@ -137,7 +139,7 @@ export default function SubTasksView(props: {
               <DragIndicatorOutlinedIcon fontSize="small" color="disabled" />
               <Checkbox disabled />
               <InputBase
-                placeholder="Add subtask..."
+                placeholder={t("views.subTasks.placeholder.addTask")}
                 value={addSubTaskField}
                 onChange={handleAddSubtasksChange}
                 fullWidth

@@ -1,4 +1,5 @@
 import { appVersion } from "../../Const";
+import { Quote } from "../schemas";
 
 const localStore = require("store");
 
@@ -46,5 +47,19 @@ export abstract class SettingsBase {
   }
   markCurrentVersionViewed() {
     localStorage.setItem("p2d.lastViewedVersion", appVersion);
+  }
+  getQuote(): Quote {
+    let quote = localStore.get("p2d.quote");
+    if (quote) {
+      return quote;
+    } else {
+      return {
+        text: "Give yourself a little motivation by configuring a quote in the settings!",
+        author: "The dev",
+      };
+    }
+  }
+  setQuote(quote: Quote) {
+    localStore.set("p2d.quote", quote);
   }
 }

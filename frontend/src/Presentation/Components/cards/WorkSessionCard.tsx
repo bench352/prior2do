@@ -10,8 +10,10 @@ import { useEffect, useState } from "react";
 import { TasksController } from "../../../Controller/Tasks";
 import { WorkSession } from "../../../Data/schemas";
 import EditWorkSessionDialog from "../dialog/plans/EditWorkSessionDialog";
+import Tooltip from "@mui/material/Tooltip";
 interface workSession {
   session: WorkSession;
+  showPlannedDate: boolean;
   handleRefreshPage(): any;
 }
 
@@ -43,18 +45,22 @@ export default function WorkSessionCard(props: workSession) {
             <Typography variant="h6" component="h6" noWrap>
               {taskName}
             </Typography>
+            {props.showPlannedDate ? (
+              <Stack
+                direction="row"
+                justifyContent="flex-start"
+                alignItems="center"
+                spacing={1}
+              >
+                <EventOutlinedIcon />
+                <Typography noWrap>
+                  {dateFormat(props.session.date, "mmm dd, yyyy")}
+                </Typography>
+              </Stack>
+            ) : (
+              ""
+            )}
 
-            <Stack
-              direction="row"
-              justifyContent="flex-start"
-              alignItems="center"
-              spacing={1}
-            >
-              <EventOutlinedIcon />
-              <Typography noWrap>
-                {dateFormat(props.session.date, "mmm dd, yyyy")}
-              </Typography>
-            </Stack>
             <Stack
               direction="row"
               justifyContent="flex-start"
@@ -65,9 +71,11 @@ export default function WorkSessionCard(props: workSession) {
               <Typography noWrap>{`${props.session.duration}h`}</Typography>
             </Stack>
           </Stack>
-          <IconButton onClick={() => setShowEditSessionDialog(true)}>
-            <EditOutlinedIcon />
-          </IconButton>
+          <Tooltip title="Edit Session">
+            <IconButton onClick={() => setShowEditSessionDialog(true)}>
+              <EditOutlinedIcon />
+            </IconButton>
+          </Tooltip>
         </Stack>
       </Card>
 

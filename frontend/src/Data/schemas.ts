@@ -27,3 +27,13 @@ export interface Task extends IdNameBasedResource {
 }
 
 export interface Tag extends IdNameBasedResource {}
+
+export interface Quote {
+  text: string;
+  author: string;
+}
+
+export const UILanguages: Record<string, string> = {
+  en: "English",
+  ch: "繁體中文",
+};

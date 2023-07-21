@@ -29,6 +29,7 @@ import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import Tooltip from "@mui/material/Tooltip";
 import SubTasksView from "../../views/SubTasksView";
 import { Box } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 interface editTaskProps {
   open: boolean;
@@ -41,6 +42,7 @@ const tasksCon = new TasksController();
 const tagsCon = new TagsController();
 
 export default function EditTaskDialog(props: editTaskProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const getTags = () => {
@@ -145,7 +147,13 @@ export default function EditTaskDialog(props: editTaskProps) {
           ) : (
             <h4>{formValues.name}</h4>
           )}
-          <Tooltip title={titleEditMode ? "Confirm" : "Rename"}>
+          <Tooltip
+            title={
+              titleEditMode
+                ? t("dialogs.taskRelated.tooltip.editMode.confirm")
+                : t("dialogs.taskRelated.tooltip.editMode.rename")
+            }
+          >
             <IconButton
               onClick={() => {
                 setTitleEditMode(!titleEditMode);
@@ -176,9 +184,15 @@ export default function EditTaskDialog(props: editTaskProps) {
                     noWrap
                     gutterBottom={false}
                   >
-                    Description
+                    {t("dialogs.taskRelated.textfield.description.label")}
                   </Typography>
-                  <Tooltip title={descEditMode ? "Confirm" : "Edit"}>
+                  <Tooltip
+                    title={
+                      descEditMode
+                        ? t("dialogs.taskRelated.tooltip.editMode.confirm")
+                        : t("dialogs.taskRelated.tooltip.editMode.edit")
+                    }
+                  >
                     <IconButton
                       onClick={() => {
                         setDescEditMode(!descEditMode);
@@ -208,7 +222,9 @@ export default function EditTaskDialog(props: editTaskProps) {
                   <ReactMarkdown
                     children={
                       formValues.description.trim().length === 0
-                        ? "(No description)"
+                        ? t(
+                            "dialogs.taskRelated.textfield.description.noDescription"
+                          )
                         : formValues.description
                     }
                     remarkPlugins={[remarkGfm, remarkBreaks]}
@@ -220,7 +236,7 @@ export default function EditTaskDialog(props: editTaskProps) {
                 id="dueDate"
                 type="date"
                 name="dueDate"
-                label="Due Date"
+                label={t("dialogs.taskRelated.textfield.dueDate.label")}
                 variant="standard"
                 fullWidth
                 InputLabelProps={{
@@ -233,7 +249,7 @@ export default function EditTaskDialog(props: editTaskProps) {
                 id="estHr"
                 type="number"
                 name="estimatedHours"
-                label="Estimated Time (h)"
+                label={t("dialogs.taskRelated.textfield.estTimeHour.label")}
                 variant="standard"
                 fullWidth
                 InputLabelProps={{
@@ -243,7 +259,9 @@ export default function EditTaskDialog(props: editTaskProps) {
                 onChange={handleInputChange}
               />
               <FormControl fullWidth variant="standard">
-                <InputLabel id="select-tag">Tag</InputLabel>
+                <InputLabel id="select-tag">
+                  {t("dialogs.taskRelated.select.tag.label")}
+                </InputLabel>
                 <Select
                   id="select-tag"
                   label="Tag"
@@ -278,9 +296,11 @@ export default function EditTaskDialog(props: editTaskProps) {
             setShowConfirmDeleteDialog(true);
           }}
         >
-          Delete
+          {t("dialogs.common.button.delete")}
         </Button>
-        <Button onClick={handleSubmit}>Close</Button>
+        <Button onClick={handleSubmit}>
+          {t("dialogs.common.button.okay")}
+        </Button>
       </DialogActions>
       <ConfirmDialog
         open={showConfirmDeleteDialog}

@@ -14,6 +14,7 @@ import { useState } from "react";
 import { WorkSessionsController } from "../../../../Controller/WorkSessions";
 import { WorkSession } from "../../../../Data/schemas";
 import ConfirmDialog from "../misc/ConfirmDialog";
+import { useTranslation } from "react-i18next";
 
 interface DialogProps {
   open: boolean;
@@ -25,6 +26,7 @@ interface DialogProps {
 const workSessionsCon = new WorkSessionsController();
 
 export default function EditWorkSessionDialog(props: DialogProps) {
+  const { t } = useTranslation();
   const [formValues, setFormValues] = useState({
     plannedOn: dateFormat(props.existingWorkSession.date, "yyyy-mm-dd"),
     budgetedTime: props.existingWorkSession.duration.toString(),
@@ -109,9 +111,11 @@ export default function EditWorkSessionDialog(props: DialogProps) {
             setShowDeleteDialog(true);
           }}
         >
-          Delete
+          {t("dialogs.common.button.delete")}
         </Button>
-        <Button onClick={handleSubmit}>Close</Button>
+        <Button onClick={handleSubmit}>
+          {t("dialogs.common.button.okay")}
+        </Button>
       </DialogActions>
       <ConfirmDialog
         open={showDeleteDialog}

@@ -10,8 +10,9 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import dateFormat from "dateformat";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TasksController } from "../../../Controller/Tasks";
+import { WorkSessionsController } from "../../../Controller/WorkSessions";
 import { Tag, Task, WorkSession } from "../../../Data/schemas";
 import { TasksViewProps } from "../../CommonView";
 import TaskPlanCard from "../../Components/cards/TaskPlanCard";
@@ -38,6 +39,7 @@ function ViewTasks(props: { tasks: Task[]; handleRefreshPage: () => any }) {
 }
 
 const tasksCon = new TasksController();
+const sessionsCon = new WorkSessionsController();
 
 function ViewPlans(props: {
   workSessions: WorkSession[];
@@ -60,6 +62,7 @@ function ViewPlans(props: {
             <WorkSessionCard
               session={session}
               handleRefreshPage={props.handleRefreshPage}
+              showPlannedDate={true}
             />
           ))}
         </>
@@ -82,21 +85,23 @@ export default function TaskPlanPage(props: TaskPlanPageProps) {
     if (newSelection) setLeftPaneView(newSelection);
   };
 
-  const asyncGetCalView = useCallback(async () => {
-    let calPromises = props.workSessions.map(async (session) => {
-      const task = await tasksCon.getTaskById(session.taskId);
-      return {
-        id: session.id,
-        title: `[${session.duration}h] ${task.name}`,
-        date: dateFormat(session.date, "yyyy-mm-dd"),
-      };
-    });
-    let events = await Promise.all(calPromises);
-    setCalendarSessions(events);
-  }, [props.workSessions]);
   useEffect(() => {
+    const asyncGetCalView = async () => {
+      let calPromises = props.workSessions.map(async (session) => {
+        const task = await tasksCon.getTaskById(session.taskId);
+        return {
+          id: session.id,
+          title: `[${session.duration}h] ${task.name}`,
+          date: dateFormat(session.date, "yyyy-mm-dd"),
+        };
+      });
+      let events = await Promise.all(calPromises);
+      setCalendarSessions(events);
+    };
+
     asyncGetCalView();
-  }, [asyncGetCalView, props]);
+  }, [props.workSessions]);
+
   return (
     <Box>
       <Stack
@@ -196,11 +201,9 @@ export default function TaskPlanPage(props: TaskPlanPageProps) {
             titleFormat={{ year: "numeric", month: "short" }}
             plugins={[dayGridPlugin]}
             events={calendarSessions}
-            eventClick={(info) => {
+            eventClick={async (info) => {
               setSelectedSession(
-                props.workSessions.find(
-                  (session) => session.id === info.event.id
-                ) as WorkSession
+                await sessionsCon.getWorkSessionById(info.event.id)
               );
               setShowEditSessionDialog(true);
             }}
@@ -214,6 +217,7 @@ export default function TaskPlanPage(props: TaskPlanPageProps) {
           open={showEditSessionDialog}
           handleClose={() => {
             setShowEditSessionDialog(false);
+            setSelectedSession(null);
           }}
           handleRefreshPage={props.handleRefreshPage}
         />

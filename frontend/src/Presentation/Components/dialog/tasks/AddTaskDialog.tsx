@@ -19,7 +19,7 @@ import { TagsController } from "../../../../Controller/Tags";
 import { SubTask, Tag } from "../../../../Data/schemas";
 import { getNewUniqueId } from "../../../../Controller/Uuid";
 import SubTasksView from "../../views/SubTasksView";
-
+import { useTranslation } from "react-i18next";
 interface addTaskProps {
   open: boolean;
   handleHideDialog(): any;
@@ -40,6 +40,7 @@ const defaultValue = {
 };
 
 export default function AddTaskDialog(props: addTaskProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const handleSelectChange = (e: SelectChangeEvent) => {
@@ -104,7 +105,7 @@ export default function AddTaskDialog(props: addTaskProps) {
           spacing={1}
         >
           <AddTaskOutlinedIcon />
-          <h4>Create Task</h4>
+          <h4>{t("dialogs.taskRelated.title")}</h4>
         </Stack>
       </DialogTitle>
       <DialogContent>
@@ -115,7 +116,7 @@ export default function AddTaskDialog(props: addTaskProps) {
                 id="name"
                 type="text"
                 name="name"
-                label="Name"
+                label={t("dialogs.taskRelated.textfield.name.label")}
                 variant="standard"
                 style={{ width: "100%" }}
                 value={formValues.name}
@@ -126,7 +127,7 @@ export default function AddTaskDialog(props: addTaskProps) {
                 id="description"
                 type="text"
                 name="description"
-                label="Description"
+                label={t("dialogs.taskRelated.textfield.description.label")}
                 variant="standard"
                 style={{ width: "100%" }}
                 minRows={3}
@@ -142,7 +143,7 @@ export default function AddTaskDialog(props: addTaskProps) {
                 id="dueDate"
                 type="date"
                 name="dueDate"
-                label="Due Date"
+                label={t("dialogs.taskRelated.textfield.dueDate.label")}
                 variant="standard"
                 style={{ width: "100%" }}
                 InputLabelProps={{
@@ -155,7 +156,7 @@ export default function AddTaskDialog(props: addTaskProps) {
                 id="estHr"
                 type="number"
                 name="estimatedHours"
-                label="Estimated Time (h)"
+                label={t("dialogs.taskRelated.textfield.estTimeHour.label")}
                 variant="standard"
                 style={{ width: "100%" }}
                 InputLabelProps={{
@@ -165,7 +166,9 @@ export default function AddTaskDialog(props: addTaskProps) {
                 onChange={handleInputChange}
               />
               <FormControl fullWidth variant="standard">
-                <InputLabel id="select-tag">Tag</InputLabel>
+                <InputLabel id="select-tag">
+                  {t("dialogs.taskRelated.select.tag.label")}
+                </InputLabel>
                 <Select
                   id="select-tag"
                   label="Tag"
@@ -190,8 +193,10 @@ export default function AddTaskDialog(props: addTaskProps) {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.handleHideDialog}>Cancel</Button>
-        <Button onClick={handleSubmit}>Add</Button>
+        <Button onClick={props.handleHideDialog}>
+          {t("dialogs.common.button.cancel")}
+        </Button>
+        <Button onClick={handleSubmit}>{t("dialogs.common.button.add")}</Button>
       </DialogActions>
     </Dialog>
   );

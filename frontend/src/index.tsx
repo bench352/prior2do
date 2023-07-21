@@ -10,6 +10,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import "./index.css";
 import CommonView from "./Presentation/CommonView";
 import reportWebVitals from "./reportWebVitals";
+import "./i18n";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 
 const root = ReactDOM.createRoot(

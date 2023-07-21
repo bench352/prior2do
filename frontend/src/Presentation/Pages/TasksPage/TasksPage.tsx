@@ -26,6 +26,7 @@ import Tooltip from "@mui/material/Tooltip";
 import TimerOutlinedIcon from "@mui/icons-material/TimerOutlined";
 import Collapse from "@mui/material/Collapse";
 import { TransitionGroup } from "react-transition-group";
+import { useTranslation } from "react-i18next";
 
 const floatingButtonStyle = {
   margin: 0,
@@ -44,8 +45,9 @@ interface TasksPageProps extends TasksViewProps {
 }
 
 export default function TasksPage(props: TasksPageProps) {
+  const { t } = useTranslation();
   const location = useLocation();
-  const [pageTitle, setPageTitle] = useState("All Tasks");
+  const [pageTitle, setPageTitle] = useState(t("tasks.title"));
   const [tagFilter, setTagFilter] = useState("");
   const [taskFilterOption, setTaskFilterOption] = useState("name");
   const [reverseSort, setReverseSort] = useState(false);
@@ -72,13 +74,13 @@ export default function TasksPage(props: TasksPageProps) {
         setPageTitle(tag.name);
       } catch (error: any) {
         props.createInfoSnackBar(error.message);
-        setPageTitle("All Tasks");
+        setPageTitle(t("tasks.title"));
         setTagFilter("");
       }
     } else {
-      setPageTitle("All Tasks");
+      setPageTitle(t("tasks.title"));
     }
-  }, [props, tagFilter]);
+  }, [props, t, tagFilter]);
   const showAddTaskDialog = () => {
     setAddTaskDialogEnabled(true);
   };
@@ -115,7 +117,7 @@ export default function TasksPage(props: TasksPageProps) {
         onClick={showAddTaskDialog}
       >
         <AddIcon sx={{ mr: 1 }} />
-        Create Task
+        {t("tasks.button.create")}
       </Fab>
       <Stack
         direction="row"
@@ -137,7 +139,7 @@ export default function TasksPage(props: TasksPageProps) {
           alignItems="center"
           spacing={1}
         >
-          <Tooltip title="Reverse">
+          <Tooltip title={t("tasks.toolTip.reverse")}>
             <IconButton
               value="check"
               onClick={() => {
@@ -158,17 +160,17 @@ export default function TasksPage(props: TasksPageProps) {
             exclusive
           >
             <ToggleButton value="name">
-              <Tooltip title="Sort by task name">
+              <Tooltip title={t("tasks.sort.byTaskName")}>
                 <TitleOutlinedIcon />
               </Tooltip>
             </ToggleButton>
             <ToggleButton value="due">
-              <Tooltip title="Sort by due date">
+              <Tooltip title={t("tasks.sort.byDueDate")}>
                 <EventOutlinedIcon />
               </Tooltip>
             </ToggleButton>
             <ToggleButton value="estTime">
-              <Tooltip title="Sort by estimated time">
+              <Tooltip title={t("tasks.sort.byEstTime")}>
                 <TimerOutlinedIcon />
               </Tooltip>
             </ToggleButton>
@@ -234,7 +236,7 @@ export default function TasksPage(props: TasksPageProps) {
         </IconButton>
         <InputBase
           fullWidth
-          placeholder="Quick add task"
+          placeholder={t("tasks.button.quickAdd")}
           value={quickAddTaskField}
           onChange={handleInputChange}
           onKeyDown={async (e: React.KeyboardEvent) => {

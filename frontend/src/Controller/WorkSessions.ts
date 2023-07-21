@@ -16,6 +16,9 @@ export class WorkSessionsController {
   async getWorkSessionsByTaskId(taskId: string): Promise<WorkSession[]> {
     return await getWorkSessionsBackend().getWorkSessionsByTaskId(taskId);
   }
+  async getWorkSessionById(id: string): Promise<WorkSession> {
+    return await getWorkSessionsBackend().getWorkSessionById(id);
+  }
   async updateWorkSession(workSession: WorkSession) {
     await getWorkSessionsBackend().updateWorkSession(workSession);
   }

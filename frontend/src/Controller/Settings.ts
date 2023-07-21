@@ -1,5 +1,6 @@
 import { SettingsBase } from "../Data/Settings/SettingsBase";
 import { SettingsLocalStorage } from "../Data/Settings/SettingsLocalStrorage";
+import { Quote } from "../Data/schemas";
 
 function getSettingsBackend(): SettingsBase {
   return new SettingsLocalStorage();
@@ -31,6 +32,12 @@ export class SettingsController {
     return getSettingsBackend().isReleaseDialogShown();
   }
   markCurrentVersionViewed() {
-    getSettingsBackend().markCurrentVersionViewed()
+    getSettingsBackend().markCurrentVersionViewed();
+  }
+  getQuote(): Quote {
+    return getSettingsBackend().getQuote();
+  }
+  setQuote(quote: Quote) {
+    getSettingsBackend().setQuote(quote);
   }
 }
