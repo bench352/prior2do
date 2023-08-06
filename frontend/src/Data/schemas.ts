@@ -1,39 +1,40 @@
 export interface IdBasedResource {
-  id: string;
+    id: string;
 }
 
 export interface IdNameBasedResource extends IdBasedResource {
-  name: string;
+    name: string;
 }
 
 export interface WorkSession extends IdBasedResource {
-  taskId: string;
-  date: Date;
-  duration: number;
+    taskId: string;
+    date: Date;
+    duration: number;
 }
 
 export interface SubTask extends IdNameBasedResource {
-  completed: boolean;
+    completed: boolean;
 }
 
 export interface Task extends IdNameBasedResource {
-  dueDate: Date | null;
-  description: string;
-  estimatedHours: number;
-  completed: boolean;
-  subTasks: SubTask[];
-  tagId: string | null;
-  issueId: string | null;
+    dueDate: Date | null;
+    description: string;
+    estimatedHours: number;
+    completed: boolean;
+    subTasks: SubTask[];
+    tagId: string | null;
+    issueId: string | null;
 }
 
-export interface Tag extends IdNameBasedResource {}
+export interface Tag extends IdNameBasedResource {
+}
 
 export interface Quote {
-  text: string;
-  author: string;
+    text: string;
+    author: string;
 }
 
 export const UILanguages: Record<string, string> = {
-  en: "English",
-  ch: "繁體中文",
+    en: "English",
+    ch: "繁體中文",
 };

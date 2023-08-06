@@ -1,6 +1,6 @@
 import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
-import { Tag } from "../../../Data/schemas";
+import {Tag} from "../../../Data/schemas";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import TagOutlinedIcon from "@mui/icons-material/TagOutlined";
@@ -13,117 +13,123 @@ import ListItemButton from "@mui/material/ListItemButton";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import SingleTextInputDialog from "./misc/SingleTextInputDialog";
-import { useState } from "react";
-import { TagsController } from "../../../Controller/Tags";
+import {useState} from "react";
+import {TagsController} from "../../../Controller/Tags";
 import ConfirmDialog from "./misc/ConfirmDialog";
 import Tooltip from "@mui/material/Tooltip";
+import {useTranslation} from "react-i18next";
 
 interface tagEditProps {
-  open: boolean;
-  tags: Tag[];
-  handleHideDialog(): any;
-  handleRefreshPage(): any;
+    open: boolean;
+    tags: Tag[];
+
+    handleHideDialog(): any;
+
+    handleRefreshPage(): any;
 }
 
 interface tagItemProps {
-  handleRefreshPage(): any;
-  tag: Tag;
+    tag: Tag;
+
+    handleRefreshPage(): any;
 }
 
 const tagsCon = new TagsController();
 
 function TagItem(props: tagItemProps) {
-  const [showEditTagDialog, setShowEditTagDialog] = useState(false);
-  const [showDeleteTagDialog, setShowDeleteTagDialog] = useState(false);
-  return (
-    <>
-      <ListItem
-        secondaryAction={
-          <Tooltip title="Delete" placement="right">
-            <IconButton
-              edge="end"
-              aria-label="delete"
-              onClick={() => {
-                setShowDeleteTagDialog(true);
-              }}
+    const {t} = useTranslation();
+    const [showEditTagDialog, setShowEditTagDialog] = useState(false);
+    const [showDeleteTagDialog, setShowDeleteTagDialog] = useState(false);
+
+    return (
+        <>
+            <ListItem
+                secondaryAction={
+                    <Tooltip title={t("dialogs.common.button.delete")} placement="right">
+                        <IconButton
+                            edge="end"
+                            aria-label="delete"
+                            onClick={() => {
+                                setShowDeleteTagDialog(true);
+                            }}
+                        >
+                            <DeleteIcon/>
+                        </IconButton>
+                    </Tooltip>
+                }
+                disablePadding
             >
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        }
-        disablePadding
-      >
-        <Tooltip title="Edit" placement="left">
-          <ListItemButton
-            onClick={() => {
-              setShowEditTagDialog(true);
-            }}
-          >
-            <Chip icon={<TagOutlinedIcon />} label={props.tag.name} />
-          </ListItemButton>
-        </Tooltip>
-      </ListItem>
-      <SingleTextInputDialog
-        title="Edit Tag Name"
-        message={`Enter a new name for [${props.tag.name}]`}
-        open={showEditTagDialog}
-        defaultValue={props.tag.name}
-        handleClose={() => {
-          setShowEditTagDialog(false);
-        }}
-        setConfirmValue={(newName: string) => {
-          tagsCon.updateTag({ id: props.tag.id, name: newName });
-          props.handleRefreshPage();
-        }}
-      />
-      <ConfirmDialog
-        title={`Delete ${props.tag.name}?`}
-        message="Deleting this tag will remove its association with existing tasks. All associated tasks will still remain in the app."
-        open={showDeleteTagDialog}
-        handleClose={() => {
-          setShowDeleteTagDialog(false);
-        }}
-        confirmAction={async () => {
-          await tagsCon.deleteTag(props.tag.id);
-          props.handleRefreshPage();
-        }}
-      />
-    </>
-  );
+                <Tooltip title={t("dialogs.common.button.edit")} placement="left">
+                    <ListItemButton
+                        onClick={() => {
+                            setShowEditTagDialog(true);
+                        }}
+                    >
+                        <Chip icon={<TagOutlinedIcon/>} label={props.tag.name}/>
+                    </ListItemButton>
+                </Tooltip>
+            </ListItem>
+            <SingleTextInputDialog
+                title={t("dialogs.tagRelated.editTags.editTagName.title")}
+                message={`${t("dialogs.tagRelated.editTags.editTagName.message")} [${props.tag.name}]`}
+                open={showEditTagDialog}
+                defaultValue={props.tag.name}
+                handleClose={() => {
+                    setShowEditTagDialog(false);
+                }}
+                setConfirmValue={(newName: string) => {
+                    tagsCon.updateTag({id: props.tag.id, name: newName});
+                    props.handleRefreshPage();
+                }}
+            />
+            <ConfirmDialog
+                title={`${t("dialogs.common.button.delete")} ${props.tag.name}?`}
+                message={t("dialogs.tagRelated.deleteTag.message")}
+                open={showDeleteTagDialog}
+                handleClose={() => {
+                    setShowDeleteTagDialog(false);
+                }}
+                confirmAction={async () => {
+                    await tagsCon.deleteTag(props.tag.id);
+                    props.handleRefreshPage();
+                }}
+            />
+        </>
+    );
 }
 
 export default function TagEditDialog(props: tagEditProps) {
-  return (
-    <Dialog open={props.open} onClose={props.handleHideDialog}>
-      <DialogTitle>Edit Tags</DialogTitle>
+    const {t} = useTranslation();
+    return (
+        <Dialog open={props.open} onClose={props.handleHideDialog}>
+            <DialogTitle>{t("dialogs.tagRelated.editTags.title")}</DialogTitle>
 
-      <List>
-        {props.tags
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .map((tag) => (
-            <TagItem
-              tag={tag}
-              handleRefreshPage={props.handleRefreshPage}
-              key={tag.id}
-            />
-          ))}
-      </List>
-      {props.tags.length === 0 ? (
-        <DialogContent>
-          <DialogContentText>
-            No tags have been created yet. Try creating a new tag to organize
-            your tasks!
-          </DialogContentText>
-        </DialogContent>
-      ) : (
-        ""
-      )}
+            <List>
+                {props.tags
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((tag) => (
+                        <TagItem
+                            tag={tag}
+                            handleRefreshPage={props.handleRefreshPage}
+                            key={tag.id}
+                        />
+                    ))}
+            </List>
+            {props.tags.length === 0 ? (
+                <DialogContent>
+                    <DialogContentText>
+                        {t("dialogs.tagRelated.editTags.noTags")}
+                    </DialogContentText>
+                </DialogContent>
+            ) : (
+                ""
+            )}
 
-      <DialogActions>
-        <Button autoFocus onClick={props.handleHideDialog}>
-          Close
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
+            <DialogActions>
+                <Button autoFocus onClick={props.handleHideDialog}>
+                    {t("dialogs.common.button.okay")}
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
 }

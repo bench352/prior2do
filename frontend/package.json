@@ -78,6 +78,7 @@
   },
   "devDependencies": {
     "@types/dateformat": "^5.0.0",
+    "@types/store": "^2.0.2",
     "gh-pages": "^4.0.0"
   }
 }

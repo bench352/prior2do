@@ -1,9 +1,7 @@
-import { SettingsBase } from "./SettingsBase";
+import {SettingsBase} from "./SettingsBase";
 
 
 export class SettingsLocalStorage extends SettingsBase {
-    
 
 
- 
 }
