@@ -1,4 +1,4 @@
-import {Task} from "../schemas";
+import {RemoteResponse, Task} from "../schemas";
 import {TasksBase} from "./TasksBase";
 import {SettingsController} from "../../Controller/Settings";
 import {getLocalLastUpdatedTimestamp, localSetLastUpdatedTimestamp,} from "../Timestamps";
@@ -29,68 +29,7 @@ export class TasksSync extends TasksBase {
             );
             if (response.ok) {
                 let remoteData = await response.json();
-                let olderTasks: Task[];
-                let newerTasks: Task[];
-                let localLastUpdated: number = getLocalLastUpdatedTimestamp();
-                let remoteLastUpdated: number = remoteData["lastUpdated"];
-                let olderTasksAreLocalTasks = false;
-                if (localLastUpdated > remoteLastUpdated) {
-                    olderTasks = remoteData["tasks"] as Task[];
-                    newerTasks = localStore.get("p2d.tasks") as Task[];
-                } else {
-                    olderTasks = localStore.get("p2d.tasks") as Task[];
-                    newerTasks = remoteData["tasks"] as Task[];
-                    olderTasksAreLocalTasks = true;
-                }
-                let olderTasksIds: Set<string> = new Set();
-                let newerTasksIds: Set<string> = new Set();
-                for (const task of olderTasks) {
-                    olderTasksIds.add(task.id);
-                }
-                for (const task of newerTasks) {
-                    newerTasksIds.add(task.id);
-                }
-                let tasksIdsToDelete: Set<string> = new Set(olderTasksIds);
-                for (const id of newerTasksIds) {
-                    tasksIdsToDelete.delete(id);
-                }
-                let tasksIdsToAdd: Set<string> = new Set(newerTasksIds);
-                for (const id of olderTasksIds) {
-                    tasksIdsToAdd.delete(id);
-                }
-                let tasksIdsIntersects: Set<string> = new Set();
-                for (const id of olderTasksIds) {
-                    if (newerTasksIds.has(id)) {
-                        tasksIdsIntersects.add(id);
-                    }
-                }
-                if (olderTasksAreLocalTasks) {
-                    for (const id of tasksIdsToDelete) {
-                        this.localDeleteTaskById(id);
-                    }
-                    for (const task of newerTasks) {
-                        if (tasksIdsToAdd.has(task.id)) {
-                            this.localAddTask(task);
-                        } else if (tasksIdsIntersects.has(task.id)) {
-                            this.localUpdateTask(task);
-                        }
-                    }
-                } else {
-                    for (const id of tasksIdsToDelete) {
-                        await this.remoteDeleteTaskById(id);
-                    }
-                    let tasksToAdd = [] as Task[];
-                    let tasksToUpdate = [] as Task[];
-                    for (const task of newerTasks) {
-                        if (tasksIdsToAdd.has(task.id)) {
-                            tasksToAdd.push(task);
-                        } else if (tasksIdsIntersects.has(task.id)) {
-                            tasksToUpdate.push(task);
-                        }
-                    }
-                    await this.remoteBulkAddTask(tasksToAdd);
-                    await this.remoteBulkUpdateTask(tasksToUpdate);
-                }
+                await this.merge_task(remoteData);
                 return this.localGetTasks();
             } else {
                 throw new Error(await response.text());
@@ -102,12 +41,6 @@ export class TasksSync extends TasksBase {
                 throw new Error(error.message);
             }
         }
-    }
-
-    async addTask(task: Task) {
-        this.localAddTask(task);
-        localSetLastUpdatedTimestamp();
-        await this.remoteAddTask(task);
     }
 
     async remoteAddTask(task: Task) {
@@ -123,8 +56,14 @@ export class TasksSync extends TasksBase {
             }
         );
         if (!response.ok) {
-            alert(await response.text());
+            throw new Error(await response.text());
         }
+    }
+
+    async addTask(task: Task) {
+        this.localAddTask(task);
+        localSetLastUpdatedTimestamp();
+        await this.remoteAddTask(task);
     }
 
     async remoteBulkAddTask(tasks: Task[]) {
@@ -140,14 +79,8 @@ export class TasksSync extends TasksBase {
             }
         );
         if (!response.ok) {
-            alert(await response.text());
+            throw new Error(await response.text());
         }
-    }
-
-    async updateTask(taskToUpdate: Task) {
-        this.localUpdateTask(taskToUpdate);
-        localSetLastUpdatedTimestamp();
-        await this.remoteUpdateTask(taskToUpdate);
     }
 
     async remoteUpdateTask(taskToUpdate: Task) {
@@ -163,8 +96,14 @@ export class TasksSync extends TasksBase {
             }
         );
         if (!response.ok) {
-            alert(await response.text());
+            throw new Error(await response.text());
         }
+    }
+
+    async updateTask(taskToUpdate: Task) {
+        this.localUpdateTask(taskToUpdate);
+        localSetLastUpdatedTimestamp();
+        await this.remoteUpdateTask(taskToUpdate);
     }
 
     async remoteBulkUpdateTask(tasks: Task[]) {
@@ -180,14 +119,8 @@ export class TasksSync extends TasksBase {
             }
         );
         if (!response.ok) {
-            alert(await response.text());
+            throw new Error(await response.text());
         }
-    }
-
-    async deleteTaskById(id: string) {
-        this.localDeleteTaskById(id);
-        localSetLastUpdatedTimestamp();
-        await this.remoteDeleteTaskById(id);
     }
 
     async remoteDeleteTaskById(id: String) {
@@ -201,7 +134,78 @@ export class TasksSync extends TasksBase {
             }
         );
         if (!response.ok) {
-            alert(await response.text());
+            throw new Error(await response.text());
+        }
+    }
+
+    async deleteTaskById(id: string) {
+        this.localDeleteTaskById(id);
+        localSetLastUpdatedTimestamp();
+        await this.remoteDeleteTaskById(id);
+    }
+
+    private async merge_task(remoteData: RemoteResponse<Task[]>) {
+        let olderTasks: Task[];
+        let newerTasks: Task[];
+        let localLastUpdated: number = getLocalLastUpdatedTimestamp();
+        let remoteLastUpdated: number = remoteData["lastUpdated"];
+        let olderTasksAreLocalTasks = false;
+        if (localLastUpdated > remoteLastUpdated) {
+            olderTasks = remoteData["data"] as Task[];
+            newerTasks = localStore.get("p2d.tasks") as Task[];
+        } else {
+            olderTasks = localStore.get("p2d.tasks") as Task[];
+            newerTasks = remoteData["data"] as Task[];
+            olderTasksAreLocalTasks = true;
+        }
+        let olderTasksIds: Set<string> = new Set();
+        let newerTasksIds: Set<string> = new Set();
+        for (const task of olderTasks) {
+            olderTasksIds.add(task.id);
+        }
+        for (const task of newerTasks) {
+            newerTasksIds.add(task.id);
+        }
+        let tasksIdsToDelete: Set<string> = new Set(olderTasksIds);
+        for (const id of newerTasksIds) {
+            tasksIdsToDelete.delete(id);
+        }
+        let tasksIdsToAdd: Set<string> = new Set(newerTasksIds);
+        for (const id of olderTasksIds) {
+            tasksIdsToAdd.delete(id);
+        }
+        let tasksIdsIntersects: Set<string> = new Set();
+        for (const id of olderTasksIds) {
+            if (newerTasksIds.has(id)) {
+                tasksIdsIntersects.add(id);
+            }
+        }
+        if (olderTasksAreLocalTasks) {
+            for (const id of tasksIdsToDelete) {
+                this.localDeleteTaskById(id);
+            }
+            for (const task of newerTasks) {
+                if (tasksIdsToAdd.has(task.id)) {
+                    this.localAddTask(task);
+                } else if (tasksIdsIntersects.has(task.id)) {
+                    this.localUpdateTask(task);
+                }
+            }
+        } else {
+            for (const id of tasksIdsToDelete) {
+                await this.remoteDeleteTaskById(id);
+            }
+            let tasksToAdd = [] as Task[];
+            let tasksToUpdate = [] as Task[];
+            for (const task of newerTasks) {
+                if (tasksIdsToAdd.has(task.id)) {
+                    tasksToAdd.push(task);
+                } else if (tasksIdsIntersects.has(task.id)) {
+                    tasksToUpdate.push(task);
+                }
+            }
+            await this.remoteBulkAddTask(tasksToAdd);
+            await this.remoteBulkUpdateTask(tasksToUpdate);
         }
     }
 }

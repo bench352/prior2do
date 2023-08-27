@@ -1,169 +1,56 @@
-# Prior2Do
+# Prior2Do (Discontinued)
 
 ![Prior2Do Logo](./readme-images/logo.PNG)
 
-**_Prior2Do_** is a to-do app that goes one step further to accelerate your productivity. It works just like other to-do apps - you can keep track of all the tasks you have to complete. But with the additional **Task Plan** feature, you can schedule dates to complete your tasks, estimate how much time you need to spend on each task so you can better manage your time, and complete your tasks based on your plan so you won't lose track as you go.
+**_Prior2Do_** is a proof-of-concept to-do app. It works just like other to-do apps - you can keep track of all the tasks you have to complete. But with the additional **Task Plan** feature, you can schedule dates to complete your tasks, estimate how much time you need to spend on each task to manage your time better and complete your tasks based on your plan so you won't lose track as you go.
 
-[Try the web app now!](http://bench352.github.io/prior2do)
+> The development of the Prior2Do app **has been discontinued** and will not be maintained for the foreseeable future. The app has not been thoroughly tested, and some features are unavailable in this release due to limited development time. The app is not expected to be used on a daily basis.
+
+[See the web app in action](http://bench352.github.io/prior2do)
 
 ## Features
 
-The app is still in development, and more features will be added in future releases. Here is what the app can (currently) do:
-
 ### Track Your Tasks
 
-![Track your tasks](./readme-images/task-track.PNG)
+![Task Page](./readme-images/task-page.jpeg)
 
-Just like any to-do app, you can keep track of all the tasks you have to do. On the _All Tasks_ page of the app, you can
+Just like any to-do app, you can keep track of all the tasks you have to do. The **Tasks page** allows you to create and manage tasks, including the ability to **sort task by title/due date/estimated time**. The **Quick Add Task** feature also allows you to quickly create a new task by simply entering the task's name.
 
-- **Add new tasks** to the app
-- Assign a **due date** for a task
-- Assign a **tag** to a task to categorize it
+![Task Detail](./readme-images/task-detail.jpeg)
 
-### Task Due
+You can include a Task Description (with Markdown support), due date, estimated time, a tag, and a list of subtasks for any task.
 
-![Task due](./readme-images/task-due.PNG)
+### Organise Tasks with Tags
 
-All the tasks with an assigned due date can be viewed on the _Task Due_ page, which sorts the tasks by ascending due dates.
+![Task Detail](./readme-images/tags.jpeg)
 
-### Task Plan
+You can create **Tags** to organise your task. You can also click on a tag on the sidebar to **filter tasks by tag**.
 
-![Task plan](./readme-images/task-plan.PNG)
+### Due Calendar
 
-What makes Prior2Do different from other to-do apps is the included _Task Plan_ feature, which lets you plan your tasks ahead of time. On the _Task Plan_ page:
+![Task Detail](./readme-images/due-calendar.jpeg)
 
-- Every task you add to the app will go to the **Unplanned Tasks** session.
-- To **plan a task**, you can **assign a date** for working on the task. It is _different from_ the due date, representing the date you are tackling the task.
-- You can **estimate how much time (in hours)** you need to tackle the task on that day. Using this feature in conjunction with the [timeboxing technique](https://en.wikipedia.org/wiki/Timeboxing) can help boost your productivity and improve your time management.
-- On the date you set a plan for specific tasks, those tasks will show up on the _Home Page_ too.
+The due date of all your tasks can be viewed easily on the **Calendar page**. You can also **filter the tasks on the calendar by tag**. You can also **create a new task with the corresponding due date** by clicking the day on the calendar.
+
+### Plan Your Task
+
+![Task plan](./readme-images/task-plan-detail.jpeg)
+
+What makes Prior2Do different from other to-do apps is the included **Task Plan** feature, which lets you plan your tasks ahead. You can create multiple **Work Sessions** for a single task, each with its own planned date and estimated time.
+
+![Task plan](./readme-images/task-plan-cal.jpeg)
+
+You can also view all the planned work sessions at once with the **View Plans** section and **Calendar View** on the Task Plan Page.
+
+### Dashboard
+
+![dashboard](./readme-images/dashboard.jpeg)
+
+The **Dashboard** is the app's home screen that lets you view essential information at a glance. You can see your **Today's Plan** (plan for the day), the **upcoming due date** for your tasks, the **planned work hours** (the sum of the estimated time for work sessions for each day), and a customisable quote to be displayed.
 
 ### Prior2Do Sync
 
-![Prior2Do Sync](./readme-images/prior2do-sync.PNG)
+> This functionality is only available on **versions 0.1.0 and 0.1.1** only. Deployment methods will be included in the the source code of previous releases. See [the Releases section](https://github.com/bench352/prior2do/releases).
 
 Prior2Do Sync is a server that provides a **backup and sync** service for your Prior2Do app. Once your app is connected to the Prior2Do Sync server, you can log in to your Prior2Do account and have your tasks **automatically backed up** and **synced across multiple devices**. A Prior2Do Sync server can be shared by multiple users.
 
-No managed Prior2Do Sync server instance is available for public use, so you will need to host your own Prior2Do Sync Server with one of the available deployment options (see next session) and configure your app to connect to it. The app would still work standalone, and **you can still back up and restore your task data with JSON files** within the _Settings_ page.
-
-## Deployment
-
-If you have your own server or Kubernetes cluster, you can spin up your own Prior2Do Sync server with **Docker Compose** or deploy the Prior2Do Sync server to a Kubernetes cluster with **Helm Chart**.
-
-Both deployment options would spin up a Prior2Do web app, a Prior2Do Sync server, and a [Neo4j Graph Database](https://neo4j.com/product/neo4j-graph-database/) for the Sync server to store user data.
-
-### Before You Start
-
-The server uses the HS256 algorithm to sign the JWT tokens generated by the server. A key (i.e. a piece of string) can be provided to the Prior2Do Sync server as a Secret Key for signing and validating the JWT tokens. The server has a default secret key (which is not secure), and it is recommended to set your own Secret Key so that only JWT tokens generated by your own server can be authenticated.
-
-There's no requirement for the format of the Secret Key, so you can set any string you want. One way to get a randomly generated secure key is with the [OpenSSL utility](https://www.openssl.org/). You can open your Bash Shell (on Linux/macOS) or use Git Bash (available when you install [Git](https://git-scm.com/downloads) on Windows) and run the following command to generate a secret key:
-
-```bash
-openssl rand -hex 32
-```
-
-To set the Secret Key for the Prior2Do server, set the `SECRET_KEY` environment variable of the Prior2Do Sync server to your preferred Secret Key. Instructions will be provided for ways to set the Secret Key with the deployment options below.
-
-### Docker Compose
-
-Using [Docker](https://www.docker.com/), you can spin up your Prior2Do Sync server with **Docker Compose**. A [docker-compose.yml](https://raw.githubusercontent.com/bench352/prior2do/main/deployment/docker-compose.yml) file is available for conveniently getting your server up and running.
-
-To run your server immediately, download the `docker-compose.yml` file to your computer and use `docker-compose up` command to start the containers. You can do so with the following commands:
-
-```bash
-curl -o docker-compose.yml https://raw.githubusercontent.com/bench352/prior2do/main/deployment/docker-compose.yml
-docker-compose up -d
-```
-
-You may want to spend some time **configuring your secret key** as well as **changing the password for the Neo4j Graph Database**. In the `docker-compose.yml` file, you can see the environment variables for the Prior2Do Sync server as below:
-
-```yaml
-api-server:
-  image: bench352/prior2do-syncserver
-  ports:
-    - 8000:8000
-  environment:
-    NEO4J_HOST: database
-    NEO4J_PORT: 7687
-    NEO4J_USERNAME: neo4j
-    NEO4J_PASSWORD: <password>
-    SECRET_KEY: <YOUR_SECRET_KEY_HERE>
-```
-
-Replace `<YOUR_SECRET_KEY_HERE>` with your own Secret Key for signing the JWT tokens. If you wish to change the password for the database, replace `<password>` next to `NEO4J_PASSWORD` with your desired password. Don't forget to update the environment variable for the Neo4j Graph Database too:
-
-```yaml
-database:
-  image: neo4j
-  volumes:
-    - neo4j-data:/data
-  environment:
-    NEO4J_AUTH: neo4j/<password>
-```
-
-Again, replace `<password>` with your desired database password. Make sure it matches the one you set for the Prior2Do Sync server so the server can connect to the database successfully.
-
-### Helm Chart
-
-If you have a Kubernetes cluster, you can deploy the Prior2Do Sync server with the provided **Helm Chart**.
-
-Deploying with Helm Chart requires [Helm](https://helm.sh/docs/intro/install/) to be installed on your computer. If you already have Helm installed, getting the Prior2Do Sync server deployed is as simple as:
-
-```bash
-helm repo add prior2do https://raw.githubusercontent.com/bench352/prior2do/main/deployment/helm-repo
-helm install prior2do prior2do/prior2do
-```
-
-Here are the parameters you can set to customize your deployment. Alternatively, you can provide a custom `values.yaml` that contains the modified value for the parameters. You may want to spend some time **configuring your secret key** as well as **changing the password for the Neo4j Graph Database**.
-
-#### Prior2Do Web App Parameters
-
-| Name                      | Description                                                  | Default value              |
-| ------------------------- | ------------------------------------------------------------ | -------------------------- |
-| `webapp.image.repository` | Docker image for the Prior2Do web app                        | `bench352/prior2do-webapp` |
-| `webapp.image.pullPolicy` | Image pull policy for the Prior2Do web app                   | `IfNotPresent`             |
-| `webapp.image.latest`     | Docker image version                                         | `latest`                   |
-| `webapp.service.type`     | Kubernetes service type for the Prior2Do web app             | `NodePort`                 |
-| `webapp.service.port`     | Service port for inner-cluster connections                   | `80`                       |
-| `webapp.service.nodePort` | Node port for exposing the web app if the service type is set to `NodePort` | `30030`                    |
-
-#### Prior2Do Sync Server Parameters
-
-| Name                         | Description                                                  | Default value                  |
-| ---------------------------- | ------------------------------------------------------------ | ------------------------------ |
-| `apiserver.image.repository` | Docker image for the Prior2Do Sync server                    | `bench352/prior2do-syncserver` |
-| `apiserver.image.pullPolicy` | Image pull policy for the Prior2Do Sync server               | `IfNotPresent`                 |
-| `apiserver.image.tag`        | Docker image version                                         | `latest`                       |
-| `apiserver.service.type`     | Kubernetes service type for the Prior2Do Sync server         | `NodePort`                     |
-| `apiserver.service.port`     | Service port for inner-cluster connections                   | `80`                           |
-| `apiserver.service.nodePort` | Node port for exposing the server if the service type is set to `NodePort` | `30080`                        |
-| `apiserver.secretKey`        | Secret Key for signing JWT tokens                            | `SECRET_KEY`                   |
-
-#### Neo4j Graph Database Parameters
-
-| Name                   | Description                           | Default value |
-| ---------------------- | ------------------------------------- | ------------- |
-| `neo4j.neo4j.password` | Password for the Neo4j Graph Database | `<password>`  |
-
-### Configure Your Prior2Do App
-
-Once you have your Prior2Do Sync server ready, you can configure your Prior2Do app to connect to it. Here are the steps to set it up:
-
-In the **Settings** page, toggle the switch next to the "Enable Prior2Do Sync" option to enable the Prior2Do Sync function in your app.
-
-![Enable Prior2Do Sync on the Settings page](./readme-images/configsvr-1.PNG)
-
-More options will be shown under the "Enable Prior2Do Sync" option, and you will also see a new "User" option that leads to the User page showing up on the side navigation menu. However, you will still have to configure the server IP address to make the Prior2Do Sync feature work. Click on "Server IP Address" to configure the IP address of your Prior2Do Sync server.
-
-![Configure the server IP address](./readme-images/configsvr-2.PNG)
-
-You will see a dialog for entering your server IP address. Enter an IP address that allows you to access the server, and don't forget to include the port if your server is not hosted on the default HTTP port. Press "OK" to confirm your input.
-
-![Enter your server IP address](./readme-images/configsvr-3.PNG)
-
-You can now click the "Test Connection" option to check if your Prior2Do app can successfully communicate with your Prior2Do Sync server.
-
-![Test connection to your server](./readme-images/configsvr-4.PNG)
-
-You can now log in or signup for your Prior2Do Account on the User page and enjoy the backup and sync feature.
-
-![Signup / login to your Prior2Do account](./readme-images/configsvr-5.PNG)

@@ -11,3 +11,7 @@ class UserAuthenticationFail(Exception):
 
 class UserNotFound(Exception):
     """Exception for user not found"""
+
+
+class ResourceNotFound(Exception):
+    """Exception for resource not found"""

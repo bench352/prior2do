@@ -16,7 +16,7 @@ interface ReleaseDialogProps {
 export default function ReleaseDialog(props: ReleaseDialogProps) {
     return (
         <Dialog open={props.open} onClose={props.handleHideDialog} scroll="paper">
-            <DialogTitle>Prior2Do has been updated!</DialogTitle>
+            <DialogTitle>Prior2Do Is No Longer Maintained...</DialogTitle>
             <DialogContent dividers={true}>
                 <ReactMarkdown children={releaseContent}/>
             </DialogContent>

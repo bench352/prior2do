@@ -119,12 +119,18 @@ export default function CommonView() {
         setShowTagEditDialog(false);
     };
     const createTag = (name: string) => {
-        tagsCon.createTag({name: name, id: getNewUniqueId()});
-        refreshPage();
+        tagsCon.createTag({name: name, id: getNewUniqueId()}).then(() => {
+            refreshPage();
+        });
+
     };
     useEffect(() => {
-        i18n.changeLanguage(settingsCon.getLanguage());
-        refreshPage();
+        i18n.changeLanguage(settingsCon.getLanguage()).then(() => {
+                refreshPage();
+            }
+        )
+        ;
+
     }, [refreshPage]);
     const drawer = (
         <div>
@@ -292,12 +298,12 @@ export default function CommonView() {
                         {t("navBar.appName") +
                             (i18n.language !== "en" ? " (Prior2Do)" : "")}
                     </Typography>
-                    <Chip
-                        label={t("navBar.tag")}
-                        color="secondary"
-                        size="small"
-                        sx={{marginLeft: "10px"}}
-                    />
+                    {/*<Chip*/}
+                    {/*    label={t("navBar.tag")}*/}
+                    {/*    color="secondary"*/}
+                    {/*    size="small"*/}
+                    {/*    sx={{marginLeft: "10px"}}*/}
+                    {/*/>*/}
                     {showLoading ? (
                         <Box
                             sx={{width: "100%", display: "flex", justifyContent: "right"}}

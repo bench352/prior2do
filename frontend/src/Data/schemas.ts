@@ -34,6 +34,11 @@ export interface Quote {
     author: string;
 }
 
+export interface RemoteResponse<Type> {
+    lastUpdated: number;
+    data: Type;
+}
+
 export const UILanguages: Record<string, string> = {
     en: "English",
     ch: "繁體中文",

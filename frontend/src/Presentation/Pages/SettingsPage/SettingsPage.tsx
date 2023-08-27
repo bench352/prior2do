@@ -1,15 +1,10 @@
-import CleaningServicesOutlinedIcon from "@mui/icons-material/CleaningServicesOutlined";
 import CloudSyncIcon from "@mui/icons-material/CloudSync";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import DnsOutlinedIcon from "@mui/icons-material/DnsOutlined";
-import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
-import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import SyncAltOutlinedIcon from "@mui/icons-material/SyncAltOutlined";
-import Alert from "@mui/material/Alert";
-import AlertTitle from "@mui/material/AlertTitle";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import List from "@mui/material/List";
@@ -83,42 +78,42 @@ export default function SettingsPage(props: SettingsPageProps) {
                 <Grid item xs={6}>
                     <h2>{t("settings.managingAppData.title")}</h2>
                     <List sx={{width: "100%"}}>
-                        <ListItem disablePadding>
-                            <ListItemButton
-                                onClick={() => {
-                                    updateVisibility("importJSONData", true);
-                                }}
-                            >
-                                <ListItemIcon>
-                                    <FileDownloadOutlinedIcon/>
-                                </ListItemIcon>
-                                <ListItemText primary={t("settings.managingAppData.importDataFromJson.option")}/>
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton
-                                onClick={() => {
-                                    updateVisibility("exportJSONData", true);
-                                }}
-                            >
-                                <ListItemIcon>
-                                    <FileUploadOutlinedIcon/>
-                                </ListItemIcon>
-                                <ListItemText primary={t("settings.managingAppData.exportDataToJson.option")}/>
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton
-                                onClick={() => {
-                                    updateVisibility("cleanupCompleted", true);
-                                }}
-                            >
-                                <ListItemIcon>
-                                    <CleaningServicesOutlinedIcon/>
-                                </ListItemIcon>
-                                <ListItemText primary={t("settings.managingAppData.cleanupAllCompleted.option")}/>
-                            </ListItemButton>
-                        </ListItem>
+                        {/*<ListItem disablePadding>*/}
+                        {/*    <ListItemButton*/}
+                        {/*        onClick={() => {*/}
+                        {/*            updateVisibility("importJSONData", true);*/}
+                        {/*        }}*/}
+                        {/*    >*/}
+                        {/*        <ListItemIcon>*/}
+                        {/*            <FileDownloadOutlinedIcon/>*/}
+                        {/*        </ListItemIcon>*/}
+                        {/*        <ListItemText primary={t("settings.managingAppData.importDataFromJson.option")}/>*/}
+                        {/*    </ListItemButton>*/}
+                        {/*</ListItem>*/}
+                        {/*<ListItem disablePadding>*/}
+                        {/*    <ListItemButton*/}
+                        {/*        onClick={() => {*/}
+                        {/*            updateVisibility("exportJSONData", true);*/}
+                        {/*        }}*/}
+                        {/*    >*/}
+                        {/*        <ListItemIcon>*/}
+                        {/*            <FileUploadOutlinedIcon/>*/}
+                        {/*        </ListItemIcon>*/}
+                        {/*        <ListItemText primary={t("settings.managingAppData.exportDataToJson.option")}/>*/}
+                        {/*    </ListItemButton>*/}
+                        {/*</ListItem>*/}
+                        {/*<ListItem disablePadding>*/}
+                        {/*    <ListItemButton*/}
+                        {/*        onClick={() => {*/}
+                        {/*            updateVisibility("cleanupCompleted", true);*/}
+                        {/*        }}*/}
+                        {/*    >*/}
+                        {/*        <ListItemIcon>*/}
+                        {/*            <CleaningServicesOutlinedIcon/>*/}
+                        {/*        </ListItemIcon>*/}
+                        {/*        <ListItemText primary={t("settings.managingAppData.cleanupAllCompleted.option")}/>*/}
+                        {/*    </ListItemButton>*/}
+                        {/*</ListItem>*/}
                         <ListItem disablePadding>
                             <ListItemButton
                                 onClick={() => {
@@ -150,12 +145,12 @@ export default function SettingsPage(props: SettingsPageProps) {
                 </Grid>
                 <Grid item xs={6}>
                     <h2>Prior2Do Sync</h2>
-                    <Alert severity="info">
-                        <AlertTitle>{t("settings.prior2DoSync.alert.title")}</AlertTitle>
-                        {t("settings.prior2DoSync.alert.message.preStrong")}
-                        <strong>{" " + t("settings.prior2DoSync.alert.message.strong") + " "}</strong>
-                        {t("settings.prior2DoSync.alert.message.postStrong")}
-                    </Alert>
+                    {/*<Alert severity="info">*/}
+                    {/*    <AlertTitle>{t("settings.prior2DoSync.alert.title")}</AlertTitle>*/}
+                    {/*    {t("settings.prior2DoSync.alert.message.preStrong")}*/}
+                    {/*    <strong>{" " + t("settings.prior2DoSync.alert.message.strong") + " "}</strong>*/}
+                    {/*    {t("settings.prior2DoSync.alert.message.postStrong")}*/}
+                    {/*</Alert>*/}
                     <List sx={{width: "100%"}}>
                         <ListItem>
                             <ListItemIcon>
@@ -166,6 +161,7 @@ export default function SettingsPage(props: SettingsPageProps) {
                                 edge="end"
                                 checked={syncOptionEnabled}
                                 onChange={handleSyncOptionChanges}
+                                disabled
                             />
                         </ListItem>
                         {syncOptionEnabled ? (

@@ -31,7 +31,7 @@ tags_metadata = [
 ]
 
 app = fastapi.FastAPI(
-    title="Prior2Do Sync", description=description, version="0.1.1", openapi_tags=tags_metadata
+    title="Prior2Do Sync", description=description, version="0.2.0", openapi_tags=tags_metadata
 )
 
 
@@ -59,4 +59,4 @@ app.add_middleware(
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0")
+    uvicorn.run("main:app", host="0.0.0.0", reload=True)
