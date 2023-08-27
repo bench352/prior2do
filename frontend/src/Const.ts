@@ -6,7 +6,7 @@ The app has now been released with my most recent progress on the new features o
 
 - More powerful task management feature, including adding **Task Descriptions** and **Subtasks**.
 - The **Tasks page** got some quality-of-life improvements, including the ability to sort tasks by different properties (task name, due date and estimated time), and the **Quick Add Task** feature makes it easier to create new tasks.
-- A fully-feature **Tag** feature lets you organise your task by tagging it and filter tasks by tag.
+- A fully-featured **Tag** feature lets you organise your task by tagging it and filter tasks by tag.
 - **Due Calendar** lets you conveniently view the due dates of your tasks on a calendar.
 - The empowered **Task Plan** feature lets you plan multiple work sessions for a single task. It also lets you view your plan on a calendar (only available on a larger display)
 - The app's home screen is now a **Dashboard** for all the handy information, such as showing your today's plan, tasks due recently, and other widgets.
