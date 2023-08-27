@@ -1,40 +1,50 @@
 """Neo4j Client for Managing Tasks"""
 
-import pendulum
+import uuid
+
+import exceptions
 import neo4j_client.base
 import neo4j_client.users
 import schema
 
 
 class Tasks(neo4j_client.base.BaseClient):
-    async def get_tasks(self, username: str) -> schema.TaskPayload:
-        async with self._neo4j_driver.session() as session:
-            user_attr = {"username": username}
-            response = await session.run(
-                f"""
+    async def get_tasks(self, username: str, task_name: str, limit: int = -1, offset: int = 0) -> schema.TasksReponse:
+        user_attr = {"username": username}
+        query = f"""
                 MATCH (u:User{self._dict_to_attr(user_attr)})-[:owns]->(t:Task)
-                RETURN t.name AS name, t.id AS id, t.dueDate AS dueDate, t.estHr AS estHr,
-                t.plannedDate AS plannedDate, t.tag AS tag, t.completed AS completed
+                WITH t ORDER BY t.name
+                WHERE t.name CONTAINS '{task_name}'
+                RETURN t.name, t.id, t.description, t.completed, t.dueDate, t.estimatedHours, t.subTasks
+                SKIP {offset}
                 """
-            )
-            result = await response.values()
-            tasks = [
-                schema.Task(
-                    name=task[0],
-                    id=task[1],
-                    due_date=pendulum.parse(task[2]) if task[2] != "None" else None,
-                    est_hr=int(task[3]),
-                    planned_date=pendulum.parse(task[4]) if task[4] != "None" else None,
-                    tag=task[5],
-                    completed=task[6],
-                )
-                for task in result
-            ]
-            return schema.TaskPayload(
+        if limit != -1:
+            query += "\nLIMIT {limit}"
+        async with self._neo4j_driver.session() as session:
+            response = await session.run(query)
+            result = await response.data()
+            tasks = [schema.Task(**task) for task in result]
+            return schema.TasksReponse(
                 last_updated=await neo4j_client.users.Users().get_user_last_updated_timestamp(
                     username
                 ),
-                tasks=tasks,
+                data=tasks,
+            )
+
+    async def get_task_by_id(self, username: str, task_id: uuid.UUID) -> schema.TaskResponse:
+        user_attr = {"username": username}
+        query = f"""
+                MATCH (u:User{self._dict_to_attr(user_attr)})-[:owns]->(t:Task{self._dict_to_attr({"id": task_id})})
+                RETURN t
+                """
+        async with self._neo4j_driver.session() as session:
+            response = await session.run(query)
+            result = await response.data()
+            if not result:
+                raise exceptions.ResourceNotFound(f"Task with id {task_id} not found.")
+            return schema.TaskResponse(
+                last_updated=await neo4j_client.users.Users().get_user_last_updated_timestamp(username),
+                data=schema.Task(**result[0]),
             )
 
     async def create_task(self, username: str, task: schema.Task):

@@ -1,10 +1,12 @@
 """Schemas for server"""
 
 import uuid
-from typing import Optional
+from typing import Optional, Generic, TypeVar
 
 import pendulum
 from pydantic import BaseModel
+
+T = TypeVar("T")
 
 
 def to_camel(text: str):
@@ -26,16 +28,48 @@ class UserPayload(RESTBase):
     password: str
 
 
-class Task(RESTBase):
+class IdBasedResource(RESTBase):
     id: uuid.UUID
+
+
+class IdNameBasedResource(IdBasedResource):
     name: str
+
+
+class Task(IdNameBasedResource):
+    class SubTask(IdNameBasedResource):
+        completed: bool
+
     due_date: Optional[pendulum.DateTime]
-    est_hr: int
-    planned_date: Optional[pendulum.DateTime]
-    tag: str
+    description: str
+    estimated_hours: float
     completed: bool
+    sub_tasks: list[SubTask]
 
 
-class TaskPayload(RESTBase):
+class Tag(IdNameBasedResource):
+    pass
+
+
+class Quote(RESTBase):
+    text: str
+    author: str
+
+
+class ResponsePayload(RESTBase, Generic[T]):
     last_updated: int
-    tasks: list[Task]
+    data: T
+
+
+class TasksReponse(ResponsePayload[list[Task]]):
+    data: list[Task]
+
+
+class TaskResponse(ResponsePayload[Task]):
+    data: Task
+
+
+class WorkSession(IdBasedResource):
+    task_id: uuid.UUID
+    date: pendulum.DateTime
+    duration: float
